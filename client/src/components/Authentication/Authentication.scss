@@ -1,0 +1,77 @@
+$main-color    : #D57834;
+
+.login-container {
+    position: relative;
+
+    .login-bg-image {
+        position: absolute;
+        width   : 100%;
+        height  : 100vh;
+
+        img {
+            width : 100%;
+            height: 100%;
+        }
+
+        z-index: 2;
+    }
+
+    .login-content {
+        position        : absolute;
+        width           : 28.125rem;
+        padding         : 1.875rem;
+        background-color: white;
+        z-index         : 3;
+
+        margin-left  : auto;
+        margin-right : auto;
+        top          : 30vh;
+        left         : 0;
+        right        : 0;
+        border-radius: 0.625rem;
+
+        .login-title {
+            font-size: 1.625rem;
+            color    : $main-color;
+        }
+
+        .login-main {
+
+            .form-control:focus {
+                border-color: $main-color;
+                box-shadow  : 0 0 0 0.01rem $main-color;
+            }
+
+            .form-check-input {
+                background-color: $main-color;
+                border          : none;
+                box-shadow      : 0 0 0 0 white;
+            }
+        }
+
+        .icon {
+            background-color: $main-color;
+            color           : white;
+        }
+
+        .login-btn-box {
+
+            .login-btn {
+                width : 100%;
+                color : $main-color;
+                border: 1px solid $main-color;
+
+                &:hover {
+                    color           : white;
+                    background-color: $main-color;
+                }
+            }
+        }
+
+
+    }
+}
+
+.red {
+    border: 1px dashed red;
+}
