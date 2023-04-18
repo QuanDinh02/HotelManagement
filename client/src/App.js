@@ -1,5 +1,4 @@
 import './App.scss';
-import { FaReact } from 'react-icons/fa';
 import LoginPage from './components/Authentication/LoginPage';
 import Homepage from './components/Homepage/Homepage';
 
@@ -17,10 +16,6 @@ function App() {
         <Router>
           <Switch>
             <Route path="/" exact>
-              <div className='d-flex align-items-center gap-2 bg-dark bg-gradient text-white p-2'>
-                <span><FaReact className='App-logo' /></span>
-                <span>Hotel Management</span>
-              </div>
               <Homepage />
             </Route>
             <Route path="/login">
