@@ -1,0 +1,111 @@
+$main-color : #D57834;
+
+.profile-modal {
+    .title {
+        color: $main-color;
+    }
+
+    .content {
+        .top-content {
+            display        : flex;
+            justify-content: space-between;
+
+            .profile-image,
+            .account-info,
+            .set-password {
+                flex-basis: 32%;
+            }
+
+            .profile-image {
+                .image {
+                    width: 35%;
+
+                    display        : flex;
+                    justify-content: center;
+
+                    img {
+                        width : 100%;
+                        height: 100%;
+                    }
+                }
+
+                .username,
+                .profile-name {
+                    color: $main-color;
+                }
+            }
+
+            .account-info,
+            .set-password {
+                .reset {
+                    all: revert;
+                }
+
+                .legend-text,
+                label {
+                    color: $main-color;
+                }
+
+                .edit-button {
+                    button {
+                        width : 100%;
+                        color : $main-color;
+                        border: 1px solid $main-color;
+
+                        &:hover {
+                            color           : white;
+                            background-color: $main-color;
+                        }
+                    }
+
+                }
+            }
+        }
+
+        .bottom-content {
+            .reset {
+                all: revert;
+            }
+
+            .legend-text,
+            label {
+                color: $main-color;
+            }
+
+            .edit-button {
+                button {
+                    width : 100%;
+                    color : $main-color;
+                    border: 1px solid $main-color;
+
+                    &:hover {
+                        color           : white;
+                        background-color: $main-color;
+                    }
+                }
+
+            }
+        }
+
+        .form-control:focus {
+            border-color: $main-color;
+            box-shadow  : 0 0 0 0.01rem $main-color;
+        }
+    }
+}
+
+.red {
+    border: 1px dashed red;
+}
+
+.blue {
+    border: 1px dashed blue;
+}
+
+.green {
+    border: 1px dashed green;
+}
+
+.orange {
+    border: 1px dashed orange;
+}

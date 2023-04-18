@@ -12,14 +12,20 @@ import Staff from '../../assets/images/staff.png';
 import Payment from '../../assets/images/service_payment.png';
 import Policy from '../../assets/images/policy.png';
 import Customer from '../../assets/images/customer.png';
+import Profile from '../Modal/Profile/Profile';
+import React from 'react';
 
 const Homepage = () => {
     const item_class_name = 'item d-flex align-items-center gap-3 mt-3';
+    const [showProfile, setShowProfile] = React.useState(false);
 
     return (
         <div className='homepage-container'>
             <div className='sidebar d-flex justify-content-end flex-column'>
-                <div className={item_class_name}><AiOutlineUser className='icon' /> <span>Thông tin cá nhân</span></div>
+                <div className={item_class_name} onClick={() => setShowProfile(true)}>
+                    <AiOutlineUser className='icon' />
+                    <span>Thông tin cá nhân</span>
+                </div>
                 <div className={item_class_name}><RxExit className='icon' /> <span>Đăng xuất</span></div>
                 <div className={item_class_name}><AiOutlineQuestionCircle className='icon' /> <span>Trợ giúp</span></div>
                 <div className={item_class_name}><RiInformationLine className='icon' /> <span>Giới thiệu</span></div>
@@ -126,6 +132,10 @@ const Homepage = () => {
                     </div>
                 </div>
             </div>
+            <Profile
+                show={showProfile}
+                setShow={setShowProfile}
+            />
         </div>
     )
 }
