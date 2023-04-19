@@ -1,0 +1,77 @@
+$main-color      : #D57834;
+$legend-text-size: 1.125rem;
+
+.book-room-detail-modal {
+
+    .detail-content {
+        display        : flex;
+        justify-content: space-between;
+
+        .border {
+            border-color: $main-color !important;
+        }
+
+        .book-info {
+            width: 29%;
+
+            .reset {
+                all: revert;
+            }
+
+            .legend-text {
+                font-size: $legend-text-size;
+                color    : $main-color;
+            }
+        }
+
+        .customer-info {
+            width: 69%;
+
+            .reset {
+                all: revert;
+            }
+
+            .legend-text {
+                font-size: $legend-text-size;
+                color    : $main-color;
+            }
+        }
+    }
+
+    .actions {
+        .edit-button {
+            button {
+                color : $main-color;
+                border: 1px solid $main-color;
+
+                &:hover {
+                    color           : white;
+                    background-color: $main-color;
+                }
+            }
+        }
+    }
+
+
+
+    .form-control:focus {
+        border-color: $main-color;
+        box-shadow  : 0 0 0 0.01rem $main-color;
+    }
+}
+
+.red {
+    border: 1px dashed red;
+}
+
+.blue {
+    border: 1px dashed blue;
+}
+
+.green {
+    border: 1px dashed green;
+}
+
+.orange {
+    border: 1px dashed orange;
+}
