@@ -1,5 +1,6 @@
 import './App.scss';
 import LoginPage from './components/Authentication/LoginPage';
+import BookRoom from './components/BookRoom/BookRoom';
 import Homepage from './components/Homepage/Homepage';
 
 import React from "react";
@@ -20,6 +21,9 @@ function App() {
             </Route>
             <Route path="/login">
               <LoginPage />
+            </Route>
+            <Route path="/book-room">
+              <BookRoom />
             </Route>
           </Switch>
         </Router>

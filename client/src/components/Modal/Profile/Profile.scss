@@ -41,8 +41,7 @@ $main-color : #D57834;
                     all: revert;
                 }
 
-                .legend-text,
-                label {
+                .legend-text {
                     color: $main-color;
                 }
 
@@ -67,8 +66,7 @@ $main-color : #D57834;
                 all: revert;
             }
 
-            .legend-text,
-            label {
+            .legend-text {
                 color: $main-color;
             }
 
@@ -92,20 +90,4 @@ $main-color : #D57834;
             box-shadow  : 0 0 0 0.01rem $main-color;
         }
     }
-}
-
-.red {
-    border: 1px dashed red;
-}
-
-.blue {
-    border: 1px dashed blue;
-}
-
-.green {
-    border: 1px dashed green;
-}
-
-.orange {
-    border: 1px dashed orange;
 }

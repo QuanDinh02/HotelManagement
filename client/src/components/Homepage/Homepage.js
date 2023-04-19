@@ -14,10 +14,12 @@ import Policy from '../../assets/images/policy.png';
 import Customer from '../../assets/images/customer.png';
 import Profile from '../Modal/Profile/Profile';
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 
 const Homepage = () => {
     const item_class_name = 'item d-flex align-items-center gap-3 mt-3';
     const [showProfile, setShowProfile] = React.useState(false);
+    const history = useHistory();
 
     return (
         <div className='homepage-container'>
@@ -39,7 +41,7 @@ const Homepage = () => {
                     <div className='item left-content'>
                         <div className='top-left'>
                             <div className='left section d-flex flex-column p-2'>
-                                <div className='image-box d-flex flex-column justify-content-center'>
+                                <div className='image-box d-flex flex-column justify-content-center' onClick={() => history.push('/book-room')}>
                                     <div>
                                         <img src={Calendar} alt='' />
                                     </div>
