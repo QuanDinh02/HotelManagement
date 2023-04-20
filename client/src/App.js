@@ -9,6 +9,7 @@ import {
   Switch,
   Route,
 } from "react-router-dom";
+import ReceiveRoom from './components/ReceiveRoom/ReceiveRoom';
 
 function App() {
   return (
@@ -24,6 +25,9 @@ function App() {
             </Route>
             <Route path="/book-room">
               <BookRoom />
+            </Route>
+            <Route path="/receive-room">
+              <ReceiveRoom />
             </Route>
           </Switch>
         </Router>

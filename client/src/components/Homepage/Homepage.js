@@ -40,15 +40,15 @@ const Homepage = () => {
                 <div className='main'>
                     <div className='item left-content'>
                         <div className='top-left'>
-                            <div className='left section d-flex flex-column p-2'>
-                                <div className='image-box d-flex flex-column justify-content-center' onClick={() => history.push('/book-room')}>
+                            <div className='left section d-flex flex-column p-2' onClick={() => history.push('/book-room')}>
+                                <div className='image-box d-flex flex-column justify-content-center'>
                                     <div>
                                         <img src={Calendar} alt='' />
                                     </div>
                                 </div>
                                 <span className='text-title'>Đặt Phòng</span>
                             </div>
-                            <div className='right section d-flex flex-column p-2'>
+                            <div className='right section d-flex flex-column p-2' onClick={() => history.push('/receive-room')}>
                                 <div className='image-box d-flex flex-column justify-content-center align-items-center'>
                                     <div className='image'>
                                         <img src={Key} alt='' />

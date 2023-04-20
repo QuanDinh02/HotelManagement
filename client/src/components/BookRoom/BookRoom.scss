@@ -80,13 +80,12 @@ $legend-text-size: 1.125rem;
                     }
 
                     .book-btn {
-                        width : 100%;
-                        color : $main-color;
-                        border: 1px solid $main-color;
+                        width           : 100%;
+                        color           : white;
+                        background-color: $main-color;
 
                         &:hover {
-                            color           : white;
-                            background-color: $main-color;
+                            opacity: 0.8;
                         }
                     }
 
@@ -148,7 +147,7 @@ $legend-text-size: 1.125rem;
         .right-content {
             width     : 40%;
             max-height: 670px;
-            overflow-y: scroll;
+            overflow-y: auto;
 
             table {
                 thead {

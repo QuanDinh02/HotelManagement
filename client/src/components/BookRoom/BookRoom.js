@@ -14,7 +14,7 @@ const BookRoom = () => {
     return (
         <>
             <div className='book-room-container'>
-                <div className='header py-2 px-3 d-flex justify-content-between align-items-center'>
+                <div className='header py-2 ps-5 pe-3 d-flex justify-content-between align-items-center'>
                     <span className='title'>Đặt Phòng <span><MdHotel /></span></span>
                     <span className='icon' onClick={() => history.push('/')}><TfiClose className='exit-icon' /></span>
                 </div>
@@ -52,7 +52,7 @@ const BookRoom = () => {
                                 <fieldset className='bottom-left border rounded-2 p-2'>
                                     <legend className='reset legend-text'>Tìm kiếm khách hàng</legend>
                                     <div className="input-group">
-                                        <input type="text" className="form-control" placeholder="Thẻ căn cước/ CMND" />
+                                        <input type="text" className="form-control" placeholder="Tên/ số điện thoại khách hàng" />
                                         <span className="input-group-text search-btn" title='Tìm kiếm'><HiOutlineSearch /></span>
                                     </div>
                                 </fieldset>
@@ -152,9 +152,9 @@ const BookRoom = () => {
                         <table className="table table-bordered">
                             <thead>
                                 <tr>
-                                    <th scope="col">Mã đặt phòng</th>
+                                    <th scope="col">Số phòng đặt</th>
                                     <th scope="col">Họ và Tên</th>
-                                    <th scope="col">CMND</th>
+                                    <th scope="col">Số điện thoại</th>
                                     <th scope="col">Loại phòng</th>
                                     <th scope="col">Ngày nhận</th>
                                     <th scope="col">Ngày trả</th>

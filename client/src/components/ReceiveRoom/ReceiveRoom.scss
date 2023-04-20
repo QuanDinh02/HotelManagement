@@ -1,0 +1,121 @@
+$main-color       : #D57834;
+$bg-color         : #ECECEC;
+$legend-text-size : 1.125rem;
+
+.receive-room-container {
+    display       : flex;
+    flex-direction: column;
+    height        : auto;
+
+    .header {
+        background-color: $bg-color;
+
+        .title {
+            font-size: 2rem;
+            color    : $main-color;
+        }
+
+        .icon {
+            .exit-icon {
+                font-size: 2rem;
+                color    : red;
+                padding  : 5px;
+
+                &:hover {
+                    cursor          : pointer;
+                    background-color: rgb(247, 190, 190);
+                    border-radius   : 0.3125rem;
+                    transition      : 0.25s;
+                }
+            }
+        }
+    }
+
+    .main {
+        flex-grow: 1;
+
+        .border {
+            border-color: $main-color !important;
+        }
+
+        .left-content {
+            width: 50%;
+
+            .reset {
+                all: revert;
+            }
+
+            .legend-text {
+                font-size: $legend-text-size;
+                color    : $main-color;
+            }
+
+
+            .middle {
+                .search-btn {
+                    &:hover {
+                        cursor          : pointer;
+                        color           : white;
+                        background-color: $main-color;
+                        transition      : 0.25s;
+                    }
+                }
+            }
+
+            .receive-btn {
+                color           : white;
+                background-color: $main-color;
+
+                &:hover {
+                    opacity   : 0.8;
+                    transition: 0.25s;
+                }
+            }
+
+            .form-control:focus {
+                border-color: $main-color;
+                box-shadow  : 0 0 0 0.01rem $main-color;
+            }
+        }
+
+        .right-content {
+            width     : 50%;
+            max-height: 670px;
+            overflow-y: auto;
+
+            table {
+                thead {
+                    tr {
+                        th {
+                            vertical-align: middle;
+                            text-align    : center;
+                        }
+                    }
+                }
+
+                tbody {
+                    tr {
+                        &:hover {
+                            cursor          : pointer;
+                            background-color: $main-color;
+                            color           : white;
+                        }
+                    }
+                }
+            }
+
+            .reset {
+                all: revert;
+            }
+
+            .legend-text {
+                font-size: $legend-text-size;
+                color    : $main-color;
+            }
+
+            .already-book {
+                background-color: $bg-color;
+            }
+        }
+    }
+}
