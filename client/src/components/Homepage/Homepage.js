@@ -77,7 +77,7 @@ const Homepage = () => {
                                 <span className='text-title'>Thống kê doanh thu</span>
                             </div>
                             <div className='bottom'>
-                                <div className='left section d-flex flex-column p-2'>
+                                <div className='left section d-flex flex-column p-2' onClick={() => history.push('/room-management')}>
                                     <div className='image-box d-flex justify-content-center align-items-center'>
                                         <div className='image'>
                                             <img src={Room} alt='' />

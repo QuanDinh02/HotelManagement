@@ -2,7 +2,7 @@ $main-color       : #D57834;
 $bg-color         : #ECECEC;
 $legend-text-size : 1.125rem;
 
-.receive-room-container {
+.room-management-container {
     display       : flex;
     flex-direction: column;
     height        : auto;
@@ -39,7 +39,7 @@ $legend-text-size : 1.125rem;
         }
 
         .left-content {
-            width: 50%;
+            width: 40%;
 
             .reset {
                 all: revert;
@@ -62,16 +62,6 @@ $legend-text-size : 1.125rem;
                 }
             }
 
-            .receive-btn {
-                color           : white;
-                background-color: $main-color;
-
-                &:hover {
-                    opacity   : 0.8;
-                    transition: 0.25s;
-                }
-            }
-
             .form-control:focus {
                 border-color: $main-color;
                 box-shadow  : 0 0 0 0.01rem $main-color;
@@ -79,7 +69,7 @@ $legend-text-size : 1.125rem;
         }
 
         .right-content {
-            width     : 50%;
+            width     : 60%;
             max-height: 39.375rem;
             overflow-y: auto;
 
@@ -88,7 +78,6 @@ $legend-text-size : 1.125rem;
                     tr {
                         th {
                             vertical-align: middle;
-                            text-align    : center;
                         }
                     }
                 }
@@ -111,10 +100,6 @@ $legend-text-size : 1.125rem;
             .legend-text {
                 font-size: $legend-text-size;
                 color    : $main-color;
-            }
-
-            .already-book {
-                background-color: $bg-color;
             }
         }
     }

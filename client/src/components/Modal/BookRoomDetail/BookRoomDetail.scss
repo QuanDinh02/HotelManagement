@@ -11,30 +11,21 @@ $legend-text-size: 1.125rem;
             border-color: $main-color !important;
         }
 
+        .reset {
+            all: revert;
+        }
+
+        .legend-text {
+            font-size: $legend-text-size;
+            color    : $main-color;
+        }
+
         .book-info {
             width: 29%;
-
-            .reset {
-                all: revert;
-            }
-
-            .legend-text {
-                font-size: $legend-text-size;
-                color    : $main-color;
-            }
         }
 
         .customer-info {
             width: 69%;
-
-            .reset {
-                all: revert;
-            }
-
-            .legend-text {
-                font-size: $legend-text-size;
-                color    : $main-color;
-            }
         }
     }
 
@@ -58,20 +49,4 @@ $legend-text-size: 1.125rem;
         border-color: $main-color;
         box-shadow  : 0 0 0 0.01rem $main-color;
     }
-}
-
-.red {
-    border: 1px dashed red;
-}
-
-.blue {
-    border: 1px dashed blue;
-}
-
-.green {
-    border: 1px dashed green;
-}
-
-.orange {
-    border: 1px dashed orange;
 }
