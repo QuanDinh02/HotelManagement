@@ -12,6 +12,7 @@ import {
 import ReceiveRoom from './components/ReceiveRoom/ReceiveRoom';
 import RoomManagement from './components/RoomManagement/RoomManagement';
 import StaffManagement from './components/StaffManagement/StaffManagement';
+import ServiceManagement from './components/ServiceManagement/ServiceManagement';
 
 function App() {
   return (
@@ -36,6 +37,9 @@ function App() {
             </Route>
             <Route path="/staff-management">
               <StaffManagement />
+            </Route>
+            <Route path="/service-management">
+              <ServiceManagement />
             </Route>
           </Switch>
         </Router>

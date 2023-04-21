@@ -114,7 +114,7 @@ const Homepage = () => {
                                 </div>
                                 <span className='text-title'>Quản Lý Hóa Đơn</span>
                             </div>
-                            <div className='right section d-flex flex-column p-2'>
+                            <div className='right section d-flex flex-column p-2' onClick={() => history.push('/service-management')}>
                                 <div className='image-box d-flex flex-column justify-content-center align-items-center'>
                                     <div className='image'>
                                         <img src={Dish} alt='' />
