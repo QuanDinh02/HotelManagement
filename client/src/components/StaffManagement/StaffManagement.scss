@@ -2,7 +2,7 @@ $main-color       : #D57834;
 $bg-color         : #ECECEC;
 $legend-text-size : 1.125rem;
 
-.receive-room-container {
+.staff-management-container {
     display       : flex;
     flex-direction: column;
     height        : auto;
@@ -50,32 +50,38 @@ $legend-text-size : 1.125rem;
                 color    : $main-color;
             }
 
+            .top-left {
+                .left {
+                    width: 50%;
 
-            .top {
-                .search-btn {
-                    &:hover {
-                        cursor          : pointer;
-                        color           : white;
-                        background-color: $main-color;
-                        transition      : 0.25s;
+                    .top {
+                        .search-btn {
+                            &:hover {
+                                cursor          : pointer;
+                                color           : white;
+                                background-color: $main-color;
+                                transition      : 0.25s;
+                            }
+                        }
+                    }
+
+                    .bottom {
+                        flex-grow: 1;
                     }
                 }
-            }
 
-            .receive-btn {
-                color           : white;
-                background-color: $main-color;
+                .right {
+                    width: 50%;
+                }
 
-                &:hover {
-                    opacity   : 0.8;
-                    transition: 0.25s;
+                .form-control:focus {
+                    border-color: $main-color;
+                    box-shadow  : 0 0 0 0.01rem $main-color;
                 }
             }
 
-            .form-control:focus {
-                border-color: $main-color;
-                box-shadow  : 0 0 0 0.01rem $main-color;
-            }
+            .bottom-left {}
+
         }
 
         .right-content {
@@ -88,7 +94,6 @@ $legend-text-size : 1.125rem;
                     tr {
                         th {
                             vertical-align: middle;
-                            text-align    : center;
                         }
                     }
                 }
@@ -111,10 +116,6 @@ $legend-text-size : 1.125rem;
             .legend-text {
                 font-size: $legend-text-size;
                 color    : $main-color;
-            }
-
-            .already-book {
-                background-color: $bg-color;
             }
         }
     }

@@ -17,7 +17,7 @@ const RoomCategory = (props) => {
                 className='room-category'
             >
                 <Modal.Header closeButton>
-                    <Modal.Title className='title'>Quản Lí Loại Phòng</Modal.Title>
+                    <Modal.Title className='title'>Quản Lý Loại Phòng</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div className='main'>

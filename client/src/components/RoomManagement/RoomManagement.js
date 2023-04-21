@@ -16,7 +16,7 @@ const RoomManagement = () => {
         <>
             <div className='room-management-container'>
                 <div className='header py-2 ps-5 pe-3 d-flex justify-content-between align-items-center'>
-                    <span className='title'>Quản Lí Phòng <span><MdBedroomParent /></span></span>
+                    <span className='title'>Quản Lý Phòng <span><MdBedroomParent /></span></span>
                     <span className='icon' onClick={() => history.push('/')}><TfiClose className='exit-icon' /></span>
                 </div>
                 <div className='main px-3 d-flex gap-3 mt-2 mb-2'>
@@ -77,7 +77,7 @@ const RoomManagement = () => {
                                     <button className='btn btn-warning col-12'>Cập nhật phòng</button>
                                 </div>
                                 <div className='form-group col-6'>
-                                    <button className='btn btn-primary col-12' onClick={() => setShowRoomCategory(true)}>Quản lí Loại phòng</button>
+                                    <button className='btn btn-primary col-12' onClick={() => setShowRoomCategory(true)}>Quản lý Loại phòng</button>
                                 </div>
                             </div>
                         </fieldset>

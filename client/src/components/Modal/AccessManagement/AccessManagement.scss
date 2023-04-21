@@ -1,0 +1,75 @@
+$main-color      : #D57834;
+$legend-text-size: 1.125rem;
+$access-color    : #ECECEC;
+
+.access-management {
+
+    .main {
+        display        : flex;
+        justify-content: space-between;
+
+        .border {
+            border-color: $main-color !important;
+        }
+
+        .reset {
+            all: revert;
+        }
+
+        .legend-text {
+            font-size: $legend-text-size;
+            color    : $main-color;
+        }
+
+        .staff-category {
+            width: 25%;
+        }
+
+        .access-list {
+            width     : 73%;
+            overflow-y: auto;
+            height    : calc(100vh - 11rem);
+
+            .access-table,
+            .not-access-table {
+                width     : 50%;
+                height    : auto;
+                overflow-y: auto;
+
+                table {
+                    thead {
+                        tr {
+                            th {
+                                vertical-align: middle;
+                            }
+                        }
+                    }
+
+                    tbody {
+                        tr {
+                            &:hover {
+                                cursor          : pointer;
+                                background-color: $main-color;
+                                color           : white;
+                            }
+                        }
+                    }
+                }
+
+                .access {
+                    background-color: $access-color;
+                }
+            }
+        }
+
+    }
+
+    .form-control:focus {
+        border-color: $main-color;
+        box-shadow  : 0 0 0 0.01rem $main-color;
+    }
+}
+
+.red {
+    border: 1px dashed red;
+}

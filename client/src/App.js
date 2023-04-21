@@ -11,6 +11,7 @@ import {
 } from "react-router-dom";
 import ReceiveRoom from './components/ReceiveRoom/ReceiveRoom';
 import RoomManagement from './components/RoomManagement/RoomManagement';
+import StaffManagement from './components/StaffManagement/StaffManagement';
 
 function App() {
   return (
@@ -32,6 +33,9 @@ function App() {
             </Route>
             <Route path="/room-management">
               <RoomManagement />
+            </Route>
+            <Route path="/staff-management">
+              <StaffManagement />
             </Route>
           </Switch>
         </Router>

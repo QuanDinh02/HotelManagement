@@ -34,7 +34,7 @@ const Homepage = () => {
             </div>
             <div className='content'>
                 <div className='title'>
-                    <span>Quản Lí Khách Sạn</span>
+                    <span>Quản Lý Khách Sạn</span>
                 </div>
                 <hr className='mb-4' />
                 <div className='main'>
@@ -83,15 +83,15 @@ const Homepage = () => {
                                             <img src={Room} alt='' />
                                         </div>
                                     </div>
-                                    <span className='text-title'>Quản Lí Phòng</span>
+                                    <span className='text-title'>Quản Lý Phòng</span>
                                 </div>
-                                <div className='right section d-flex flex-column p-2'>
+                                <div className='right section d-flex flex-column p-2' onClick={() => history.push('/staff-management')}>
                                     <div className='image-box d-flex justify-content-center align-items-center'>
                                         <div className='staff-image'>
                                             <img src={Staff} alt='' />
                                         </div>
                                     </div>
-                                    <span className='text-title'>Quản Lí Nhân Viên</span>
+                                    <span className='text-title'>Quản Lý Nhân Viên</span>
                                 </div>
                             </div>
                         </div>
@@ -101,7 +101,7 @@ const Homepage = () => {
                                     <img src={Customer} alt='' />
                                 </div>
                             </div>
-                            <span className='text-title'>Quản Lí Khách Hàng</span>
+                            <span className='text-title'>Quản Lý Khách Hàng</span>
                         </div>
                     </div>
                     <div className='item right-content'>
@@ -112,7 +112,7 @@ const Homepage = () => {
                                         <img src={Invoice} alt='' />
                                     </div>
                                 </div>
-                                <span className='text-title'>Quản Lí Hóa Đơn</span>
+                                <span className='text-title'>Quản Lý Hóa Đơn</span>
                             </div>
                             <div className='right section d-flex flex-column p-2'>
                                 <div className='image-box d-flex flex-column justify-content-center align-items-center'>
@@ -120,7 +120,7 @@ const Homepage = () => {
                                         <img src={Dish} alt='' />
                                     </div>
                                 </div>
-                                <span className='text-title'>Quản Lí Dịch Vụ</span>
+                                <span className='text-title'>Quản Lý Dịch Vụ</span>
                             </div>
                         </div>
                         <div className='bottom-left section d-flex flex-column p-2'>
