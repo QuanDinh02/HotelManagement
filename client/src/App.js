@@ -14,6 +14,7 @@ import RoomManagement from './components/RoomManagement/RoomManagement';
 import StaffManagement from './components/StaffManagement/StaffManagement';
 import ServiceManagement from './components/ServiceManagement/ServiceManagement';
 import CustomerManagement from './components/CustomerManagement/CustomerManagement';
+import ServicePayment from './components/ServiceUsingPayment/ServicePayment';
 
 function App() {
   return (
@@ -44,6 +45,9 @@ function App() {
             </Route>
             <Route path="/customer-management">
               <CustomerManagement />
+            </Route>
+            <Route path="/service-using-payment">
+              <ServicePayment />
             </Route>
           </Switch>
         </Router>

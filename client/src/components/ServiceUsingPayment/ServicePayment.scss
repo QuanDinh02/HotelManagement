@@ -1,0 +1,174 @@
+$main-color      : #D57834;
+$bg-color        : #ECECEC;
+$legend-text-size: 1.125rem;
+
+.service-payment-container {
+    display       : flex;
+    flex-direction: column;
+
+    .header {
+        background-color: $bg-color;
+
+        .title {
+            font-size: 2rem;
+            color    : $main-color;
+        }
+
+        .icon {
+            .exit-icon {
+                font-size: 2rem;
+                color    : red;
+                padding  : 5px;
+
+                &:hover {
+                    cursor          : pointer;
+                    background-color: rgb(247, 190, 190);
+                    border-radius   : 0.3125rem;
+                    transition      : 0.25s;
+                }
+            }
+        }
+    }
+
+    .main {
+        height: 41.875rem;
+
+        .border {
+            border-color: $main-color !important;
+        }
+
+        .left-content {
+            width: 60%;
+
+            .reset {
+                all: revert;
+            }
+
+            .legend-text {
+                font-size: $legend-text-size;
+                color    : $main-color;
+            }
+
+            .left {
+                width : 60%;
+                height: 41.875rem;
+
+                .search-btn {
+                    &:hover {
+                        cursor          : pointer;
+                        color           : white;
+                        background-color: $main-color;
+                        transition      : 0.25s;
+                    }
+                }
+
+                .room-list {
+                    overflow-y: auto;
+
+                    table {
+                        thead {
+                            tr {
+                                th {
+                                    vertical-align: middle;
+                                    text-align    : center;
+                                }
+                            }
+                        }
+
+                        tbody {
+                            tr {
+                                td {
+                                    vertical-align: middle;
+                                }
+
+                                &:hover {
+                                    cursor          : pointer;
+                                    background-color: $main-color;
+                                    color           : white;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            .right {
+                width : 40%;
+                height: 41.875rem;
+
+                .payment {
+                    flex-grow: 1;
+                }
+
+                .payment-btn {
+                    color           : white;
+                    background-color: $main-color;
+
+                    &:hover {
+                        background-color: #b8662c;
+                    }
+                }
+            }
+
+            .form-control:focus {
+                border-color: $main-color;
+                box-shadow  : 0 0 0 0.01rem $main-color;
+            }
+        }
+
+        .right-content {
+            width       : 40%;
+            height      : 41.875rem;
+
+            .room-invoice {
+                height: 30%;
+            }
+
+            .policies {
+                height: 30%;
+            }
+
+            .service {
+                height: 40%;
+            }
+
+            .room-invoice,
+            .policies,
+            .service {
+                width       : 100%;
+                //overflow-x: auto;
+                overflow    : auto;
+            }
+
+            table {
+                thead {
+                    tr {
+                        th {
+                            vertical-align: middle;
+                            text-align    : center;
+                        }
+                    }
+                }
+
+                tbody {
+                    tr {
+                        background-color: $bg-color;
+
+                        td {
+                            vertical-align: middle;
+                        }
+                    }
+                }
+            }
+
+            .reset {
+                all: revert;
+            }
+
+            .legend-text {
+                font-size: $legend-text-size;
+                color    : $main-color;
+            }
+        }
+    }
+}

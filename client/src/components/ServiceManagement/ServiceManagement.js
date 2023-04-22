@@ -2,7 +2,6 @@ import { useHistory } from 'react-router-dom';
 import './ServiceManagement.scss';
 import { TfiClose } from 'react-icons/tfi';
 import { HiOutlineSearch } from 'react-icons/hi';
-import { MdBedroomParent } from 'react-icons/md';
 import React from 'react';
 import { CurrencyFormat } from '../Format/FormatNumber';
 import ServiceCategory from '../Modal/ServiceCategory/ServiceCategory';
@@ -18,7 +17,7 @@ const ServiceManagement = () => {
         <>
             <div className='service-management-container'>
                 <div className='header py-2 ps-5 pe-3 d-flex justify-content-between align-items-center'>
-                    <span className='title'>Quản Lý Dịch Vụ <span><MdBedroomParent /></span></span>
+                    <span className='title'>Quản Lý Dịch Vụ</span>
                     <span className='icon' onClick={() => history.push('/')}><TfiClose className='exit-icon' /></span>
                 </div>
                 <div className='main px-3 d-flex gap-3 mt-2 mb-2'>
