@@ -1,0 +1,64 @@
+$main-color      : #D57834;
+$legend-text-size: 1.125rem;
+
+.customer-history {
+
+    .main {
+        display        : flex;
+        justify-content: space-between;
+
+        .border {
+            border-color: $main-color !important;
+        }
+
+        .reset {
+            all: revert;
+        }
+
+        .legend-text {
+            font-size: $legend-text-size;
+            color    : $main-color;
+        }
+
+        .customer-info {
+            width: 29%;
+        }
+
+        .list {
+            width     : 69%;
+            overflow-y: auto;
+            height    : calc(100vh - 11rem);
+
+            .room-history-table,
+            .service-history-table {
+                height    : 50%;
+                overflow-y: auto;
+
+                table {
+                    thead {
+                        tr {
+                            th {
+                                vertical-align: middle;
+                            }
+                        }
+                    }
+
+                    tbody {
+                        tr {
+                            &:hover {
+                                cursor          : pointer;
+                                background-color: $main-color;
+                                color           : white;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .form-control:focus {
+        border-color: $main-color;
+        box-shadow  : 0 0 0 0.01rem $main-color;
+    }
+}

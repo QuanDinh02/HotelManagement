@@ -13,6 +13,7 @@ import ReceiveRoom from './components/ReceiveRoom/ReceiveRoom';
 import RoomManagement from './components/RoomManagement/RoomManagement';
 import StaffManagement from './components/StaffManagement/StaffManagement';
 import ServiceManagement from './components/ServiceManagement/ServiceManagement';
+import CustomerManagement from './components/CustomerManagement/CustomerManagement';
 
 function App() {
   return (
@@ -40,6 +41,9 @@ function App() {
             </Route>
             <Route path="/service-management">
               <ServiceManagement />
+            </Route>
+            <Route path="/customer-management">
+              <CustomerManagement />
             </Route>
           </Switch>
         </Router>

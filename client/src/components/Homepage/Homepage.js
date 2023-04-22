@@ -95,7 +95,7 @@ const Homepage = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className='bottom-left section d-flex flex-column p-2'>
+                        <div className='bottom-left section d-flex flex-column p-2' onClick={() => history.push('/customer-management')}>
                             <div className='image-box d-flex justify-content-center align-items-center'>
                                 <div className='image'>
                                     <img src={Customer} alt='' />
