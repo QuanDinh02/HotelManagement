@@ -14,7 +14,6 @@ const cache = new InMemoryCache({
             return incoming;
           },
         },
-        
       },
     },
   },

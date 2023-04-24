@@ -1,14 +1,98 @@
+import React from 'react';
 import { useHistory } from 'react-router-dom';
 import './CustomerManagement.scss';
 import { TfiClose } from 'react-icons/tfi';
 import { HiOutlineSearch } from 'react-icons/hi';
-import React from 'react';
 import CustomerHistory from '../Modal/CustomerHistory/CustomerHistory';
+import { GET_ALL_CUSTOMERS, GET_CUSTOMER_BY_NAME_PHONE } from '../Query/CustomerQuery';
+import { UPDATE_CUSTOMER } from '../Mutation/ClientMutation';
+import { useQuery, useLazyQuery, useMutation } from '@apollo/client';
+import { useImmer } from "use-immer";
+import _ from 'lodash';
 
 const CustomerManagement = () => {
 
     const history = useHistory();
+
     const [showCustomerHistory, setShowCustomerHistory] = React.useState(false);
+    const [customerList, setCustomerList] = useImmer([]);
+    const [editCustomer, setEditCustomer] = useImmer({});
+    const [editAllowance, setEditAllowance] = React.useState(false);
+    const [search, setSearch] = React.useState('');
+
+    const { data: customersData } = useQuery(GET_ALL_CUSTOMERS);
+    const [getCustomerByValue] = useLazyQuery(GET_CUSTOMER_BY_NAME_PHONE);
+    const [updateCustomer, { data: updateMsg }] = useMutation(UPDATE_CUSTOMER, {
+        refetchQueries: [
+            { query: GET_ALL_CUSTOMERS }
+        ],
+    });
+
+    const handleSelectingCustomer = (selected_customer) => {
+        let _editCustomer = _.cloneDeep(selected_customer);
+        delete _editCustomer.__typename;
+        delete _editCustomer.isSelected;
+
+        setEditCustomer(_editCustomer);
+
+        setCustomerList(draft => {
+            draft = draft.map(item => {
+                if (item.id === selected_customer.id) {
+                    item.isSelected = true;
+                    return item;
+                } else {
+                    item.isSelected = false;
+                    return item;
+                }
+            })
+        })
+    }
+
+    const handleCustomerSearch = async () => {
+        setEditCustomer({});
+
+        let { data: { customer } } = await getCustomerByValue({
+            variables: {
+                value: search
+            }
+        });
+        setCustomerList(customer);
+    }
+
+    const handleEditCustomer = (attribute, value) => {
+        setEditCustomer(draft => {
+            draft[attribute] = value;
+        });
+    }
+
+    const handleUpdateCustomer = async () => {
+        if (editAllowance) {
+            let result = await updateCustomer({
+                variables: {
+                    input: {
+                        ...editCustomer,
+                        customer_category: +editCustomer.customer_category.id
+                    }
+                }
+            });
+            console.log(result);
+            setEditAllowance(false);
+        } else {
+            setEditAllowance(true);
+        }
+
+    }
+
+    React.useEffect(() => {
+        if (customersData && customersData.customers) {
+            let _customerList = customersData.customers.map(item => {
+                return {
+                    ...item, isSelected: false
+                }
+            });
+            setCustomerList(_customerList);
+        }
+    }, [customersData]);
 
     return (
         <>
@@ -22,8 +106,14 @@ const CustomerManagement = () => {
                         <fieldset className='top border rounded-2 pt-2 pb-3'>
                             <legend className='reset legend-text'>Tìm kiếm khách hàng</legend>
                             <div className="input-group px-4">
-                                <input type="text" className="form-control" placeholder="Tên/ số điện thoại của khách hàng" />
-                                <span className="input-group-text search-btn" title='Tìm kiếm'><HiOutlineSearch /></span>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    placeholder="Tên/ số điện thoại của khách hàng"
+                                    value={search}
+                                    onChange={(event) => setSearch(event.target.value)}
+                                />
+                                <span className="input-group-text search-btn" title='Tìm kiếm' onClick={handleCustomerSearch}><HiOutlineSearch /></span>
                             </div>
                         </fieldset>
                         <fieldset className='middle border rounded-2 pb-3'>
@@ -31,27 +121,35 @@ const CustomerManagement = () => {
                             <div className='row align-items-center px-4'>
                                 <div className='form-group col-6'>
                                     <label className='form-label'>Họ và Tên:</label>
-                                    <input type='text' className='form-control' />
+                                    <input type='text' className='form-control' disabled={!editAllowance} value={editCustomer?.name ? editCustomer.name : ''}
+                                        onChange={(event) => handleEditCustomer('name', event.target.value)}
+                                    />
                                 </div>
                                 <div className='form-group col-6'>
                                     <label className='form-label'>Ngày sinh:</label>
-                                    <input type='text' className='form-control' />
+                                    <input type='text' className='form-control' disabled={!editAllowance} value={editCustomer?.dob ? editCustomer.dob : ''}
+                                        onChange={(event) => handleEditCustomer('dob', event.target.value)}
+                                    />
                                 </div>
                             </div>
                             <div className='row mt-1 px-4'>
                                 <div className='form-group col-6'>
                                     <label className='form-label'>Thẻ căn cước/ CMND:</label>
-                                    <input type='text' className='form-control' />
+                                    <input type='text' className='form-control' disabled={!editAllowance} value={editCustomer?.citizenID ? editCustomer.citizenID : ''}
+                                        onChange={(event) => handleEditCustomer('citizenID', event.target.value)}
+                                    />
                                 </div>
                                 <div className='form-group col-6'>
                                     <label className='form-label'>Số điện thoại:</label>
-                                    <input type='text' className='form-control' />
+                                    <input type='text' className='form-control' disabled={!editAllowance} value={editCustomer?.phone ? editCustomer.phone : ''}
+                                        onChange={(event) => handleEditCustomer('phone', event.target.value)}
+                                    />
                                 </div>
                             </div>
                             <div className='row mt-1 px-4'>
                                 <div className='form-group col-6'>
                                     <label className='form-label'>Loại khách hàng:</label>
-                                    <select className="form-select">
+                                    <select className="form-select" disabled={!editAllowance} >
                                         <option defaultValue={'1'}>Khách du lịch</option>
                                         <option value="2">Khách nội địa</option>
                                         <option value="3">Khách cũ</option>
@@ -59,43 +157,48 @@ const CustomerManagement = () => {
                                 </div>
                                 <div className='form-group col-6'>
                                     <label className='form-label'>Địa chỉ:</label>
-                                    <input type='text' className='form-control' />
+                                    <input type='text' className='form-control' disabled={!editAllowance} value={editCustomer?.address ? editCustomer.address : ''}
+                                        onChange={(event) => handleEditCustomer('address', event.target.value)}
+                                    />
                                 </div>
                             </div>
                             <div className='row mt-1 px-4'>
                                 <div className='form-group col-6'>
                                     <label className='form-label'>Giới tính:</label>
-                                    <select className="form-select">
-                                        <option defaultValue={'1'}>Nam</option>
-                                        <option value="2">Nữ</option>
-                                        <option value="3">Khác</option>
+                                    <select className="form-select" disabled={!editAllowance} value={editCustomer?.gender ? editCustomer.gender : ''}>
+                                        <option defaultValue={'Nam'}>Nam</option>
+                                        <option value="Nữ">Nữ</option>
+                                        <option value="Khác">Khác</option>
                                     </select>
                                 </div>
                                 <div className='form-group col-6'>
                                     <label className='form-label'>Quốc tịch:</label>
-                                    <select className="form-select">
-                                        <option defaultValue={'1'}>Việt Nam</option>
-                                        <option value="2">Khác</option>
-                                    </select>
+                                    <input type='text' className='form-control' disabled={!editAllowance} value={editCustomer?.nationality ? editCustomer.nationality : ''}
+                                        onChange={(event) => handleEditCustomer('nationality', event.target.value)}
+                                    />
                                 </div>
                             </div>
                         </fieldset>
-                        <fieldset className='border rounded-2 p-2'>
-                            <legend className='reset legend-text'>Chức năng</legend>
-                            <div className='row mb-3 px-4'>
-                                <div className='form-group col-6'>
-                                    <button className='btn btn-outline-danger col-12'>Xóa khách hàng</button>
+                        {!_.isEmpty(editCustomer) &&
+                            <fieldset className='border rounded-2 p-2'>
+                                <legend className='reset legend-text'>Chức năng</legend>
+                                <div className='row mb-3 px-4'>
+                                    <div className='form-group col-6'>
+                                        <button className='btn btn-outline-danger col-12'>Xóa khách hàng</button>
+                                    </div>
+                                    <div className='form-group col-6'>
+                                        <button className='btn btn-warning col-12' onClick={handleUpdateCustomer}>
+                                            {editAllowance === false ? <span>Chỉnh sửa</span> : <span>Lưu chỉnh sửa</span>}
+                                        </button>
+                                    </div>
                                 </div>
-                                <div className='form-group col-6'>
-                                    <button className='btn btn-warning col-12'>Chỉnh sửa</button>
+                                <div className='row mb-3 px-4'>
+                                    <div className='form-group col-6'>
+                                        <button className='btn btn-secondary col-12' onClick={() => setShowCustomerHistory(true)}>Lịch sử Khách hàng</button>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className='row mb-3 px-4'>
-                                <div className='form-group col-6'>
-                                    <button className='btn btn-secondary col-12' onClick={() => setShowCustomerHistory(true)}>Lịch sử Khách hàng</button>
-                                </div>
-                            </div>
-                        </fieldset>
+                            </fieldset>
+                        }
                     </div>
                     <fieldset className='right-content border rounded-2 p-2' onScroll={(event) => { event.preventDefault() }}>
                         <legend className='reset legend-text'>Danh sách Khách hàng</legend>
@@ -112,17 +215,21 @@ const CustomerManagement = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {
-                                    [...Array(15)].map((item, index) => {
+                                {customerList && customerList.length > 0 &&
+                                    customerList.map((item, index) => {
                                         return (
-                                            <tr>
+                                            <tr
+                                                key={`customer-${item.id}`}
+                                                className={item.isSelected ? 'selected-row' : ''}
+                                                onClick={() => handleSelectingCustomer(item)}
+                                            >
                                                 <td>{index + 1}</td>
-                                                <td>Nguyen Le Thi Dung</td>
-                                                <td>543534535345</td>
-                                                <td>Khách du lịch</td>
-                                                <td>090123654</td>
-                                                <td>12/434 Lê Quang Diệu, Q.12, TPHCM</td>
-                                                <td>Việt Nam</td>
+                                                <td>{item.name}</td>
+                                                <td>{item.citizenID}</td>
+                                                <td>{item?.customer_category?.name}</td>
+                                                <td>{item.phone}</td>
+                                                <td>{item.address}</td>
+                                                <td>{item.nationality}</td>
                                             </tr>
                                         )
                                     })
