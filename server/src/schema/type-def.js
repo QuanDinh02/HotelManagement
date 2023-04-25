@@ -2,7 +2,7 @@ const typeDefs = `#graphql
   type Customer {
     id: ID!
     name: String!
-    citizenID: String
+    citizen_id: String
     phone: String!
     dob: String
     address: String
@@ -25,7 +25,7 @@ const typeDefs = `#graphql
   input CustomerInput {
     id: ID!
     name: String!
-    citizenID: String
+    citizen_id: String
     phone: String!
     dob: String
     address: String
@@ -36,6 +36,7 @@ const typeDefs = `#graphql
 
   type Mutation {
     updateCustomer(input: CustomerInput!): String
+    deleteCustomer(id: ID!): String
   }
 `;
 

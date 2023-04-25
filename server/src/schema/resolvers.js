@@ -26,6 +26,10 @@ const resolvers = {
     Mutation: {
         updateCustomer: async (parent, args) => {
             return await CustomerServices.updateCustomer(args.input);
+        },
+
+        deleteCustomer: async (parent, args) => {
+            return await CustomerServices.deleteCustomer(args.id);
         }
     }
 };

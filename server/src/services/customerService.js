@@ -79,6 +79,29 @@ const updateCustomer = async (data) => {
         return 'Customer is not existed !';
     }
 }
+
+const deleteCustomer = async (customer_id) => {
+    let existedCustomer = await db.Customer.findOne({
+        where: {
+            id: +customer_id
+        },
+        raw: true
+    })
+
+    if (existedCustomer) {
+        await db.Customer.destroy({
+            where: {
+                id: +customer_id
+            }
+        });
+
+        return 'Delete customer successfully !';
+    } else {
+        return 'Customer is not existed !';
+    }
+}
+
 module.exports = {
-    getAllCustomers, getAllCustomerCategory, getCustomerByNamePhone, updateCustomer
+    getAllCustomers, getAllCustomerCategory, getCustomerByNamePhone, updateCustomer,
+    deleteCustomer
 }

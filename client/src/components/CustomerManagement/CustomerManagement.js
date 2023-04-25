@@ -5,10 +5,11 @@ import { TfiClose } from 'react-icons/tfi';
 import { HiOutlineSearch } from 'react-icons/hi';
 import CustomerHistory from '../Modal/CustomerHistory/CustomerHistory';
 import { GET_ALL_CUSTOMERS, GET_CUSTOMER_BY_NAME_PHONE } from '../Query/CustomerQuery';
-import { UPDATE_CUSTOMER } from '../Mutation/ClientMutation';
+import { UPDATE_CUSTOMER, DELETE_CUSTOMER } from '../Mutation/ClientMutation';
 import { useQuery, useLazyQuery, useMutation } from '@apollo/client';
 import { useImmer } from "use-immer";
 import _ from 'lodash';
+import DeleteModal from '../Modal/CustomerMutation/DeleteModal';
 
 const CustomerManagement = () => {
 
@@ -18,11 +19,18 @@ const CustomerManagement = () => {
     const [customerList, setCustomerList] = useImmer([]);
     const [editCustomer, setEditCustomer] = useImmer({});
     const [editAllowance, setEditAllowance] = React.useState(false);
+    const [customerCategories, setCustomerCategories] = React.useState([]);
     const [search, setSearch] = React.useState('');
+    const [showDeleteModal, setShowDeleteModal] = React.useState(false);
 
     const { data: customersData } = useQuery(GET_ALL_CUSTOMERS);
     const [getCustomerByValue] = useLazyQuery(GET_CUSTOMER_BY_NAME_PHONE);
     const [updateCustomer, { data: updateMsg }] = useMutation(UPDATE_CUSTOMER, {
+        refetchQueries: [
+            { query: GET_ALL_CUSTOMERS }
+        ],
+    });
+    const [deleteCustomer, { data: deleteMsg }] = useMutation(DELETE_CUSTOMER, {
         refetchQueries: [
             { query: GET_ALL_CUSTOMERS }
         ],
@@ -60,13 +68,27 @@ const CustomerManagement = () => {
     }
 
     const handleEditCustomer = (attribute, value) => {
-        setEditCustomer(draft => {
-            draft[attribute] = value;
-        });
+        if (attribute === 'customer_category') {
+            let category = _.find(customerCategories, item => item.id === value);
+            setEditCustomer(draft => {
+                draft[attribute] = category;
+            });
+        } else {
+            setEditCustomer(draft => {
+                draft[attribute] = value;
+            });
+        }
+    }
+
+    const dataValidation = () => {
+        if (editCustomer.customer_category === "0") {
+            return;
+        }
     }
 
     const handleUpdateCustomer = async () => {
         if (editAllowance) {
+            dataValidation();
             let result = await updateCustomer({
                 variables: {
                     input: {
@@ -76,11 +98,23 @@ const CustomerManagement = () => {
                 }
             });
             console.log(result);
+            setEditCustomer({});
             setEditAllowance(false);
         } else {
             setEditAllowance(true);
         }
+    }
 
+    const handleDeleteCustomer = async () => {
+        if (!_.isEmpty(editCustomer)) {
+            let result = await deleteCustomer({
+                variables: {
+                    deleteCustomerId: editCustomer.id
+                }
+            });
+            setEditCustomer({});
+            setEditAllowance(false);
+        }
     }
 
     React.useEffect(() => {
@@ -91,6 +125,7 @@ const CustomerManagement = () => {
                 }
             });
             setCustomerList(_customerList);
+            setCustomerCategories(customersData.customer_categories);
         }
     }, [customersData]);
 
@@ -135,8 +170,8 @@ const CustomerManagement = () => {
                             <div className='row mt-1 px-4'>
                                 <div className='form-group col-6'>
                                     <label className='form-label'>Thẻ căn cước/ CMND:</label>
-                                    <input type='text' className='form-control' disabled={!editAllowance} value={editCustomer?.citizenID ? editCustomer.citizenID : ''}
-                                        onChange={(event) => handleEditCustomer('citizenID', event.target.value)}
+                                    <input type='text' className='form-control' disabled={!editAllowance} value={editCustomer?.citizen_id? editCustomer.citizen_id : ''}
+                                        onChange={(event) => handleEditCustomer('citizen_id', event.target.value)}
                                     />
                                 </div>
                                 <div className='form-group col-6'>
@@ -149,10 +184,17 @@ const CustomerManagement = () => {
                             <div className='row mt-1 px-4'>
                                 <div className='form-group col-6'>
                                     <label className='form-label'>Loại khách hàng:</label>
-                                    <select className="form-select" disabled={!editAllowance} >
-                                        <option defaultValue={'1'}>Khách du lịch</option>
-                                        <option value="2">Khách nội địa</option>
-                                        <option value="3">Khách cũ</option>
+                                    <select className="form-select" disabled={!editAllowance} value={editCustomer?.customer_category ? editCustomer.customer_category.id : '0'}
+                                        onChange={(event) => handleEditCustomer('customer_category', event.target.value)}
+                                    >
+                                        <option key={`customer-type-default`} value="0">Select customer type...</option>
+                                        {customerCategories && customerCategories.length > 0 &&
+                                            customerCategories.map(item => {
+                                                return (
+                                                    <option key={`customer-type-${item.id}`} value={item.id}>{item.name}</option>
+                                                )
+                                            })
+                                        }
                                     </select>
                                 </div>
                                 <div className='form-group col-6'>
@@ -165,7 +207,9 @@ const CustomerManagement = () => {
                             <div className='row mt-1 px-4'>
                                 <div className='form-group col-6'>
                                     <label className='form-label'>Giới tính:</label>
-                                    <select className="form-select" disabled={!editAllowance} value={editCustomer?.gender ? editCustomer.gender : ''}>
+                                    <select className="form-select" disabled={!editAllowance} value={editCustomer?.gender ? editCustomer.gender : ''}
+                                        onChange={(event) => handleEditCustomer('gender', event.target.value)}
+                                    >
                                         <option defaultValue={'Nam'}>Nam</option>
                                         <option value="Nữ">Nữ</option>
                                         <option value="Khác">Khác</option>
@@ -184,7 +228,9 @@ const CustomerManagement = () => {
                                 <legend className='reset legend-text'>Chức năng</legend>
                                 <div className='row mb-3 px-4'>
                                     <div className='form-group col-6'>
-                                        <button className='btn btn-outline-danger col-12'>Xóa khách hàng</button>
+                                        <button className='btn btn-outline-danger col-12' onClick={() => setShowDeleteModal(true)}>
+                                            Xóa khách hàng
+                                        </button>
                                     </div>
                                     <div className='form-group col-6'>
                                         <button className='btn btn-warning col-12' onClick={handleUpdateCustomer}>
@@ -225,7 +271,7 @@ const CustomerManagement = () => {
                                             >
                                                 <td>{index + 1}</td>
                                                 <td>{item.name}</td>
-                                                <td>{item.citizenID}</td>
+                                                <td>{item.citizen_id}</td>
                                                 <td>{item?.customer_category?.name}</td>
                                                 <td>{item.phone}</td>
                                                 <td>{item.address}</td>
@@ -242,6 +288,11 @@ const CustomerManagement = () => {
             <CustomerHistory
                 show={showCustomerHistory}
                 setShow={setShowCustomerHistory}
+            />
+            <DeleteModal
+                show={showDeleteModal}
+                setShow={setShowDeleteModal}
+                handleDeleteCustomer={handleDeleteCustomer}
             />
         </>
 

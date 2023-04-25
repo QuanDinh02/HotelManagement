@@ -5,7 +5,7 @@ const GET_ALL_CUSTOMERS = gql`
     customers {
       id
       name
-      citizenID
+      citizen_id
       phone
       dob
       address
@@ -16,6 +16,11 @@ const GET_ALL_CUSTOMERS = gql`
         name
       }
     }
+
+    customer_categories {
+      id
+      name
+    }
   }
 `;
 
@@ -24,7 +29,7 @@ const GET_CUSTOMER_BY_NAME_PHONE = gql`
     customer(value: $value) {
       id
       name
-      citizenID
+      citizen_id
       phone
       dob
       address
