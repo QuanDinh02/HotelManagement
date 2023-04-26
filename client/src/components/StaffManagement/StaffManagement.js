@@ -5,11 +5,137 @@ import { HiOutlineSearch } from 'react-icons/hi';
 import { FaUserTie } from 'react-icons/fa';
 import React from 'react';
 import AccessManagement from '../Modal/AccessManagement/AccessManagement';
+import { GET_ALL_STAFFS, GET_SEARCHED_STAFF } from '../Query/StaffQuery';
+import { useQuery, useLazyQuery, useMutation } from '@apollo/client';
+import { UPDATE_STAFF, DELETE_STAFF } from '../Mutation/StaffMutation';
+import { useImmer } from "use-immer";
+import _ from 'lodash';
+import DeleteModal from '../Modal/StaffMutation/DeleteModal';
 
 const StaffManagement = () => {
 
     const history = useHistory();
     const [showAccessControl, setShowAccessControl] = React.useState(false);
+    const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+    const [staffList, setStaffList] = useImmer([]);
+    const [editStaff, setEditStaff] = useImmer({});
+    const [editAllowance, setEditAllowance] = React.useState(false);
+    const [search, setSearch] = React.useState('');
+    const [staffCategories, setStaffCategories] = React.useState([]);
+
+    const { data: staffData } = useQuery(GET_ALL_STAFFS);
+
+    const [getSearchedStaff] = useLazyQuery(GET_SEARCHED_STAFF);
+
+    const [updateStaff, { data: updateMsg }] = useMutation(UPDATE_STAFF, {
+        refetchQueries: [
+            { query: GET_ALL_STAFFS }
+        ],
+    });
+
+    const [deleteStaff, { data: deleteMsg }] = useMutation(DELETE_STAFF, {
+        refetchQueries: [
+            { query: GET_ALL_STAFFS }
+        ],
+    });
+
+    const handleStaffSearch = async () => {
+        setEditStaff({});
+
+        let { data: { staff } } = await getSearchedStaff({
+            variables: {
+                value: search
+            }
+        });
+        setStaffList(staff);
+    }
+
+    const handleSelectingStaff = (selected_customer) => {
+        let _editStaff = _.cloneDeep(selected_customer);
+        delete _editStaff.__typename;
+        delete _editStaff.isSelected;
+
+        setEditStaff(_editStaff);
+
+        setStaffList(draft => {
+            draft = draft.map(item => {
+                if (item.id === selected_customer.id) {
+                    item.isSelected = true;
+                    return item;
+                } else {
+                    item.isSelected = false;
+                    return item;
+                }
+            })
+        })
+    }
+
+    const handleEditStaff = (attribute, value) => {
+        if (attribute === 'staff_category') {
+            let category = _.find(staffCategories, item => item.id === value);
+            setEditStaff(draft => {
+                draft[attribute] = category;
+            });
+        } else {
+            setEditStaff(draft => {
+                draft[attribute] = value;
+            });
+        }
+    }
+
+    const dataValidation = () => {
+        if (editStaff.staff_category === "0") {
+            return;
+        }
+    }
+
+    const handleUpdateStaff = async () => {
+        if (editAllowance) {
+            dataValidation();
+            let _editStaff = _.cloneDeep(editStaff);
+            delete _editStaff.staff_account_name;
+
+            console.log(_editStaff);
+
+            let result = await updateStaff({
+                variables: {
+                    input: {
+                        ..._editStaff,
+                        staff_category: +_editStaff.staff_category.id
+                    }
+                }
+            });
+
+            setEditStaff({});
+            setEditAllowance(false);
+        } else {
+            setEditAllowance(true);
+        }
+    }
+
+    const handleDeleteStaff = async () => {
+        if (!_.isEmpty(editStaff)) {
+            let result = await deleteStaff({
+                variables: {
+                    deleteStaffId: editStaff.id
+                }
+            });
+            setEditStaff({});
+            setEditAllowance(false);
+        }
+    }
+
+    React.useEffect(() => {
+        if (staffData && staffData.staffs) {
+            let _staffList = staffData.staffs.map(item => {
+                return {
+                    ...item, isSelected: false
+                }
+            });
+            setStaffList(_staffList);
+            setStaffCategories(staffData.staff_categories);
+        }
+    }, [staffData]);
 
     return (
         <>
@@ -25,27 +151,42 @@ const StaffManagement = () => {
                                 <fieldset className='top border rounded-2 pt-2 pb-3'>
                                     <legend className='reset legend-text'>Tìm kiếm nhân viên</legend>
                                     <div className="input-group px-4">
-                                        <input type="text" className="form-control" placeholder="Tài khoản/ Tên/ CMND/ SĐT" />
-                                        <span className="input-group-text search-btn" title='Tìm kiếm'><HiOutlineSearch /></span>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            placeholder="Tên/ CMND/ SĐT"
+                                            value={search}
+                                            onChange={(event) => setSearch(event.target.value)}
+                                        />
+                                        <span className="input-group-text search-btn" title='Tìm kiếm' onClick={handleStaffSearch}><HiOutlineSearch /></span>
                                     </div>
                                 </fieldset>
                                 <fieldset className='bottom border rounded-2 pb-3'>
                                     <legend className='reset legend-text'>Tài khoản nhân viên</legend>
                                     <div className='form-group col-12 px-4 mt-2'>
                                         <label className='form-label'>Tên đăng nhập:</label>
-                                        <input type='text' className='form-control' />
+                                        <input type='text' className='form-control' disabled value={editStaff?.staff_account_name ? editStaff.staff_account_name : ''} />
                                     </div>
                                     <div className='form-group col-12 px-4 mt-2'>
                                         <label className='form-label'>Loại nhân viên:</label>
-                                        <select className="form-select">
-                                            <option defaultValue={'1'}>Quản lí Nhân viên</option>
-                                            <option value="2">Lễ Tân</option>
-                                            <option value="3">Bellman</option>
+                                        <select className="form-select" disabled={!editAllowance} value={editStaff?.staff_category ? editStaff.staff_category.id : ''}
+                                            onChange={(event) => handleEditStaff('staff_category', event.target.value)}
+                                        >
+                                            <option key={`staff-type-default`} value="0">Select staff type...</option>
+                                            {staffCategories && staffCategories.length > 0 &&
+                                                staffCategories.map(item => {
+                                                    return (
+                                                        <option key={`staff-type-${item.id}`} value={item.id}>{item.name}</option>
+                                                    )
+                                                })
+                                            }
                                         </select>
                                     </div>
                                     <div className='form-group col-12 px-4 mt-2'>
                                         <label className='form-label'>Ngày vào làm:</label>
-                                        <input type='text' className='form-control' />
+                                        <input type='text' className='form-control' disabled={!editAllowance} value={editStaff?.working_day ? editStaff.working_day : ''}
+                                            onChange={(event) => handleEditStaff('working_day', event.target.value)}
+                                        />
                                     </div>
                                 </fieldset>
                             </div>
@@ -53,48 +194,68 @@ const StaffManagement = () => {
                                 <legend className='reset legend-text'>Thông tin nhân viên</legend>
                                 <div className='form-group col-12 px-4 mt-2'>
                                     <label className='form-label'>Tên:</label>
-                                    <input type='text' className='form-control' />
+                                    <input type='text' className='form-control' disabled={!editAllowance} value={editStaff?.name ? editStaff.name : ''}
+                                        onChange={(event) => handleEditStaff('name', event.target.value)}
+                                    />
                                 </div>
                                 <div className='form-group col-12 px-4 mt-2'>
                                     <label className='form-label'>Số CCCD/ CMND:</label>
-                                    <input type='text' className='form-control' />
+                                    <input type='text' className='form-control' disabled={!editAllowance} value={editStaff?.citizen_id ? editStaff.citizen_id : ''}
+                                        onChange={(event) => handleEditStaff('citizen_id', event.target.value)}
+                                    />
                                 </div>
                                 <div className='form-group col-12 px-4 mt-2'>
                                     <label className='form-label'>Giới tính:</label>
-                                    <select className="form-select">
-                                        <option defaultValue={'1'}>Nam</option>
-                                        <option value="2">Nữ</option>
-                                        <option value="3">Khác</option>
+                                    <select className="form-select" disabled={!editAllowance} value={editStaff?.gender ? editStaff.gender : ''}
+                                        onChange={(event) => handleEditStaff('gender', event.target.value)}
+                                    >
+                                        <option defaultValue={'Nam'}>Nam</option>
+                                        <option value="Nữ">Nữ</option>
+                                        <option value="Khác">Khác</option>
                                     </select>
                                 </div>
                                 <div className='form-group col-12 px-4 mt-2'>
                                     <label className='form-label'>Ngày sinh:</label>
-                                    <input type='text' className='form-control' />
+                                    <input type='text' className='form-control' disabled={!editAllowance} value={editStaff?.dob ? editStaff.dob : ''}
+                                        onChange={(event) => handleEditStaff('dob', event.target.value)}
+                                    />
                                 </div>
                                 <div className='form-group col-12 px-4 mt-2'>
                                     <label className='form-label'>Số điện thoại:</label>
-                                    <input type='text' className='form-control' />
+                                    <input type='text' className='form-control' disabled={!editAllowance} value={editStaff?.phone ? editStaff.phone : ''}
+                                        onChange={(event) => handleEditStaff('phone', event.target.value)}
+                                    />
                                 </div>
                                 <div className='form-group col-12 px-4 mt-2'>
                                     <label className='form-label'>Địa chỉ:</label>
-                                    <input type='text' className='form-control' />
+                                    <input type='text' className='form-control' disabled={!editAllowance} value={editStaff?.address ? editStaff.address : ''}
+                                        onChange={(event) => handleEditStaff('address', event.target.value)}
+                                    />
                                 </div>
                             </fieldset>
                         </div>
                         <fieldset className='bottom-left border rounded-2 p-2'>
                             <legend className='reset legend-text'>Chức năng</legend>
                             <div className='row mb-3 px-4'>
-                                <div className='form-group col-6'>
-                                    <button className='btn btn-outline-danger col-12'>Xóa nhân viên</button>
-                                </div>
+                                {!_.isEmpty(editStaff) &&
+                                    <div className='form-group col-6'>
+                                        <button className='btn btn-outline-danger col-12' onClick={() => setShowDeleteModal(true)}>
+                                            Xóa nhân viên
+                                        </button>
+                                    </div>
+                                }
                                 <div className='form-group col-6'>
                                     <button className='btn btn-success col-12'>Thêm nhân viên</button>
                                 </div>
                             </div>
                             <div className='row px-4'>
-                                <div className='form-group col-6'>
-                                    <button className='btn btn-warning col-12'>Cập nhật nhân viên</button>
-                                </div>
+                                {!_.isEmpty(editStaff) &&
+                                    <div className='form-group col-6'>
+                                        <button className='btn btn-warning col-12' onClick={handleUpdateStaff}>
+                                            {editAllowance === false ? <span>Chỉnh sửa</span> : <span>Lưu chỉnh sửa</span>}
+                                        </button>
+                                    </div>
+                                }
                                 <div className='form-group col-6'>
                                     <button className='btn btn-primary col-12' onClick={() => setShowAccessControl(true)}>Quyền truy cập</button>
                                 </div>
@@ -114,28 +275,19 @@ const StaffManagement = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {
-                                    [...Array(3)].map(item => {
+                                {staffList && staffList.length > 0 &&
+                                    staffList.map((item, index) => {
                                         return (
-                                            <tr>
-                                                <td>staff123</td>
-                                                <td>Ngô Hữu Toàn</td>
-                                                <td>Quản lí Nhân Viên</td>
-                                                <td>123456879</td>
-                                                <td>090882741</td>
-                                            </tr>
-                                        )
-                                    })
-                                }
-                                {
-                                    [...Array(12)].map(item => {
-                                        return (
-                                            <tr>
-                                                <td>staff111</td>
-                                                <td>Nguyễn Văn Lượng</td>
-                                                <td>Lễ Tân</td>
-                                                <td>123456879</td>
-                                                <td>090882741</td>
+                                            <tr
+                                                key={`staff-${item.id}`}
+                                                className={item.isSelected ? 'selected-row' : ''}
+                                                onClick={() => handleSelectingStaff(item)}
+                                            >
+                                                <td>{item.staff_account_name}</td>
+                                                <td>{item.name}</td>
+                                                <td>{item?.staff_category?.name}</td>
+                                                <td>{item.citizen_id}</td>
+                                                <td>{item.phone}</td>
                                             </tr>
                                         )
                                     })
@@ -149,10 +301,11 @@ const StaffManagement = () => {
                 show={showAccessControl}
                 setShow={setShowAccessControl}
             />
-            {/* <RoomCategory
-                show={showRoomCategory}
-                setShow={setShowRoomCategory}
-            /> */}
+            <DeleteModal
+                show={showDeleteModal}
+                setShow={setShowDeleteModal}
+                handleDeleteStaff={handleDeleteStaff}
+            />
         </>
 
     )
