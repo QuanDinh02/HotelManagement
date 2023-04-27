@@ -1,5 +1,6 @@
 const CustomerServices = require('../services/customerService.js');
 const StaffServices = require('../services/staffService.js');
+const AccessPermissionServices = require('../services/accessPermissionService.js');
 
 const resolvers = {
     Customer: {
@@ -14,6 +15,13 @@ const resolvers = {
             let staffCategory = await StaffServices.getAllStaffCategory();
             return staffCategory.filter(item => +item.id === +parent.staff_category)[0];
         }
+    },
+
+    StaffCategoryAccess: {
+        // staff_category_info: async (parent, args) => {
+        //     let staffCategory = await StaffServices.getAllStaffCategory();
+        //     return staffCategory.filter(item => +item.id === +parent.staff_category)[0];
+        // }
     },
 
     Query: {
@@ -42,6 +50,32 @@ const resolvers = {
         staff_categories: async () => {
             return await StaffServices.getAllStaffCategory();
         },
+
+        staff_access_management: async () => {
+            let _access_permisions_list = await AccessPermissionServices.getAllAccessPermissions();
+            let access_permisions_list = _access_permisions_list;
+
+            let _staff_access_list = await StaffServices.getAllStaffCategory();
+
+            let buildData = await Promise.all(_staff_access_list.map(async (item) => {
+                let staff_category_info = item;
+                let access_permisions = await AccessPermissionServices.getStaffAccessPermissions(item.id);
+                if (access_permisions) {
+                    return {
+                        staff_category_info: staff_category_info,
+                        access_permisions: access_permisions.AccessPermissions
+                    }
+                }
+            }));
+
+            if (buildData) {
+                return {
+                    access_permisions_list: access_permisions_list,
+                    staff_access_list: buildData
+                }
+            }
+            
+        },
     },
 
     Mutation: {
@@ -51,6 +85,10 @@ const resolvers = {
 
         deleteCustomer: async (parent, args) => {
             return await CustomerServices.deleteCustomer(args.id);
+        },
+
+        createStaff: async (parent, args) => {
+            return await StaffServices.createStaff(args.input);
         },
 
         updateStaff: async (parent, args) => {

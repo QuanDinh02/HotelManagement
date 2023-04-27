@@ -34,6 +34,62 @@ const getAllStaffCategory = async () => {
     return result;
 }
 
+const createStaff = async (data) => {
+    let { staffInfo, staffAccount } = data;
+
+    let existedStaff = await db.Staff.findOne({
+        where: {
+            [Op.or]: [
+                {
+                    citizen_id: {
+                        [Op.substring]: `${staffInfo.citizen_id}`
+                    }
+                },
+                {
+                    phone: {
+                        [Op.substring]: `${staffInfo.phone}`
+                    }
+                }
+            ]
+        },
+        raw: true
+    })
+
+    if (existedStaff) {
+        return {
+            errorCode: -1,
+            message: 'Staff is existed !'
+        }
+    } else {
+
+        let res = await db.Staff.create(staffInfo);
+
+        if (res) {
+            let result = res.get({ plain: true });
+
+            let buildData = {
+                account_name: staffAccount.account_name,
+                password: staffAccount.password,
+                staff_id: +result.id
+            }
+
+            let account_res = await db.StaffAccount.create(buildData);
+
+            if (account_res) {
+                return {
+                    errorCode: 0,
+                    message: 'Create staff successfully !'
+                }
+            } else {
+                return {
+                    errorCode: -2,
+                    message: 'Something is wrong !'
+                }
+            }
+        }
+    }
+}
+
 const updateStaff = async (data) => {
     let existedStaff = await db.Staff.findOne({
         where: {
@@ -155,6 +211,6 @@ const getSearchedStaff = async (value) => {
 }
 
 module.exports = {
-    getAllStaffs, getAllStaffCategory, updateStaff,
-    deleteStaff, getSearchedStaff
+    getAllStaffs, getAllStaffCategory, createStaff,
+    updateStaff, deleteStaff, getSearchedStaff
 }

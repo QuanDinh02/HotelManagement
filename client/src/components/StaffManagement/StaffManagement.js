@@ -11,12 +11,16 @@ import { UPDATE_STAFF, DELETE_STAFF } from '../Mutation/StaffMutation';
 import { useImmer } from "use-immer";
 import _ from 'lodash';
 import DeleteModal from '../Modal/StaffMutation/DeleteModal';
+import StaffModal from '../Modal/Staff/StaffModal';
 
 const StaffManagement = () => {
 
     const history = useHistory();
+
     const [showAccessControl, setShowAccessControl] = React.useState(false);
     const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+    const [showAddNewModal, setShowAddNewModal] = React.useState(false);
+
     const [staffList, setStaffList] = useImmer([]);
     const [editStaff, setEditStaff] = useImmer({});
     const [editAllowance, setEditAllowance] = React.useState(false);
@@ -172,7 +176,7 @@ const StaffManagement = () => {
                                         <select className="form-select" disabled={!editAllowance} value={editStaff?.staff_category ? editStaff.staff_category.id : ''}
                                             onChange={(event) => handleEditStaff('staff_category', event.target.value)}
                                         >
-                                            <option key={`staff-type-default`} value="0">Select staff type...</option>
+                                            <option key={`staff-type-default`} value="0">Chọn loại nhân viên...</option>
                                             {staffCategories && staffCategories.length > 0 &&
                                                 staffCategories.map(item => {
                                                     return (
@@ -245,7 +249,7 @@ const StaffManagement = () => {
                                     </div>
                                 }
                                 <div className='form-group col-6'>
-                                    <button className='btn btn-success col-12'>Thêm nhân viên</button>
+                                    <button className='btn btn-success col-12' onClick={() => setShowAddNewModal(true)}>Thêm nhân viên</button>
                                 </div>
                             </div>
                             <div className='row px-4'>
@@ -305,6 +309,11 @@ const StaffManagement = () => {
                 show={showDeleteModal}
                 setShow={setShowDeleteModal}
                 handleDeleteStaff={handleDeleteStaff}
+            />
+            <StaffModal
+                show={showAddNewModal}
+                setShow={setShowAddNewModal}
+                staffCategories={staffCategories}
             />
         </>
 
