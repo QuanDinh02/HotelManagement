@@ -21,19 +21,31 @@ const AccessManagement = (props) => {
     const [addAccess, setAddAccess] = React.useState(false);
     const [editAccess, setEditAccess] = React.useState(false);
 
-    const [getAccessPermissionsList] = useLazyQuery(GET_ALL_ACCESS_PERMISSIONS);
+    const [getAccessPermissionsList, { refetch }] = useLazyQuery(GET_ALL_ACCESS_PERMISSIONS);
 
     const [addAccessPermissions] = useMutation(ADD_ACCESS_PERMISSIONS, {
-        refetchQueries: [
-            { query: GET_ALL_ACCESS_PERMISSIONS }
-        ],
+        onCompleted: async () => {
+            await updateAfterAddMutation();
+        }
     });
+
+    const updateAfterAddMutation = async () => {
+        let { data: { staff_access_management } } = await refetch();
+        setAccessPermissionList(staff_access_management.access_permisions_list);
+        setStaffCategories(staff_access_management.staff_access_list);
+
+        let staff_category = _.find(staff_access_management.staff_access_list, item => item.staff_category_info.id === selectedStaffCategory.staff_category_info.id);
+        setSelectedStaffCategory({
+            staff_category_info: staff_category.staff_category_info,
+            access_permisions: staff_category.access_permisions
+        });
+    }
 
     const handleAddAccessPermissions = async () => {
         let new_access_permisions = staffNoAccessList.filter(item => item.isSelected === true);
         let _new_acc_per = new_access_permisions.map(item => item.id);
 
-        let result = await addAccessPermissions({
+        await addAccessPermissions({
             variables: {
                 input: {
                     id: selectedStaffCategory.staff_category_info.id,
@@ -42,14 +54,8 @@ const AccessManagement = (props) => {
             }
         });
 
-        if (result) {
-            setStaffNoAccessList(draft => {
-                draft = draft.map(item => {
-                    item.isSelected = false;
-                    return item;
-                })
-            })
-        }
+        setAddAccess(false);
+        setEditAccess(false);
     }
 
     const checkSelectAccess = (type) => {

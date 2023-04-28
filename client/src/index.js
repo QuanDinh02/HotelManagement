@@ -14,6 +14,11 @@ const cache = new InMemoryCache({
             return incoming;
           },
         },
+        staff_access_management: {
+          merge(existing, incoming) {
+            return incoming;
+          },
+        },
       },
     },
   },
