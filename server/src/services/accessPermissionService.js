@@ -32,6 +32,41 @@ const getStaffAccessPermissions = async (staff_category_id) => {
     return _result;
 }
 
+const addAccessPermissions = async (data) => {
+    let { id, access_permissions } = data;
+
+    let existedStaffCategory = await db.StaffCategory.findOne({
+        where: {
+            id: +id
+        },
+        raw: true
+    })
+
+    if (!existedStaffCategory) {
+        return {
+            errorCode: -1,
+            message: 'Staff is not existed !'
+        }
+    } else {
+
+        let buildInput = access_permissions.map(item => {
+            return {
+                staff_id: +id,
+                access_id: +item
+            }
+        })
+
+        let res = await db.Staff_AccessPermission.bulkCreate(buildInput);
+
+        if (res) {
+            return {
+                errorCode: 0,
+                message: 'Add access permissions successfully !'
+            }
+        }
+    }
+}
+
 module.exports = {
-    getAllAccessPermissions, getStaffAccessPermissions
+    getAllAccessPermissions, getStaffAccessPermissions, addAccessPermissions
 }

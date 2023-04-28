@@ -112,6 +112,11 @@ const typeDefs = `#graphql
     staffAccount: StaffAccountInput!
   }
 
+  input AccessPermissionInput {
+    id: ID!
+    access_permissions: [ID!]
+  }
+
   type Mutation {
     updateCustomer(input: CustomerInput!): String
     deleteCustomer(id: ID!): String
@@ -119,6 +124,8 @@ const typeDefs = `#graphql
     createStaff(input: CreateStaffInput!): Response
     updateStaff(input: StaffInput!): String
     deleteStaff(id: ID!): String
+
+    addAccessPermission(input: AccessPermissionInput!): Response
   }
 `;
 

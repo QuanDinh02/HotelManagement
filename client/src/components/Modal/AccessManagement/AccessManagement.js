@@ -1,8 +1,9 @@
 import React from 'react';
 import Modal from 'react-bootstrap/Modal';
 import './AccessManagement.scss';
-import { useLazyQuery } from '@apollo/client';
+import { useLazyQuery, useMutation } from '@apollo/client';
 import { GET_ALL_ACCESS_PERMISSIONS } from '../../Query/AccessPermissionQuery';
+import { ADD_ACCESS_PERMISSIONS } from '../../Mutation/StaffMutation';
 import { useImmer } from "use-immer";
 import _ from 'lodash';
 
@@ -17,11 +18,96 @@ const AccessManagement = (props) => {
     const [staffAccessList, setStaffAccessList] = useImmer([]);
     const [staffNoAccessList, setStaffNoAccessList] = useImmer([]);
 
+    const [addAccess, setAddAccess] = React.useState(false);
+    const [editAccess, setEditAccess] = React.useState(false);
+
     const [getAccessPermissionsList] = useLazyQuery(GET_ALL_ACCESS_PERMISSIONS);
+
+    const [addAccessPermissions] = useMutation(ADD_ACCESS_PERMISSIONS, {
+        refetchQueries: [
+            { query: GET_ALL_ACCESS_PERMISSIONS }
+        ],
+    });
+
+    const handleAddAccessPermissions = async () => {
+        let new_access_permisions = staffNoAccessList.filter(item => item.isSelected === true);
+        let _new_acc_per = new_access_permisions.map(item => item.id);
+
+        let result = await addAccessPermissions({
+            variables: {
+                input: {
+                    id: selectedStaffCategory.staff_category_info.id,
+                    access_permissions: _new_acc_per
+                }
+            }
+        });
+
+        if (result) {
+            setStaffNoAccessList(draft => {
+                draft = draft.map(item => {
+                    item.isSelected = false;
+                    return item;
+                })
+            })
+        }
+    }
+
+    const checkSelectAccess = (type) => {
+        if (type === 'ACCESS') {
+            return staffAccessList.some(item => item.isSelected === true);
+        }
+
+        if (type === 'NO_ACCESS') {
+            return staffNoAccessList.some(item => item.isSelected === true);
+        }
+    }
+
+    const handleCancelSelections = () => {
+        if (editAccess) {
+            setStaffAccessList(draft => {
+                draft = draft.map(item => {
+                    item.isSelected = false;
+                    return item;
+                })
+            })
+        }
+
+        if (addAccess) {
+            setStaffNoAccessList(draft => {
+                draft = draft.map(item => {
+                    item.isSelected = false;
+                    return item;
+                })
+            })
+        }
+    }
+
+    const handleSelectingAccess = (type, selected_access) => {
+        if (type === 'ACCESS') {
+            setStaffAccessList(draft => {
+                draft = draft.map(item => {
+                    if (item.id === selected_access.id) {
+                        item.isSelected = !item.isSelected;
+                        return item;
+                    }
+                })
+            })
+        }
+
+        if (type === 'NO_ACCESS') {
+            setStaffNoAccessList(draft => {
+                draft = draft.map(item => {
+                    if (item.id === selected_access.id) {
+                        item.isSelected = !item.isSelected;
+                        return item;
+                    }
+                })
+            })
+        }
+    }
 
     const fetchAccessPermissionList = async () => {
         let { data: { staff_access_management } } = await getAccessPermissionsList();
-        console.log(staff_access_management);
 
         setAccessPermissionList(staff_access_management.access_permisions_list);
         setStaffCategories(staff_access_management.staff_access_list);
@@ -31,6 +117,10 @@ const AccessManagement = (props) => {
     const handleSelectStaffCategory = (value) => {
         if (value === "0") {
             setSelectedStaffCategory({});
+            setStaffAccessList([]);
+            setStaffNoAccessList([]);
+            setAddAccess(false);
+            setEditAccess(false);
         } else {
             let staff_category = _.find(staffCategories, item => item.staff_category_info.id === value);
             setSelectedStaffCategory({
@@ -42,8 +132,34 @@ const AccessManagement = (props) => {
 
     const handleCloseModal = () => {
         setSelectedStaffCategory({});
+        setStaffAccessList([]);
+        setStaffNoAccessList([]);
+        setAddAccess(false);
+        setEditAccess(false);
         setShow(false);
     }
+
+    React.useEffect(() => {
+        if (staffAccessList && staffAccessList.length > 0) {
+            if (checkSelectAccess('ACCESS')) {
+                setEditAccess(true);
+                setAddAccess(false);
+            } else {
+                setEditAccess(false);
+            }
+        }
+    }, [staffAccessList]);
+
+    React.useEffect(() => {
+        if (staffNoAccessList && staffNoAccessList.length > 0) {
+            if (checkSelectAccess('NO_ACCESS')) {
+                setAddAccess(true);
+                setEditAccess(false);
+            } else {
+                setAddAccess(false);
+            }
+        }
+    }, [staffNoAccessList]);
 
     React.useEffect(() => {
         if (!_.isEmpty(selectedStaffCategory)) {
@@ -61,6 +177,26 @@ const AccessManagement = (props) => {
             fetchAccessPermissionList();
         }
     }, [show]);
+
+    React.useEffect(() => {
+        if (staffAccessList && staffAccessList.length > 0) {
+            let _staffAccessList = staffAccessList.map(item => {
+                return {
+                    ...item, isSelected: false
+                }
+            });
+            setStaffAccessList(_staffAccessList);
+        }
+
+        if (staffNoAccessList && staffNoAccessList.length > 0) {
+            let _staffNoAccessList = staffNoAccessList.map(item => {
+                return {
+                    ...item, isSelected: false
+                }
+            });
+            setStaffNoAccessList(_staffNoAccessList);
+        }
+    }, [selectedStaffCategory?.id]);
 
     return (
         <>
@@ -98,9 +234,18 @@ const AccessManagement = (props) => {
 
                             </div>
                             <div className='mt-4 d-flex flex-column col-12'>
-                                <button className='btn btn-warning col-12'>Sửa tên quyền</button>
-                                <button className='btn btn-success col-12 mt-3'>Thêm quyền</button>
-                                <button className='btn btn-outline-danger col-12 mt-3'>Xóa quyền</button>
+                                {(addAccess || editAccess) &&
+                                    <button className='btn btn-dark col-12 mt-3' onClick={handleCancelSelections}>Hủy chọn</button>
+                                }
+                                {(addAccess && !editAccess) &&
+                                    <button className='btn btn-success col-12 mt-3' onClick={handleAddAccessPermissions}>Thêm quyền</button>
+                                }
+                                {(editAccess && !addAccess) &&
+                                    <>
+                                        <button className='btn btn-warning col-12 mt-3'>Sửa tên quyền</button>
+                                        <button className='btn btn-outline-danger col-12 mt-3'>Xóa quyền</button>
+                                    </>
+                                }
                             </div>
                         </fieldset>
                         <div className='access-list d-flex gap-3'>
@@ -111,9 +256,19 @@ const AccessManagement = (props) => {
                                         {staffAccessList && staffAccessList.length > 0 &&
                                             staffAccessList.map(item => {
                                                 return (
-                                                    <tr key={`access-permission-${item.id}`} className='access'>
-                                                        <td>{item.name}</td>
-                                                    </tr>
+                                                    <>
+                                                        {!addAccess ?
+                                                            <tr key={`access-permission-${item.id}`} onClick={() => handleSelectingAccess('ACCESS', item)}
+                                                                className={item.isSelected ? 'selected-row table-row-hover' : 'table-row-hover'}
+                                                            >
+                                                                <td>{item.name}</td>
+                                                            </tr>
+                                                            :
+                                                            <tr key={`access-permission-${item.id}`} className='disabled-access'>
+                                                                <td>{item.name}</td>
+                                                            </tr>
+                                                        }
+                                                    </>
                                                 )
                                             })
                                         }
@@ -127,9 +282,20 @@ const AccessManagement = (props) => {
                                         {staffNoAccessList && staffNoAccessList.length > 0 &&
                                             staffNoAccessList.map(item => {
                                                 return (
-                                                    <tr key={`no-access-permission-${item.id}`}>
-                                                        <td>{item.name}</td>
-                                                    </tr>
+                                                    <>
+                                                        {!editAccess ?
+                                                            <tr key={`no-access-permission-${item.id}`} onClick={() => handleSelectingAccess('NO_ACCESS', item)}
+                                                                className={item.isSelected ? 'selected-row table-row-hover' : 'table-row-hover'}
+                                                            >
+                                                                <td>{item.name}</td>
+                                                            </tr>
+                                                            :
+                                                            <tr key={`no-access-permission-${item.id}`} className='disabled-access'>
+                                                                <td>{item.name}</td>
+                                                            </tr>
+                                                        }
+                                                    </>
+
                                                 )
                                             })
                                         }

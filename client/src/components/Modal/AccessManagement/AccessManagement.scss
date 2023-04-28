@@ -36,6 +36,19 @@ $access-color    : #ECECEC;
                 height    : auto;
                 overflow-y: auto;
 
+                .disabled-access {
+                    cursor          : not-allowed;
+                    background-color: rgb(206, 206, 206);
+                }
+
+                .table-row-hover {
+                    &:hover {
+                        cursor          : pointer;
+                        background-color: $main-color;
+                        color           : white;
+                    }
+                }
+
                 table {
                     thead {
                         tr {
@@ -46,13 +59,18 @@ $access-color    : #ECECEC;
                     }
 
                     tbody {
-                        tr {
-                            &:hover {
-                                cursor          : pointer;
-                                background-color: $main-color;
-                                color           : white;
-                            }
+                        .selected-row {
+                            background-color: $main-color;
+                            color           : white;
                         }
+
+                        // tr {
+                        //     &:hover {
+                        //         cursor          : pointer;
+                        //         background-color: $main-color;
+                        //         color           : white;
+                        //     }
+                        // }
                     }
                 }
 

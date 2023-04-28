@@ -98,6 +98,10 @@ const resolvers = {
         deleteStaff: async (parent, args) => {
             return await StaffServices.deleteStaff(args.id);
         },
+
+        addAccessPermission: async (parent, args) => {
+            return await AccessPermissionServices.addAccessPermissions(args.input);
+        },
     }
 };
 
