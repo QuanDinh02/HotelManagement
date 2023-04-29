@@ -19,4 +19,32 @@ const GET_ALL_HOTEL_SERVICES = gql`
   }
 `;
 
-export { GET_ALL_HOTEL_SERVICES }
+const GET_SEARCHED_SERVICE_BY_NAME = gql`
+  query getSearchService($value: String!) {
+    searched_service_by_name(value: $value) {
+      id
+      name
+      price
+      hotel_service_category {
+        id
+        name
+      }
+    }
+  }
+`;
+
+const GET_SEARCHED_SERVICE_BY_CATEGORY = gql`
+  query getSearchService($value: String!) {
+    searched_service_by_category(value: $value) {
+      id
+      name
+      price
+      hotel_service_category {
+        id
+        name
+      }
+    }
+  }
+`;
+
+export { GET_ALL_HOTEL_SERVICES, GET_SEARCHED_SERVICE_BY_NAME, GET_SEARCHED_SERVICE_BY_CATEGORY }

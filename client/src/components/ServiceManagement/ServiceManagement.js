@@ -6,7 +6,10 @@ import React from 'react';
 import { CurrencyFormat } from '../Format/FormatNumber';
 import ServiceCategory from '../Modal/ServiceCategory/ServiceCategory';
 import ServiceModal from '../Modal/Service/ServiceModal';
-import { GET_ALL_HOTEL_SERVICES } from '../Query/HotelServiceQuery';
+import {
+    GET_ALL_HOTEL_SERVICES, GET_SEARCHED_SERVICE_BY_NAME,
+    GET_SEARCHED_SERVICE_BY_CATEGORY
+} from '../Query/HotelServiceQuery';
 import { UPDATE_SERVICE, DELETE_SERVICE } from '../Mutation/ServiceMutation';
 import { useQuery, useLazyQuery, useMutation } from '@apollo/client';
 import { useImmer } from "use-immer";
@@ -26,6 +29,12 @@ const ServiceManagement = () => {
     const [editAllowance, setEditAllowance] = React.useState(false);
     const [serviceCategories, setServiceCategories] = React.useState([]);
 
+    const [nameSearch, setNameSearch] = React.useState('');
+    const [categorySearch, setCategorySearch] = React.useState('');
+
+    const [getSearchedServiceByName] = useLazyQuery(GET_SEARCHED_SERVICE_BY_NAME);
+    const [getSearchedServiceByCategory] = useLazyQuery(GET_SEARCHED_SERVICE_BY_CATEGORY);
+
     const { data: hotel_services_data } = useQuery(GET_ALL_HOTEL_SERVICES);
 
     const [updateService, { data: updateMsg }] = useMutation(UPDATE_SERVICE, {
@@ -39,6 +48,29 @@ const ServiceManagement = () => {
             { query: GET_ALL_HOTEL_SERVICES }
         ],
     });
+
+    const handleSearchService = async (type) => {
+        setEditService({});
+
+        if (type === 'NAME') {
+            let { data: { searched_service_by_name } } = await getSearchedServiceByName({
+                variables: {
+                    value: nameSearch
+                }
+            });
+            setHotelServices(searched_service_by_name);
+        }
+
+        if (type === 'CATEGORY') {
+            let { data: { searched_service_by_category } } = await getSearchedServiceByCategory({
+                variables: {
+                    value: categorySearch
+                }
+            });
+            setHotelServices(searched_service_by_category);
+        }
+
+    }
 
     const handleEditService = (attribute, value) => {
         if (attribute === 'hotel_service_category') {
@@ -136,12 +168,16 @@ const ServiceManagement = () => {
                             <legend className='reset legend-text'>Tìm kiếm</legend>
                             <div className='d-flex gap-3 px-4'>
                                 <div className="input-group">
-                                    <input type="text" className="form-control" placeholder="Tên dịch vụ" />
-                                    <span className="input-group-text search-btn" title='Tìm kiếm'><HiOutlineSearch /></span>
+                                    <input type="text" className="form-control" placeholder="Tên dịch vụ" value={nameSearch}
+                                        onChange={(event) => setNameSearch(event.target.value)}
+                                    />
+                                    <span className="input-group-text search-btn" title='Tìm kiếm' onClick={() => handleSearchService('NAME')}><HiOutlineSearch /></span>
                                 </div>
                                 <div className="input-group">
-                                    <input type="text" className="form-control" placeholder="Loại dịch vụ" />
-                                    <span className="input-group-text search-btn" title='Tìm kiếm'><HiOutlineSearch /></span>
+                                    <input type="text" className="form-control" placeholder="Loại dịch vụ" value={categorySearch}
+                                        onChange={(event) => setCategorySearch(event.target.value)}
+                                    />
+                                    <span className="input-group-text search-btn" title='Tìm kiếm' onClick={() => handleSearchService('CATEGORY')}><HiOutlineSearch /></span>
                                 </div>
                             </div>
 

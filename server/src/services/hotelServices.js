@@ -129,7 +129,122 @@ const deleteService = async (service_id) => {
     }
 }
 
+const getSearchedServiceByName = async (service_name) => {
+    if (service_name) {
+        let result = await db.HotelService.findAll({
+            raw: true,
+            nest: true,
+            include: {
+                model: db.HotelServiceCategory, attributes: ['id', 'name'],
+            },
+            order: [
+                ['id', 'ASC']
+            ],
+            where: {
+                name: {
+                    [Op.substring]: `${service_name}`
+                }
+            }
+        });
+
+        if (result) {
+            let _result = result.map(item => {
+                let category = item.HotelServiceCategory;
+                delete item.HotelServiceCategory;
+
+                return {
+                    ...item, hotel_service_category: category
+                }
+            });
+
+            return _result;
+        }
+        return result;
+
+    }
+
+    let result = await db.HotelService.findAll({
+        raw: true,
+        nest: true,
+        include: {
+            model: db.HotelServiceCategory, attributes: ['id', 'name']
+        },
+        order: [
+            ['id', 'ASC']
+        ]
+    });
+
+    let _result = result.map(item => {
+        let category = item.HotelServiceCategory;
+        delete item.HotelServiceCategory;
+
+        return {
+            ...item, hotel_service_category: category
+        }
+    });
+
+    return _result;
+}
+
+const getSearchedServiceByCategory = async (service_category_name) => {
+    if (service_category_name) {
+        let result = await db.HotelService.findAll({
+            raw: true,
+            nest: true,
+            include: {
+                model: db.HotelServiceCategory, attributes: ['id', 'name'],
+                where: {
+                    name: {
+                        [Op.substring]: `${service_category_name}`
+                    }
+                }
+            },
+            order: [
+                ['id', 'ASC']
+            ]
+        });
+
+        if (result) {
+            let _result = result.map(item => {
+                let category = item.HotelServiceCategory;
+                delete item.HotelServiceCategory;
+
+                return {
+                    ...item, hotel_service_category: category
+                }
+            });
+
+            return _result;
+        }
+        return result;
+    }
+
+    let result = await db.HotelService.findAll({
+        raw: true,
+        nest: true,
+        include: {
+            model: db.HotelServiceCategory, attributes: ['id', 'name']
+        },
+        order: [
+            ['id', 'ASC']
+        ]
+    });
+
+    let _result = result.map(item => {
+        let category = item.HotelServiceCategory;
+        delete item.HotelServiceCategory;
+
+        return {
+            ...item, hotel_service_category: category
+        }
+    });
+
+    return _result;
+}
+
 module.exports = {
     getAllHotelServices, getAllHotelServiceCategories, createNewService,
-    updateService, deleteService
+    updateService, deleteService,
+
+    getSearchedServiceByName, getSearchedServiceByCategory
 }

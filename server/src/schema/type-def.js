@@ -75,10 +75,13 @@ const typeDefs = `#graphql
     staffs: [Staff!]
     staff(value: String!): [Staff]
     staff_categories: [StaffCategory!]
-
     staff_access_management: StaffAccessManagement!
+
     hotel_services: [HotelService!]
     hotel_service_categories: [HotelServiceCategory!]
+
+    searched_service_by_name(value: String!): [HotelService!]
+    searched_service_by_category(value: String!): [HotelService!]
   }
 
   input CustomerInput {

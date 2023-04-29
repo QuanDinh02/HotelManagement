@@ -77,7 +77,17 @@ const resolvers = {
 
         hotel_service_categories: async () => {
             return await HotelServices.getAllHotelServiceCategories();
-        }
+        },
+
+        searched_service_by_name: async (parent, args) => {
+            let service = await HotelServices.getSearchedServiceByName(args.value);
+            return service;
+        },
+
+        searched_service_by_category: async (parent, args) => {
+            let service = await HotelServices.getSearchedServiceByCategory(args.value);
+            return service;
+        },
     },
 
     Mutation: {
