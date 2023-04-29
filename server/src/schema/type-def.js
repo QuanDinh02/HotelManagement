@@ -55,6 +55,18 @@ const typeDefs = `#graphql
     access_permisions_list: [AccessPermission!]
   }
 
+  type HotelServiceCategory {
+    id: ID!
+    name: String!
+  }
+
+  type HotelService {
+    id: ID!
+    name: String!
+    price: Int!
+    hotel_service_category: HotelServiceCategory!
+  }
+
   type Query {
     customers: [Customer!]
     customer(value: String!): [Customer]
@@ -65,6 +77,8 @@ const typeDefs = `#graphql
     staff_categories: [StaffCategory!]
 
     staff_access_management: StaffAccessManagement!
+    hotel_services: [HotelService!]
+    hotel_service_categories: [HotelServiceCategory!]
   }
 
   input CustomerInput {

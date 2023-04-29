@@ -1,6 +1,7 @@
 const CustomerServices = require('../services/customerService.js');
 const StaffServices = require('../services/staffService.js');
 const AccessPermissionServices = require('../services/accessPermissionService.js');
+const HotelServices = require('../services/hotelServices.js');
 
 const resolvers = {
     Customer: {
@@ -69,6 +70,14 @@ const resolvers = {
             }
             
         },
+
+        hotel_services: async () => {
+            return await HotelServices.getAllHotelServices();
+        },
+
+        hotel_service_categories: async () => {
+            return await HotelServices.getAllHotelServiceCategories();
+        }
     },
 
     Mutation: {

@@ -27,7 +27,7 @@ const DeleteModal = (props) => {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="outline-danger" onClick={handleDelete}>Xóa</Button>
-                    <Button variant="light">Hủy</Button>
+                    <Button variant="light" onClick={() => setShow(false)}>Hủy</Button>
                 </Modal.Footer>
             </Modal>
         </>
