@@ -170,7 +170,7 @@ const CustomerManagement = () => {
                             <div className='row mt-1 px-4'>
                                 <div className='form-group col-6'>
                                     <label className='form-label'>Thẻ căn cước/ CMND:</label>
-                                    <input type='text' className='form-control' disabled={!editAllowance} value={editCustomer?.citizen_id? editCustomer.citizen_id : ''}
+                                    <input type='text' className='form-control' disabled={!editAllowance} value={editCustomer?.citizen_id ? editCustomer.citizen_id : ''}
                                         onChange={(event) => handleEditCustomer('citizen_id', event.target.value)}
                                     />
                                 </div>
@@ -223,28 +223,26 @@ const CustomerManagement = () => {
                                 </div>
                             </div>
                         </fieldset>
-                        {!_.isEmpty(editCustomer) &&
-                            <fieldset className='border rounded-2 p-2'>
-                                <legend className='reset legend-text'>Chức năng</legend>
-                                <div className='row mb-3 px-4'>
-                                    <div className='form-group col-6'>
-                                        <button className='btn btn-outline-danger col-12' onClick={() => setShowDeleteModal(true)}>
-                                            Xóa khách hàng
-                                        </button>
-                                    </div>
-                                    <div className='form-group col-6'>
-                                        <button className='btn btn-warning col-12' onClick={handleUpdateCustomer}>
-                                            {editAllowance === false ? <span>Chỉnh sửa</span> : <span>Lưu chỉnh sửa</span>}
-                                        </button>
-                                    </div>
+                        <fieldset className='border rounded-2 p-2'>
+                            <legend className='reset legend-text'>Chức năng</legend>
+                            <div className='row mb-3 px-4'>
+                                <div className='form-group col-6'>
+                                    <button className='btn btn-outline-danger col-12' onClick={() => setShowDeleteModal(true)} disabled={_.isEmpty(editCustomer) ? true : false}>
+                                        Xóa khách hàng
+                                    </button>
                                 </div>
-                                <div className='row mb-3 px-4'>
-                                    <div className='form-group col-6'>
-                                        <button className='btn btn-secondary col-12' onClick={() => setShowCustomerHistory(true)}>Lịch sử Khách hàng</button>
-                                    </div>
+                                <div className='form-group col-6'>
+                                    <button className='btn btn-warning col-12' onClick={handleUpdateCustomer} disabled={_.isEmpty(editCustomer) ? true : false}>
+                                        {editAllowance === false ? <span>Chỉnh sửa</span> : <span>Lưu chỉnh sửa</span>}
+                                    </button>
                                 </div>
-                            </fieldset>
-                        }
+                            </div>
+                            <div className='row mb-3 px-4'>
+                                <div className='form-group col-6'>
+                                    <button className='btn btn-secondary col-12' onClick={() => setShowCustomerHistory(true)} disabled={_.isEmpty(editCustomer) ? true : false}>Lịch sử Khách hàng</button>
+                                </div>
+                            </div>
+                        </fieldset>
                     </div>
                     <fieldset className='right-content border rounded-2 p-2' onScroll={(event) => { event.preventDefault() }}>
                         <legend className='reset legend-text'>Danh sách Khách hàng</legend>

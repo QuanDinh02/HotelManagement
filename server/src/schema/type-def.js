@@ -131,6 +131,19 @@ const typeDefs = `#graphql
     access_permissions: [ID!]
   }
 
+  input ServiceInput {
+    name: String!
+    price: Int!
+    hotel_service_category: Int!
+  }
+
+  input ServiceUpdateInput {
+    id: ID!
+    name: String!
+    price: Int!
+    hotel_service_category: Int!
+  }
+
   type Mutation {
     updateCustomer(input: CustomerInput!): String
     deleteCustomer(id: ID!): String
@@ -141,6 +154,10 @@ const typeDefs = `#graphql
 
     addAccessPermission(input: AccessPermissionInput!): Response
     deleteStaffAccess(input: AccessPermissionInput!): Response
+
+    createService(input: ServiceInput!): Response
+    updateService(input: ServiceUpdateInput!): Response
+    deleteService(id: ID!): Response
   }
 `;
 

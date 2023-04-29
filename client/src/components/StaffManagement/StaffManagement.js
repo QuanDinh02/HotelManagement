@@ -241,27 +241,23 @@ const StaffManagement = () => {
                         <fieldset className='bottom-left border rounded-2 p-2'>
                             <legend className='reset legend-text'>Chức năng</legend>
                             <div className='row mb-3 px-4'>
-                                {!_.isEmpty(editStaff) &&
-                                    <div className='form-group col-6'>
-                                        <button className='btn btn-outline-danger col-12' onClick={() => setShowDeleteModal(true)}>
-                                            Xóa nhân viên
-                                        </button>
-                                    </div>
-                                }
                                 <div className='form-group col-6'>
                                     <button className='btn btn-success col-12' onClick={() => setShowAddNewModal(true)}>Thêm nhân viên</button>
                                 </div>
+                                <div className='form-group col-6'>
+                                    <button className='btn btn-outline-danger col-12' onClick={() => setShowDeleteModal(true)} disabled={_.isEmpty(editStaff) ? true : false}>
+                                        Xóa nhân viên
+                                    </button>
+                                </div>
                             </div>
                             <div className='row px-4'>
-                                {!_.isEmpty(editStaff) &&
-                                    <div className='form-group col-6'>
-                                        <button className='btn btn-warning col-12' onClick={handleUpdateStaff}>
-                                            {editAllowance === false ? <span>Chỉnh sửa</span> : <span>Lưu chỉnh sửa</span>}
-                                        </button>
-                                    </div>
-                                }
                                 <div className='form-group col-6'>
                                     <button className='btn btn-primary col-12' onClick={() => setShowAccessControl(true)}>Quyền truy cập</button>
+                                </div>
+                                <div className='form-group col-6'>
+                                    <button className='btn btn-warning col-12' onClick={handleUpdateStaff} disabled={_.isEmpty(editStaff) ? true : false}>
+                                        {editAllowance === false ? <span>Chỉnh sửa</span> : <span>Lưu chỉnh sửa</span>}
+                                    </button>
                                 </div>
                             </div>
                         </fieldset>

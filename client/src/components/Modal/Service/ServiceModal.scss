@@ -18,6 +18,10 @@ $legend-text-size: 1.125rem;
             color    : $main-color;
         }
 
+        .required {
+            color: red;
+        }
+        
         .service-category-info {
             width: 100%;
         }

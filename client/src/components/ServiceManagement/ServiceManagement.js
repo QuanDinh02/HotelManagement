@@ -7,21 +7,38 @@ import { CurrencyFormat } from '../Format/FormatNumber';
 import ServiceCategory from '../Modal/ServiceCategory/ServiceCategory';
 import ServiceModal from '../Modal/Service/ServiceModal';
 import { GET_ALL_HOTEL_SERVICES } from '../Query/HotelServiceQuery';
+import { UPDATE_SERVICE, DELETE_SERVICE } from '../Mutation/ServiceMutation';
 import { useQuery, useLazyQuery, useMutation } from '@apollo/client';
 import { useImmer } from "use-immer";
 import _ from 'lodash';
+import DeleteModal from '../Modal/ServiceMutation/DeleteModal';
 
 const ServiceManagement = () => {
 
     const history = useHistory();
+
     const [showServiceCategory, setShowServiceCategory] = React.useState(false);
     const [showServiceModal, setShowServiceModal] = React.useState(false);
+    const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+
     const [hotelServices, setHotelServices] = useImmer([]);
     const [editService, setEditService] = useImmer({});
     const [editAllowance, setEditAllowance] = React.useState(false);
     const [serviceCategories, setServiceCategories] = React.useState([]);
 
     const { data: hotel_services_data } = useQuery(GET_ALL_HOTEL_SERVICES);
+
+    const [updateService, { data: updateMsg }] = useMutation(UPDATE_SERVICE, {
+        refetchQueries: [
+            { query: GET_ALL_HOTEL_SERVICES }
+        ],
+    });
+
+    const [deleteService, { data: deleteMsg }] = useMutation(DELETE_SERVICE, {
+        refetchQueries: [
+            { query: GET_ALL_HOTEL_SERVICES }
+        ],
+    });
 
     const handleEditService = (attribute, value) => {
         if (attribute === 'hotel_service_category') {
@@ -56,11 +73,41 @@ const ServiceManagement = () => {
         })
     }
 
+    const dataValidation = () => {
+        if (!editService) {
+            return;
+        }
+    }
+
     const handleUpdateService = async () => {
         if (editAllowance) {
+            dataValidation();
+            let result = await updateService({
+                variables: {
+                    input: {
+                        ...editService,
+                        price: +editService.price,
+                        hotel_service_category: +editService.hotel_service_category.id
+                    }
+                }
+            });
+
+            setEditService({});
             setEditAllowance(false);
         } else {
             setEditAllowance(true);
+        }
+    }
+
+    const handleDeleteService = async () => {
+        if (!_.isEmpty(editService)) {
+            let result = await deleteService({
+                variables: {
+                    deleteServiceId: editService.id
+                }
+            });
+            setEditService({});
+            setEditAllowance(false);
         }
     }
 
@@ -139,28 +186,24 @@ const ServiceManagement = () => {
                                 <div className='form-group col-6'>
                                     <button className='btn btn-success col-12' onClick={() => setShowServiceModal(true)}>Thêm dịch vụ</button>
                                 </div>
-                                {!_.isEmpty(editService) &&
-                                    <div className='form-group col-6'>
-                                        <button className='btn btn-outline-danger col-12'>Xóa dịch vụ</button>
-                                    </div>
-                                }
+                                <div className='form-group col-6'>
+                                    <button className='btn btn-outline-danger col-12' onClick={() => setShowDeleteModal(true)} disabled={_.isEmpty(editService) ? true : false}>Xóa dịch vụ</button>
+                                </div>
                             </div>
                             <div className='row mb-3 px-4'>
                                 <div className='form-group col-6'>
                                     <button className='btn btn-primary col-12' onClick={() => setShowServiceCategory(true)}>Quản lý Loại dịch vụ</button>
                                 </div>
-                                {!_.isEmpty(editService) &&
-                                    <div className='form-group col-6'>
-                                        <button className='btn btn-warning col-12' onClick={handleUpdateService}>
-                                            {editAllowance === false ? <span>Chỉnh sửa</span> : <span>Lưu chỉnh sửa</span>}
-                                        </button>
-                                    </div>
-                                }
+                                <div className='form-group col-6'>
+                                    <button className='btn btn-warning col-12' onClick={handleUpdateService} disabled={_.isEmpty(editService) ? true : false}>
+                                        {editAllowance === false ? <span>Chỉnh sửa</span> : <span>Lưu chỉnh sửa</span>}
+                                    </button>
+                                </div>
                             </div>
                         </fieldset>
                     </div>
                     <fieldset className='right-content border rounded-2 p-2' onScroll={(event) => { event.preventDefault() }}>
-                        <legend className='reset legend-text'>Danh sách tất cả các phòng</legend>
+                        <legend className='reset legend-text'>Danh sách tất cả các dịch vụ</legend>
                         <table className="table table-bordered">
                             <thead>
                                 <tr>
@@ -195,9 +238,15 @@ const ServiceManagement = () => {
                 show={showServiceCategory}
                 setShow={setShowServiceCategory}
             />
+            <DeleteModal
+                show={showDeleteModal}
+                setShow={setShowDeleteModal}
+                handleDeleteService={handleDeleteService}
+            />
             <ServiceModal
                 show={showServiceModal}
                 setShow={setShowServiceModal}
+                serviceCategories={serviceCategories}
             />
         </>
 

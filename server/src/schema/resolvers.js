@@ -108,6 +108,18 @@ const resolvers = {
         deleteStaffAccess: async (parent, args) => {
             return await AccessPermissionServices.deleteAccessPermissions(args.input);
         },
+
+        createService: async (parent, args) => {
+            return await HotelServices.createNewService(args.input);
+        },
+
+        updateService: async (parent, args) => {
+            return await HotelServices.updateService(args.input);
+        },
+
+        deleteService: async (parent, args) => {
+            return await HotelServices.deleteService(args.id);
+        },
     }
 };
 
