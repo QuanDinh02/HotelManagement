@@ -3,7 +3,7 @@ import Modal from 'react-bootstrap/Modal';
 import './AccessManagement.scss';
 import { useLazyQuery, useMutation } from '@apollo/client';
 import { GET_ALL_ACCESS_PERMISSIONS } from '../../Query/AccessPermissionQuery';
-import { ADD_ACCESS_PERMISSIONS } from '../../Mutation/StaffMutation';
+import { ADD_ACCESS_PERMISSIONS, DELETE_ACCESS_PERMISSIONS } from '../../Mutation/StaffMutation';
 import { useImmer } from "use-immer";
 import _ from 'lodash';
 
@@ -25,11 +25,17 @@ const AccessManagement = (props) => {
 
     const [addAccessPermissions] = useMutation(ADD_ACCESS_PERMISSIONS, {
         onCompleted: async () => {
-            await updateAfterAddMutation();
+            await updateAfterMutation();
         }
     });
 
-    const updateAfterAddMutation = async () => {
+    const [deleteAccessPermissions] = useMutation(DELETE_ACCESS_PERMISSIONS, {
+        onCompleted: async () => {
+            await updateAfterMutation();
+        }
+    });
+
+    const updateAfterMutation = async () => {
         let { data: { staff_access_management } } = await refetch();
         setAccessPermissionList(staff_access_management.access_permisions_list);
         setStaffCategories(staff_access_management.staff_access_list);
@@ -50,6 +56,23 @@ const AccessManagement = (props) => {
                 input: {
                     id: selectedStaffCategory.staff_category_info.id,
                     access_permissions: _new_acc_per
+                }
+            }
+        });
+
+        setAddAccess(false);
+        setEditAccess(false);
+    }
+
+    const handleDeleteAccessPermissions = async () => {
+        let old_access_permisions = staffAccessList.filter(item => item.isSelected === true);
+        let _old_access_permisions = old_access_permisions.map(item => item.id);
+
+        await deleteAccessPermissions({
+            variables: {
+                input: {
+                    id: selectedStaffCategory.staff_category_info.id,
+                    access_permissions: _old_access_permisions
                 }
             }
         });
@@ -247,10 +270,7 @@ const AccessManagement = (props) => {
                                     <button className='btn btn-success col-12 mt-3' onClick={handleAddAccessPermissions}>Thêm quyền</button>
                                 }
                                 {(editAccess && !addAccess) &&
-                                    <>
-                                        <button className='btn btn-warning col-12 mt-3'>Sửa tên quyền</button>
-                                        <button className='btn btn-outline-danger col-12 mt-3'>Xóa quyền</button>
-                                    </>
+                                    <button className='btn btn-outline-danger col-12 mt-3' onClick={handleDeleteAccessPermissions}>Xóa quyền</button>
                                 }
                             </div>
                         </fieldset>

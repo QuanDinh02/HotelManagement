@@ -126,6 +126,7 @@ const typeDefs = `#graphql
     deleteStaff(id: ID!): String
 
     addAccessPermission(input: AccessPermissionInput!): Response
+    deleteStaffAccess(input: AccessPermissionInput!): Response
   }
 `;
 

@@ -17,13 +17,6 @@ const resolvers = {
         }
     },
 
-    StaffCategoryAccess: {
-        // staff_category_info: async (parent, args) => {
-        //     let staffCategory = await StaffServices.getAllStaffCategory();
-        //     return staffCategory.filter(item => +item.id === +parent.staff_category)[0];
-        // }
-    },
-
     Query: {
         customers: async () => {
             return await CustomerServices.getAllCustomers();
@@ -101,6 +94,10 @@ const resolvers = {
 
         addAccessPermission: async (parent, args) => {
             return await AccessPermissionServices.addAccessPermissions(args.input);
+        },
+
+        deleteStaffAccess: async (parent, args) => {
+            return await AccessPermissionServices.deleteAccessPermissions(args.input);
         },
     }
 };

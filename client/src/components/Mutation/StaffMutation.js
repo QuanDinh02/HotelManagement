@@ -29,7 +29,17 @@ const ADD_ACCESS_PERMISSIONS = gql`
         }
     }
 `;
+
+const DELETE_ACCESS_PERMISSIONS = gql`
+    mutation DeleteAccessPermissions($input: AccessPermissionInput!) {
+        deleteStaffAccess(input: $input) {
+            errorCode
+            message
+        }
+    }
+`;
+
 export { 
     CREATE_STAFF, UPDATE_STAFF, DELETE_STAFF,
-    ADD_ACCESS_PERMISSIONS 
+    ADD_ACCESS_PERMISSIONS, DELETE_ACCESS_PERMISSIONS
 }
