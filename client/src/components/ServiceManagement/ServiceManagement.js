@@ -35,19 +35,30 @@ const ServiceManagement = () => {
     const [getSearchedServiceByName] = useLazyQuery(GET_SEARCHED_SERVICE_BY_NAME);
     const [getSearchedServiceByCategory] = useLazyQuery(GET_SEARCHED_SERVICE_BY_CATEGORY);
 
-    const { data: hotel_services_data } = useQuery(GET_ALL_HOTEL_SERVICES);
+    const [getServiceList, { refetch }] = useLazyQuery(GET_ALL_HOTEL_SERVICES);
 
     const [updateService, { data: updateMsg }] = useMutation(UPDATE_SERVICE, {
-        refetchQueries: [
-            { query: GET_ALL_HOTEL_SERVICES }
-        ],
+        onCompleted: async () => {
+            await updateServiceListAfterMutation();
+        }
     });
 
     const [deleteService, { data: deleteMsg }] = useMutation(DELETE_SERVICE, {
-        refetchQueries: [
-            { query: GET_ALL_HOTEL_SERVICES }
-        ],
+        onCompleted: async () => {
+            await updateServiceListAfterMutation();
+        }
     });
+
+    const updateServiceListAfterMutation = async () => {
+        let { data: hotel_services_management } = await refetch();
+        let _hotelServices = hotel_services_management?.hotel_services.map(item => {
+            return {
+                ...item, isSelected: false
+            }
+        });
+        setHotelServices(_hotelServices);
+        setServiceCategories(hotel_services_management?.hotel_service_categories);
+    }
 
     const handleSearchService = async (type) => {
         setEditService({});
@@ -143,17 +154,21 @@ const ServiceManagement = () => {
         }
     }
 
+    const fetchServiceList = async () => {
+        let { data: hotel_services_management } = await getServiceList();
+
+        let _hotelServices = hotel_services_management?.hotel_services.map(item => {
+            return {
+                ...item, isSelected: false
+            }
+        });
+        setHotelServices(_hotelServices);
+        setServiceCategories(hotel_services_management?.hotel_service_categories);
+    }
+
     React.useEffect(() => {
-        if (hotel_services_data && hotel_services_data.hotel_services) {
-            let _hotelServices = hotel_services_data.hotel_services.map(item => {
-                return {
-                    ...item, isSelected: false
-                }
-            });
-            setHotelServices(_hotelServices);
-            setServiceCategories(hotel_services_data.hotel_service_categories);
-        }
-    }, [hotel_services_data]);
+        fetchServiceList();
+    }, []);
 
     return (
         <>
@@ -273,6 +288,7 @@ const ServiceManagement = () => {
             <ServiceCategory
                 show={showServiceCategory}
                 setShow={setShowServiceCategory}
+                updateServiceList={updateServiceListAfterMutation}
             />
             <DeleteModal
                 show={showDeleteModal}
@@ -283,6 +299,7 @@ const ServiceManagement = () => {
                 show={showServiceModal}
                 setShow={setShowServiceModal}
                 serviceCategories={serviceCategories}
+                updateServiceList={updateServiceListAfterMutation}
             />
         </>
 

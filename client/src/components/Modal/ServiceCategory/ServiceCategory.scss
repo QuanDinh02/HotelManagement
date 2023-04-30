@@ -11,6 +11,10 @@ $legend-text-size: 1.125rem;
             border-color: $main-color !important;
         }
 
+        input:disabled {
+            cursor: not-allowed;
+        }
+
         .reset {
             all: revert;
         }
@@ -21,16 +25,16 @@ $legend-text-size: 1.125rem;
         }
 
         .service-category-info {
-            width: 29%;
+            width: 39%;
         }
 
         .service-category-list {
-            width     : 69%;
+            width     : 59%;
             overflow-y: auto;
             height    : calc(100vh - 11rem);
 
             .service-category-table {
-                height    : auto;
+                flex-grow : 1;
                 overflow-y: auto;
 
                 table {
@@ -43,6 +47,11 @@ $legend-text-size: 1.125rem;
                     }
 
                     tbody {
+                        .selected-row {
+                            background-color: $main-color;
+                            color           : white;
+                        }
+
                         tr {
                             &:hover {
                                 cursor          : pointer;
@@ -53,12 +62,7 @@ $legend-text-size: 1.125rem;
                     }
                 }
             }
-
-            .service-category-addition {
-                height: auto;
-            }
         }
-
     }
 
     .form-control:focus {

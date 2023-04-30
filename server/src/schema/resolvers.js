@@ -130,6 +130,19 @@ const resolvers = {
         deleteService: async (parent, args) => {
             return await HotelServices.deleteService(args.id);
         },
+
+        createServiceCategory: async (parent, args) => {
+            return await HotelServices.createNewServiceCategory(args.name);
+        },
+
+        updateServiceCategory: async (parent, args) => {
+            return await HotelServices.updateServiceCategory(args.input);
+        },
+
+        deleteServiceCategory: async (parent, args) => {
+            return await HotelServices.deleteServiceCategory(args.id);
+        },
+
     }
 };
 

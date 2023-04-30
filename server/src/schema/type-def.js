@@ -147,6 +147,11 @@ const typeDefs = `#graphql
     hotel_service_category: Int!
   }
 
+  input ServiceCategoryInput {
+    id: ID!
+    name: String!
+  }
+
   type Mutation {
     updateCustomer(input: CustomerInput!): String
     deleteCustomer(id: ID!): String
@@ -161,6 +166,10 @@ const typeDefs = `#graphql
     createService(input: ServiceInput!): Response
     updateService(input: ServiceUpdateInput!): Response
     deleteService(id: ID!): Response
+
+    createServiceCategory(name: String!): Response
+    updateServiceCategory(input: ServiceCategoryInput!): Response
+    deleteServiceCategory(id: ID!): Response
   }
 `;
 

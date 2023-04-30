@@ -42,7 +42,7 @@ const createNewService = async (data) => {
     let existedServiceName = await db.HotelService.findOne({
         where: {
             name: {
-                [Op.substring]: `${newServiceName}`
+                [Op.like]: `${newServiceName}`
             }
         },
         raw: true
@@ -97,7 +97,7 @@ const updateService = async (data) => {
         }
     } else {
         return {
-            errorCode: 0,
+            errorCode: -1,
             message: 'Service is not existed !'
         }
     }
@@ -123,7 +123,7 @@ const deleteService = async (service_id) => {
         }
     } else {
         return {
-            errorCode: 0,
+            errorCode: -1,
             message: 'Service is not existed !'
         }
     }
@@ -242,9 +242,134 @@ const getSearchedServiceByCategory = async (service_category_name) => {
     return _result;
 }
 
+const createNewServiceCategory = async (newServiceCategoryName) => {
+    let existedServiceCategoryName = await db.HotelServiceCategory.findOne({
+        where: {
+            name: {
+                [Op.like]: `${newServiceCategoryName}`
+            }
+        },
+        raw: true
+    })
+
+    if (existedServiceCategoryName) {
+        return {
+            errorCode: -1,
+            message: 'Service category name is existed !'
+        }
+    } else {
+
+        let res = await db.HotelServiceCategory.create({
+            name: newServiceCategoryName
+        });
+
+        if (res) {
+            return {
+                errorCode: 0,
+                message: 'Create service category successfully !'
+            }
+        }
+        else {
+            return {
+                errorCode: -2,
+                message: 'Create service category failed !'
+            }
+        }
+
+    }
+}
+
+const updateServiceCategory = async (data) => {
+
+    let existedCategoryName = await db.HotelServiceCategory.findOne({
+        where: {
+            name: {
+                [Op.like]: `${data.name}`
+            }
+        },
+        raw: true
+    })
+
+    if (existedCategoryName) {
+        return {
+            errorCode: -1,
+            message: 'Service category name is existed !'
+        }
+    } else {
+        let existedCategory = await db.HotelServiceCategory.findOne({
+            where: {
+                id: +data.id
+            },
+            raw: true
+        });
+
+        if (existedCategory) {
+            let { id: category_id } = data;
+            delete data.id;
+
+            await db.HotelServiceCategory.update(data, {
+                where: {
+                    id: +category_id
+                }
+            });
+            return {
+                errorCode: 0,
+                message: 'Update service category successfully !'
+            }
+        } else {
+            return {
+                errorCode: -1,
+                message: 'Service category is not existed!'
+            }
+        }
+    }
+
+
+}
+
+const deleteServiceCategory = async (category_id) => {
+    let existedServiceCategory = await db.HotelServiceCategory.findOne({
+        where: {
+            id: +category_id
+        },
+        raw: true
+    })
+
+    if (existedServiceCategory) {
+        let result = await db.HotelService.destroy({
+            where: {
+                hotel_service_category: +category_id
+            }
+        })
+        if (result) {
+            await db.HotelServiceCategory.destroy({
+                where: {
+                    id: +category_id
+                }
+            });
+            return {
+                errorCode: 0,
+                message: 'Delete service category successfully !'
+            }
+        } else {
+            return {
+                errorCode: -1,
+                message: 'Delete service category failed !'
+            }
+        }
+
+    } else {
+        return {
+            errorCode: -1,
+            message: 'Service category is not existed !'
+        }
+    }
+}
+
 module.exports = {
     getAllHotelServices, getAllHotelServiceCategories, createNewService,
     updateService, deleteService,
 
-    getSearchedServiceByName, getSearchedServiceByCategory
+    getSearchedServiceByName, getSearchedServiceByCategory, createNewServiceCategory,
+    updateServiceCategory, deleteServiceCategory
 }

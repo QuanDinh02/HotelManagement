@@ -10,7 +10,7 @@ import { useMutation } from '@apollo/client';
 
 const ServiceModal = (props) => {
 
-    const { show, setShow, serviceCategories } = props;
+    const { show, setShow, serviceCategories, updateServiceList } = props;
 
     const [newService, setNewService] = useImmer({
         name: '',
@@ -55,7 +55,7 @@ const ServiceModal = (props) => {
 
     const handleAddNewService = async () => {
         let result = await createNewService({
-            
+
             variables: {
                 input: {
                     name: newService.name,
@@ -64,6 +64,7 @@ const ServiceModal = (props) => {
                 }
             }
         });
+        updateServiceList();
         handleCloseModal();
     }
 
