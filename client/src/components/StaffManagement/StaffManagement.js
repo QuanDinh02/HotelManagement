@@ -130,6 +130,10 @@ const StaffManagement = () => {
     }
 
     React.useEffect(() => {
+        setEditAllowance(false);
+    }, [editStaff?.id]);
+
+    React.useEffect(() => {
         if (staffData && staffData.staffs) {
             let _staffList = staffData.staffs.map(item => {
                 return {

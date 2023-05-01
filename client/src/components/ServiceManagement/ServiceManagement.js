@@ -11,7 +11,7 @@ import {
     GET_SEARCHED_SERVICE_BY_CATEGORY
 } from '../Query/HotelServiceQuery';
 import { UPDATE_SERVICE, DELETE_SERVICE } from '../Mutation/ServiceMutation';
-import { useQuery, useLazyQuery, useMutation } from '@apollo/client';
+import { useLazyQuery, useMutation } from '@apollo/client';
 import { useImmer } from "use-immer";
 import _ from 'lodash';
 import DeleteModal from '../Modal/ServiceMutation/DeleteModal';
@@ -167,6 +167,10 @@ const ServiceManagement = () => {
     }
 
     React.useEffect(() => {
+        setEditAllowance(false);
+    }, [editService?.id]);
+
+    React.useEffect(() => {
         fetchServiceList();
     }, []);
 
@@ -279,7 +283,6 @@ const ServiceManagement = () => {
                                         )
                                     })
                                 }
-
                             </tbody>
                         </table>
                     </fieldset>

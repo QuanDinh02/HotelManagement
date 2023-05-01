@@ -41,6 +41,11 @@ $legend-text-size : 1.125rem;
         .left-content {
             width: 40%;
 
+            input:disabled,
+            select:disabled {
+                cursor: not-allowed;
+            }
+
             .reset {
                 all: revert;
             }
@@ -83,6 +88,11 @@ $legend-text-size : 1.125rem;
                 }
 
                 tbody {
+                    .selected-row {
+                        background-color: $main-color;
+                        color           : white;
+                    }
+
                     tr {
                         &:hover {
                             cursor          : pointer;

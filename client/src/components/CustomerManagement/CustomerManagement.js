@@ -118,6 +118,10 @@ const CustomerManagement = () => {
     }
 
     React.useEffect(() => {
+        setEditAllowance(false);
+    }, [editCustomer?.id]);
+
+    React.useEffect(() => {
         if (customersData && customersData.customers) {
             let _customerList = customersData.customers.map(item => {
                 return {
