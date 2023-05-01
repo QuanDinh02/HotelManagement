@@ -67,6 +67,21 @@ const typeDefs = `#graphql
     hotel_service_category: HotelServiceCategory!
   }
 
+  type HotelRoomCategory {
+    id: ID!
+    name: String!
+    description: String!
+    price: Int!
+    people_maximum: Int!
+  }
+
+  type HotelRoom {
+    id: ID!
+    name: String!
+    status: String!
+    room_category: HotelRoomCategory!
+  }
+
   type Query {
     customers: [Customer!]
     customer(value: String!): [Customer]
@@ -82,6 +97,9 @@ const typeDefs = `#graphql
 
     searched_service_by_name(value: String!): [HotelService!]
     searched_service_by_category(value: String!): [HotelService!]
+
+    hotel_rooms: [HotelRoom!]
+    hotel_room_categories: [HotelRoomCategory!]
   }
 
   input CustomerInput {
