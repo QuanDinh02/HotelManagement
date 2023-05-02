@@ -7,14 +7,19 @@ import React from 'react';
 import { CurrencyFormat } from '../Format/FormatNumber';
 import RoomCategory from '../Modal/RoomCategory/RoomCategory';
 import { GET_ALL_HOTEL_ROOMS } from '../Query/HotelRoomQuery';
+import { UPDATE_ROOM, DELETE_ROOM } from '../Mutation/RoomMutation';
 import { useLazyQuery, useMutation } from '@apollo/client';
 import { useImmer } from "use-immer";
 import _ from 'lodash';
+import RoomAddModal from '../Modal/RoomManagement/RoomAddModal';
+import DeleteModal from '../Modal/RoomManagement/DeleteModal';
 
 const RoomManagement = () => {
 
     const history = useHistory();
     const [showRoomCategory, setShowRoomCategory] = React.useState(false);
+    const [showAddModal, setShowAddModal] = React.useState(false);
+    const [showDeleteModal, setShowDeleteModal] = React.useState(false);
 
     const [hotelRooms, setHotelRooms] = useImmer([]);
     const [editRoom, setEditRoom] = useImmer({});
@@ -22,6 +27,29 @@ const RoomManagement = () => {
     const [roomCategories, setRoomCategories] = React.useState([]);
 
     const [getRoomList, { refetch }] = useLazyQuery(GET_ALL_HOTEL_ROOMS);
+
+    const [updateRoom, { data: updateMsg }] = useMutation(UPDATE_ROOM, {
+        onCompleted: async () => {
+            await updateRoomListAfterMutation();
+        }
+    });
+
+    const [deleteRoom, { data: deleteMsg }] = useMutation(DELETE_ROOM, {
+        onCompleted: async () => {
+            await updateRoomListAfterMutation();
+        }
+    });
+
+    const updateRoomListAfterMutation = async () => {
+        let { data: hotel_rooms_management } = await refetch();
+        let _hotelRooms = hotel_rooms_management?.hotel_rooms.map(item => {
+            return {
+                ...item, isSelected: false
+            }
+        });
+        setHotelRooms(_hotelRooms);
+        setRoomCategories(hotel_rooms_management?.hotel_room_categories);
+    }
 
     const handleEditRoom = (attribute, value) => {
         if (attribute === 'room_category') {
@@ -56,12 +84,40 @@ const RoomManagement = () => {
         })
     }
 
+    const dataValidation = () => {
+        if (!editRoom) {
+            return;
+        }
+    }
+
     const handleUpdateRoomInfo = async () => {
         if (editAllowance) {
+            dataValidation();
+            let result = await updateRoom({
+                variables: {
+                    input: {
+                        ...editRoom,
+                        room_category: +editRoom.room_category.id
+                    }
+                }
+            });
+
             setEditRoom({});
             setEditAllowance(false);
         } else {
             setEditAllowance(true);
+        }
+    }
+
+    const handleDeleteRoom = async () => {
+        if (!_.isEmpty(editRoom)) {
+            let result = await deleteRoom({
+                variables: {
+                    deleteRoomId: editRoom.id
+                }
+            });
+            setEditRoom({});
+            setEditAllowance(false);
         }
     }
 
@@ -149,10 +205,10 @@ const RoomManagement = () => {
                             <legend className='reset legend-text'>Chức năng</legend>
                             <div className='row mb-3 px-4'>
                                 <div className='form-group col-6'>
-                                    <button className='btn btn-success col-12'>Thêm phòng</button>
+                                    <button className='btn btn-success col-12' onClick={() => setShowAddModal(true)}>Thêm phòng</button>
                                 </div>
                                 <div className='form-group col-6'>
-                                    <button className='btn btn-outline-danger col-12' disabled={_.isEmpty(editRoom) ? true : false}>Xóa phòng</button>
+                                    <button className='btn btn-outline-danger col-12' onClick={() => setShowDeleteModal(true)} disabled={_.isEmpty(editRoom) ? true : false}>Xóa phòng</button>
                                 </div>
                             </div>
                             <div className='row px-4'>
@@ -206,6 +262,17 @@ const RoomManagement = () => {
             <RoomCategory
                 show={showRoomCategory}
                 setShow={setShowRoomCategory}
+            />
+            <RoomAddModal
+                show={showAddModal}
+                setShow={setShowAddModal}
+                roomCategories={roomCategories}
+                updateRoomList={updateRoomListAfterMutation}
+            />
+            <DeleteModal
+                show={showDeleteModal}
+                setShow={setShowDeleteModal}
+                handleDelete={handleDeleteRoom}
             />
         </>
 

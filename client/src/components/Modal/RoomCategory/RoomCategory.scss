@@ -11,6 +11,11 @@ $legend-text-size: 1.125rem;
             border-color: $main-color !important;
         }
 
+        input:disabled,
+        select:disabled {
+            cursor: not-allowed;
+        }
+        
         .reset {
             all: revert;
         }
@@ -21,11 +26,11 @@ $legend-text-size: 1.125rem;
         }
 
         .room-category-info {
-            width: 29%;
+            width: 39%;
         }
 
         .room-category-list {
-            width     : 69%;
+            width     : 59%;
             overflow-y: auto;
             height    : calc(100vh - 11rem);
 
@@ -43,6 +48,11 @@ $legend-text-size: 1.125rem;
                     }
 
                     tbody {
+                        .selected-row {
+                            background-color: $main-color;
+                            color           : white;
+                        }
+
                         tr {
                             &:hover {
                                 cursor          : pointer;

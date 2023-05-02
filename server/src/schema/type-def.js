@@ -170,6 +170,18 @@ const typeDefs = `#graphql
     name: String!
   }
 
+  input HotelRoomInput {
+    name: String!
+    room_category: Int!
+  }
+
+  input HotelRoomUpdateInput {
+    id: ID!
+    name: String!
+    status: String!
+    room_category: Int!
+  }
+
   type Mutation {
     updateCustomer(input: CustomerInput!): String
     deleteCustomer(id: ID!): String
@@ -188,6 +200,10 @@ const typeDefs = `#graphql
     createServiceCategory(name: String!): Response
     updateServiceCategory(input: ServiceCategoryInput!): Response
     deleteServiceCategory(id: ID!): Response
+
+    createRoom(input: HotelRoomInput!): Response
+    updateRoom(input: HotelRoomUpdateInput!): Response
+    deleteRoom(id: ID!): Response
   }
 `;
 

@@ -149,6 +149,10 @@ const ServiceCategory = (props) => {
     }
 
     React.useEffect(() => {
+        setEditAllowance(false);
+    }, [editServiceCategory?.id]);
+
+    React.useEffect(() => {
         fetchServiceCategoryList();
     }, []);
 

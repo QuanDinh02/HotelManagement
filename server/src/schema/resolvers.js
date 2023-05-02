@@ -69,7 +69,7 @@ const resolvers = {
                     staff_access_list: buildData
                 }
             }
-            
+
         },
 
         hotel_services: async () => {
@@ -150,6 +150,18 @@ const resolvers = {
 
         deleteServiceCategory: async (parent, args) => {
             return await HotelServices.deleteServiceCategory(args.id);
+        },
+
+        createRoom: async (parent, args) => {
+            return await HotelRoomsServices.createNewRoom(args.input);
+        },
+
+        updateRoom: async (parent, args) => {
+            return await HotelRoomsServices.updateRoom(args.input);
+        },
+
+        deleteRoom: async (parent, args) => {
+            return await HotelRoomsServices.deleteRoom(args.id);
         },
 
     }
