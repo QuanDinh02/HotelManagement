@@ -5,13 +5,16 @@ import _ from 'lodash';
 import { useImmer } from "use-immer";
 import { CurrencyFormat } from '../../Format/FormatNumber';
 import { GET_ALL_HOTEL_ROOMS_CATEOGRY } from '../../Query/HotelRoomQuery';
-import { useLazyQuery } from '@apollo/client';
+import { CREATE_NEW_ROOM_CATEGORY, UPDATE_ROOM_CATEGORY, DELETE_ROOM_CATEGORY } from '../../Mutation/RoomMutation';
+import { useLazyQuery, useMutation } from '@apollo/client';
+import DeleteModal from './DeleteCategoryModal';
 
 const RoomCategory = (props) => {
 
-    const { show, setShow } = props;
+    const { show, setShow, updateRoomList } = props;
 
     const [categoryList, setCategoryList] = useImmer([]);
+    const [showDeleteModal, setShowDeleteModal] = React.useState(false);
     const [editRoomCategory, setEditRoomCategory] = useImmer({});
     const [editAllowance, setEditAllowance] = React.useState(false);
     const [newCategory, setNewCategory] = useImmer({
@@ -22,6 +25,110 @@ const RoomCategory = (props) => {
     });
 
     const [getRoomCateogryList, { refetch }] = useLazyQuery(GET_ALL_HOTEL_ROOMS_CATEOGRY);
+
+    const [createNewRoomCategory] = useMutation(CREATE_NEW_ROOM_CATEGORY, {
+        onCompleted: async () => {
+            await updateListAfterMutation();
+        }
+    });
+
+    const [updateRoomCategory, { data: updateMsg }] = useMutation(UPDATE_ROOM_CATEGORY, {
+        onCompleted: async () => {
+            await updateListAfterMutation();
+        }
+    });
+
+    const [deleteRoomCategory, { data: deleteMsg }] = useMutation(DELETE_ROOM_CATEGORY, {
+        onCompleted: async () => {
+            await updateListAfterMutation();
+        }
+    });
+
+    const updateListAfterMutation = async () => {
+        let { data: category } = await refetch();
+
+        let _categories = category?.hotel_room_categories.map(item => {
+            return {
+                ...item, isSelected: false
+            }
+        });
+        setCategoryList(_categories);
+    }
+
+    const dataValidation = () => {
+        if (!editRoomCategory) {
+            return;
+        }
+    }
+
+    const handleAddNewRoomCategory = async () => {
+        if (!newCategory.name || newCategory.people_maximum === 0 || !newCategory.price === 0 || !newCategory.description) {
+            return;
+        } else {
+            let result = await createNewRoomCategory({
+                variables: {
+                    input: {
+                        ...newCategory,
+                        price: +newCategory.price,
+                        people_maximum: +newCategory.people_maximum
+                    }
+                }
+            });
+            setNewCategory({
+                name: '',
+                people_maximum: 0,
+                price: 0,
+                description: ''
+            });
+            updateRoomList();
+        }
+    }
+
+    const handleUpdateCategory = async () => {
+        if (editAllowance) {
+            dataValidation();
+            let result = await updateRoomCategory({
+                variables: {
+                    input: {
+                        ...editRoomCategory,
+                        price: +editRoomCategory.price,
+                        people_maximum: +editRoomCategory.people_maximum
+                    }
+                }
+            });
+
+            setCategoryList(draft => {
+                draft = draft.map(item => {
+                    item.isSelected = false;
+                    return item;
+                })
+            })
+            setEditRoomCategory({});
+            setEditAllowance(false);
+            updateRoomList();
+        } else {
+            setEditAllowance(true);
+        }
+    }
+
+    const handleDeleteCategory = async () => {
+        if (!_.isEmpty(editRoomCategory)) {
+            let result = await deleteRoomCategory({
+                variables: {
+                    deleteRoomCategoryId: +editRoomCategory.id
+                }
+            });
+            setCategoryList(draft => {
+                draft = draft.map(item => {
+                    item.isSelected = false;
+                    return item;
+                })
+            })
+            setEditRoomCategory({});
+            setEditAllowance(false);
+            updateRoomList();
+        }
+    }
 
     const handleSelectingCategory = (category) => {
         let _editCategory = _.cloneDeep(category);
@@ -55,29 +162,6 @@ const RoomCategory = (props) => {
         });
     }
 
-    const handleUpdateCategory = async () => {
-        if (editAllowance) {
-            // dataValidation();
-            // let result = await updateServiceCategory({
-            //     variables: {
-            //         input: editServiceCategory
-            //     }
-            // });
-
-            // setCategoryList(draft => {
-            //     draft = draft.map(item => {
-            //         item.isSelected = false;
-            //         return item;
-            //     })
-            // })
-            setEditRoomCategory({});
-            setEditAllowance(false);
-            //updateServiceList();
-        } else {
-            setEditAllowance(true);
-        }
-    }
-
     const fetchRoomCategoryList = async () => {
         let { data: category } = await getRoomCateogryList();
 
@@ -87,15 +171,6 @@ const RoomCategory = (props) => {
             }
         });
         setCategoryList(_categories);
-    }
-
-    const handleAddNewRoom = async () => {
-        setNewCategory({
-            name: '',
-            people_maximum: 0,
-            price: 0,
-            description: ''
-        })
     }
 
     React.useEffect(() => {
@@ -153,7 +228,11 @@ const RoomCategory = (props) => {
                                 </button>
                             </div>
                             <div className='form-group mt-4 d-flex justify-content-center'>
-                                <button className='btn btn-outline-danger w-50' disabled={_.isEmpty(editRoomCategory) ? true : false}>Xóa loại phòng</button>
+                                <button className='btn btn-outline-danger w-50' disabled={_.isEmpty(editRoomCategory) ? true : false}
+                                    onClick={() => setShowDeleteModal(true)}
+                                >
+                                    Xóa loại phòng
+                                </button>
                             </div>
                         </fieldset>
                         <div className='room-category-list d-flex gap-3 flex-column'>
@@ -162,6 +241,7 @@ const RoomCategory = (props) => {
                                 <table className="table table-bordered">
                                     <thead>
                                         <tr>
+                                            <th scope="col">#</th>
                                             <th scope="col">Tên loại phòng</th>
                                             <th scope="col">Số người tối đa</th>
                                             <th scope="col">Giá</th>
@@ -169,16 +249,17 @@ const RoomCategory = (props) => {
                                     </thead>
                                     <tbody>
                                         {categoryList && categoryList.length > 0 &&
-                                            categoryList.map(item => {
+                                            categoryList.map((item, index) => {
                                                 return (
                                                     <tr
                                                         key={`room-category-item-${item.id}`}
                                                         className={item.isSelected ? 'selected-row' : ''}
                                                         onClick={() => handleSelectingCategory(item)}
                                                     >
+                                                        <td>{index + 1}</td>
                                                         <td>{item.name}</td>
                                                         <td>{item.people_maximum}</td>
-                                                        <td>{item.price}</td>
+                                                        <td>{CurrencyFormat(item.price)}</td>
                                                     </tr>
                                                 )
                                             })
@@ -215,13 +296,18 @@ const RoomCategory = (props) => {
                                     />
                                 </div>
                                 <div className='form-group mt-4 d-flex justify-content-center'>
-                                    <button className='btn btn-success w-50' onClick={handleAddNewRoom}>Thêm mới</button>
+                                    <button className='btn btn-success w-50' onClick={handleAddNewRoomCategory}>Thêm mới</button>
                                 </div>
                             </fieldset>
                         </div>
                     </div>
                 </Modal.Body>
             </Modal>
+            <DeleteModal
+                show={showDeleteModal}
+                setShow={setShowDeleteModal}
+                handleDelete={handleDeleteCategory}
+            />
         </>
     )
 }

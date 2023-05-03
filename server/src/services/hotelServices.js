@@ -243,6 +243,7 @@ const getSearchedServiceByCategory = async (service_category_name) => {
 }
 
 const createNewServiceCategory = async (newServiceCategoryName) => {
+
     let existedServiceCategoryName = await db.HotelServiceCategory.findOne({
         where: {
             name: {
@@ -283,9 +284,16 @@ const updateServiceCategory = async (data) => {
 
     let existedCategoryName = await db.HotelServiceCategory.findOne({
         where: {
-            name: {
-                [Op.like]: `${data.name}`
-            }
+            [Op.and]: [
+                {
+                    [Op.not]: +data.id
+                },
+                {
+                    name: {
+                        [Op.like]: `${data.name}`
+                    }
+                }
+            ]
         },
         raw: true
     })
@@ -328,6 +336,7 @@ const updateServiceCategory = async (data) => {
 }
 
 const deleteServiceCategory = async (category_id) => {
+
     let existedServiceCategory = await db.HotelServiceCategory.findOne({
         where: {
             id: +category_id
@@ -336,26 +345,21 @@ const deleteServiceCategory = async (category_id) => {
     })
 
     if (existedServiceCategory) {
-        let result = await db.HotelService.destroy({
+        await db.HotelService.destroy({
             where: {
                 hotel_service_category: +category_id
             }
         })
-        if (result) {
-            await db.HotelServiceCategory.destroy({
-                where: {
-                    id: +category_id
-                }
-            });
-            return {
-                errorCode: 0,
-                message: 'Delete service category successfully !'
+
+        await db.HotelServiceCategory.destroy({
+            where: {
+                id: +category_id
             }
-        } else {
-            return {
-                errorCode: -1,
-                message: 'Delete service category failed !'
-            }
+        });
+        
+        return {
+            errorCode: 0,
+            message: 'Delete service category successfully !'
         }
 
     } else {

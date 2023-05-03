@@ -6,7 +6,7 @@ import { MdBedroomParent } from 'react-icons/md';
 import React from 'react';
 import { CurrencyFormat } from '../Format/FormatNumber';
 import RoomCategory from '../Modal/RoomCategory/RoomCategory';
-import { GET_ALL_HOTEL_ROOMS } from '../Query/HotelRoomQuery';
+import { GET_ALL_HOTEL_ROOMS, GET_SEARCHED_ROOM_BY_NAME, GET_SEARCHED_ROOM_BY_CATEGORY } from '../Query/HotelRoomQuery';
 import { UPDATE_ROOM, DELETE_ROOM } from '../Mutation/RoomMutation';
 import { useLazyQuery, useMutation } from '@apollo/client';
 import { useImmer } from "use-immer";
@@ -26,7 +26,12 @@ const RoomManagement = () => {
     const [editAllowance, setEditAllowance] = React.useState(false);
     const [roomCategories, setRoomCategories] = React.useState([]);
 
+    const [nameSearch, setNameSearch] = React.useState('');
+    const [categorySearch, setCategorySearch] = React.useState('');
+
     const [getRoomList, { refetch }] = useLazyQuery(GET_ALL_HOTEL_ROOMS);
+    const [getSearchedRoomByName] = useLazyQuery(GET_SEARCHED_ROOM_BY_NAME);
+    const [getSearchedRoomByCategory] = useLazyQuery(GET_SEARCHED_ROOM_BY_CATEGORY);
 
     const [updateRoom, { data: updateMsg }] = useMutation(UPDATE_ROOM, {
         onCompleted: async () => {
@@ -39,6 +44,29 @@ const RoomManagement = () => {
             await updateRoomListAfterMutation();
         }
     });
+
+    const handleSearchRoom = async (type) => {
+        setEditRoom({});
+
+        if (type === 'NAME') {
+            let { data: { room_search_by_name } } = await getSearchedRoomByName({
+                variables: {
+                    value: nameSearch
+                }
+            });
+            setHotelRooms(room_search_by_name);
+        }
+
+        if (type === 'CATEGORY') {
+            let { data: { room_search_by_category } } = await getSearchedRoomByCategory({
+                variables: {
+                    value: categorySearch
+                }
+            });
+            setHotelRooms(room_search_by_category);
+        }
+
+    }
 
     const updateRoomListAfterMutation = async () => {
         let { data: hotel_rooms_management } = await refetch();
@@ -152,9 +180,15 @@ const RoomManagement = () => {
                     <div className='left-content d-flex flex-column gap-3'>
                         <fieldset className='top border rounded-2 pt-2 pb-3'>
                             <legend className='reset legend-text'>Tìm kiếm phòng</legend>
-                            <div className="input-group px-4">
-                                <input type="text" className="form-control" placeholder="Tên/ loại phòng" />
-                                <span className="input-group-text search-btn" title='Tìm kiếm'><HiOutlineSearch /></span>
+                            <div className='d-flex gap-3 px-4'>
+                                <div className="input-group">
+                                    <input type="text" className="form-control" placeholder="Số phòng" value={nameSearch} onChange={(event) => setNameSearch(event.target.value)} />
+                                    <span className="input-group-text search-btn" title='Tìm kiếm' onClick={() => handleSearchRoom('NAME', nameSearch)}><HiOutlineSearch /></span>
+                                </div>
+                                <div className="input-group">
+                                <input type="text" className="form-control" placeholder="Loại phòng" value={categorySearch} onChange={(event) => setCategorySearch(event.target.value)} />
+                                    <span className="input-group-text search-btn" title='Tìm kiếm' onClick={() => handleSearchRoom('CATEGORY', categorySearch)}><HiOutlineSearch /></span>
+                                </div>
                             </div>
                         </fieldset>
                         <fieldset className='middle border rounded-2 pb-3'>
@@ -262,6 +296,7 @@ const RoomManagement = () => {
             <RoomCategory
                 show={showRoomCategory}
                 setShow={setShowRoomCategory}
+                updateRoomList={updateRoomListAfterMutation}
             />
             <RoomAddModal
                 show={showAddModal}

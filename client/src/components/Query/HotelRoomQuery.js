@@ -35,6 +35,40 @@ const GET_ALL_HOTEL_ROOMS_CATEOGRY = gql`
   }
 `;
 
+const GET_SEARCHED_ROOM_BY_NAME = gql`
+  query getSearchRoomByName($value: String!) {
+    room_search_by_name(value: $value) {
+        id
+        name
+        status
+        room_category {
+          id
+          name
+          description
+          price
+          people_maximum
+        }
+    }
+  }
+`;
+
+const GET_SEARCHED_ROOM_BY_CATEGORY = gql`
+  query getSearchRoomByCategory($value: String!) {
+    room_search_by_category(value: $value) {
+        id
+        name
+        status
+        room_category {
+          id
+          name
+          description
+          price
+          people_maximum
+        }
+    }
+  }
+`;
+
 export {
-  GET_ALL_HOTEL_ROOMS, GET_ALL_HOTEL_ROOMS_CATEOGRY
+  GET_ALL_HOTEL_ROOMS, GET_ALL_HOTEL_ROOMS_CATEOGRY, GET_SEARCHED_ROOM_BY_NAME, GET_SEARCHED_ROOM_BY_CATEGORY
 }

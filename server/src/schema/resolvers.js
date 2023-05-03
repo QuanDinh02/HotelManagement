@@ -97,6 +97,16 @@ const resolvers = {
         hotel_room_categories: async () => {
             return await HotelRoomsServices.getAllHotelRoomCategories();
         },
+
+        room_search_by_name: async (parent, args) => {
+            let room = await HotelRoomsServices.getRoomSearchByName(args.value);
+            return room;
+        },
+
+        room_search_by_category: async (parent, args) => {
+            let room = await HotelRoomsServices.getRoomSearchByCategory(args.value);
+            return room;
+        },
     },
 
     Mutation: {
@@ -164,6 +174,17 @@ const resolvers = {
             return await HotelRoomsServices.deleteRoom(args.id);
         },
 
+        createRoomCategory: async (parent, args) => {
+            return await HotelRoomsServices.createNewRoomCategory(args.input);
+        },
+
+        updateRoomCategory: async (parent, args) => {
+            return await HotelRoomsServices.updateRoomCategory(args.input);
+        },
+
+        deleteRoomCategory: async (parent, args) => {
+            return await HotelRoomsServices.deleteRoomCategory(args.id);
+        },
     }
 };
 
