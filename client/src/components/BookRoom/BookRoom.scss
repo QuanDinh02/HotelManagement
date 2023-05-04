@@ -39,114 +39,86 @@ $legend-text-size: 1.125rem;
         }
 
         .left-content {
-            width: 60%;
+            width: 40%;
 
-
-            .top {
-                height: 50%;
+            input:disabled,
+            select:disabled {
+                cursor: not-allowed;
             }
 
-            .bottom {
-                height: auto;
+            .reset {
+                all: revert;
+            }
 
-                .left {
-                    height: auto;
+            .legend-text {
+                font-size: $legend-text-size;
+                color    : $main-color;
+            }
 
-                    .reset {
-                        all: revert;
-                    }
-
-                    .legend-text {
-                        font-size: $legend-text-size;
-                        color    : $main-color;
-                    }
+            .search-btn {
+                &:hover {
+                    cursor          : pointer;
+                    color           : white;
+                    background-color: $main-color;
+                    transition      : 0.25s;
                 }
+            }
 
-                .right {
-                    .checkbox-form {
-                        .form-check-input {
-                            font-size : 20px;
-                            box-shadow: 0 0 0 0 white;
+            .checkbox-form {
+                .form-check-input {
+                    font-size : 20px;
+                    box-shadow: 0 0 0 0 white;
 
-                            &:checked {
-                                background-color: $main-color;
-                                border-color    : $main-color;
-                            }
-                        }
-
-                        .form-check-label {
-                            font-size: 18px;
-                        }
-                    }
-
-                    .book-btn {
-                        width           : 100%;
-                        color           : white;
+                    &:checked {
                         background-color: $main-color;
-
-                        &:hover {
-                            opacity: 0.8;
-                        }
+                        border-color    : $main-color;
                     }
+                }
 
-                    .cancel-btn {
-                        width: 100%;
-                    }
+                .form-check-label {
+                    font-size: 18px;
                 }
             }
 
-            .top,
-            .bottom {
-                .left {
-                    width: 60%;
+            .book-btn {
+                width           : 100%;
+                color           : white;
+                background-color: $main-color;
 
-                    .top-left,
-                    .bottom-left {
-                        flex-grow: 1;
-
-                        .reset {
-                            all: revert;
-                        }
-
-                        .legend-text {
-                            font-size: $legend-text-size;
-                            color    : $main-color;
-                        }
-
-                        .search-btn {
-                            &:hover {
-                                cursor          : pointer;
-                                color           : white;
-                                background-color: $main-color;
-                                transition      : 0.25s;
-                            }
-                        }
-                    }
+                &:hover {
+                    opacity: 0.8;
                 }
+            }
 
-                .right {
-                    width: 40%;
-
-                    .reset {
-                        all: revert;
-                    }
-
-                    .legend-text {
-                        font-size: $legend-text-size;
-                        color    : $main-color;
-                    }
-                }
+            .cancel-btn {
+                width: 100%;
             }
 
             .form-control:focus {
                 border-color: $main-color;
                 box-shadow  : 0 0 0 0.01rem $main-color;
             }
+
+            .last-confirm-form {
+                flex-grow: 1;
+
+                .refresh-btn {
+                    display        : flex;
+                    justify-content: center;
+                    align-items    : center;
+                    gap            : 0.3125rem;
+
+                    .refresh-icon {
+                        font-size: 1.25rem;
+                    }
+                }
+
+            }
         }
 
         .right-content {
-            width     : 40%;
-            max-height: 41.875rem;
+            width     : 60%;
+            max-height: 65.625rem;
             overflow-y: auto;
 
             table {

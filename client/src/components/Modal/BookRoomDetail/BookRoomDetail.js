@@ -106,11 +106,11 @@ const BookRoomDetail = (props) => {
                         </fieldset>
                     </div>
                     <div className='actions d-flex mt-4 gap-3 justify-content-end'>
-                        <div className='edit-button'>
-                            <button className='btn'>Lưu thay đổi</button>
-                        </div>
                         <div>
                             <button className='btn btn-outline-danger'>Hủy đặt phòng</button>
+                        </div>
+                        <div>
+                            <button className='btn btn-warning' disabled>Lưu thay đổi</button>
                         </div>
                     </div>
                 </Modal.Body>
