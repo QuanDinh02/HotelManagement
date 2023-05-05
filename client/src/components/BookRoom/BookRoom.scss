@@ -1,5 +1,6 @@
 $main-color      : #D57834;
 $bg-color        : #ECECEC;
+$red-pink-color  : #F26C63;
 $legend-text-size: 1.125rem;
 
 .book-room-container {
@@ -135,8 +136,26 @@ $legend-text-size: 1.125rem;
                 color    : $main-color;
             }
 
-            .already-book {
-                background-color: $bg-color;
+            .room-book-cancel {
+                background-color: #FF8A8A;
+                color           : black;
+
+                &:hover {
+                    cursor          : not-allowed;
+                    color           : black;
+                    background-color: #FF8A8A;
+                }
+            }
+
+            .already-received {
+                background-color: #90EE90;
+                color           : black;
+
+                &:hover {
+                    cursor          : not-allowed;
+                    color           : black;
+                    background-color: #90EE90;
+                }
             }
         }
     }

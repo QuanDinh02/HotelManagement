@@ -53,4 +53,16 @@ const GET_CUSTOMER_INFO_BY_PHONE = gql`
   }
 `;
 
-export { GET_ALL_CUSTOMERS, GET_CUSTOMER_BY_NAME_PHONE, GET_CUSTOMER_INFO_BY_PHONE }
+const GET_CUSTOMER_CATEGORIES = gql`
+  query GetCustomerCategories {
+    customer_categories {
+      id
+      name
+    }
+  }
+`;
+
+
+export { 
+  GET_ALL_CUSTOMERS, GET_CUSTOMER_BY_NAME_PHONE, 
+  GET_CUSTOMER_INFO_BY_PHONE, GET_CUSTOMER_CATEGORIES }

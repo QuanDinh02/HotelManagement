@@ -94,6 +94,24 @@ const typeDefs = `#graphql
     phone: String!
   }
 
+  type CustomerByBookRoomId {
+    id: ID!
+    name: String!
+    citizen_id: String
+    phone: String!
+    dob: String
+    address: String
+    gender: String
+    nationality: String
+    customer_category: String!
+  }
+
+  type RoomByBookRoomId {
+    id: ID!
+    name: String!
+    category: HotelRoomCategory!
+  }
+
   type HotelRoomUse {
     id: ID!
     night_stay: Int!
@@ -102,6 +120,16 @@ const typeDefs = `#graphql
     status: String!
     room: RoomUse!
     customer: CustomerUse!
+  }
+
+  type HotelRoomUseById {
+    id: ID!
+    night_stay: Int!
+    receive_date: String!
+    checkOut_date: String!
+    status: String!
+    room: RoomByBookRoomId!
+    customer: CustomerByBookRoomId!
   }
 
   type HotelRoomReponse {
@@ -147,6 +175,7 @@ const typeDefs = `#graphql
 
     hotel_room_use_list: [HotelRoomUse!]
     hotel_rooms_by_categories: [HotelRoomByRoomCategory!]
+    hotel_room_use_by_id(id: ID!): HotelRoomUseById
 
     customer_info_by_phone(value: String!): CustomerInfoByPhone
   }

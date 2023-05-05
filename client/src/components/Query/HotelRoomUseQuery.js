@@ -38,6 +38,38 @@ const GET_ALL_HOTEL_ROOM_USE = gql`
   }
 `;
 
+const GET_HOTEL_ROOM_USE_BY_ID = gql`
+  query GetHotelRoomUseById($hotelRoomUseById: ID!) {
+    hotel_room_use_by_id(id: $hotelRoomUseById) {
+      id
+      night_stay
+      receive_date
+      checkOut_date
+      status
+      room {
+        id
+        name
+        category {
+          id
+          name
+        }
+      }
+      customer {
+        id
+        name
+        phone
+        citizen_id
+        phone
+        dob
+        address
+        gender
+        nationality
+        customer_category
+      }
+    }
+  }
+`;
+
 export {
-    GET_ALL_HOTEL_ROOM_USE
+    GET_ALL_HOTEL_ROOM_USE, GET_HOTEL_ROOM_USE_BY_ID
 }

@@ -5,7 +5,7 @@ const _ = require('lodash');
 const createNewRoomUse = async (data) => {
     let res = await db.HotelRoomUse.create(data);
 
-    if (res) { 
+    if (res) {
         return {
             errorCode: 0,
             message: 'Book room successfully !'
@@ -39,7 +39,7 @@ const getAllHotelRoomUse = async () => {
         ],
         attributes: ['id', 'night_stay', 'receive_date', 'checkOut_date', 'status'],
         order: [
-            ['id', 'ASC']
+            ['id', 'DESC']
         ]
     });
 
@@ -82,6 +82,48 @@ const getHotelRoomsByRoomsCategory = async () => {
     return roomsByRoomCategory;
 }
 
+const getHotelRoomUseById = async (room_use_id) => {
+
+    let result = await db.HotelRoomUse.findOne({
+        raw: true,
+        nest: true,
+        include: [
+            {
+                model: db.HotelRoom, attributes: ['id', 'name'],
+                raw: true,
+                nest: true,
+                include: {
+                    model: db.HotelRoomCategory, attributes: ['id', 'name']
+                }
+            },
+            {
+                model: db.Customer,
+                raw: true,
+                nest: true,
+                include: {
+                    model: db.CustomerCategory, attributes: ['name']
+                }
+            },
+        ],
+        attributes: ['id', 'night_stay', 'receive_date', 'checkOut_date', 'status'],
+        where: {
+            id: +room_use_id
+        }
+    });
+
+    result.HotelRoom.category = result.HotelRoom.HotelRoomCategory;
+    result.room = result.HotelRoom;
+    result.customer = result.Customer;
+    result.customer.customer_category = result.customer.CustomerCategory.name;
+
+    delete result.HotelRoom;
+    delete result.Customer;
+    delete result.customer.CustomerCategory;
+    delete result.room.HotelRoomCategory;
+
+    return result;
+}
+
 module.exports = {
-    getAllHotelRoomUse, getHotelRoomsByRoomsCategory, createNewRoomUse
+    getAllHotelRoomUse, getHotelRoomsByRoomsCategory, createNewRoomUse, getHotelRoomUseById
 }

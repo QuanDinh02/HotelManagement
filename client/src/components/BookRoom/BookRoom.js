@@ -15,11 +15,16 @@ import { useImmer } from "use-immer";
 import _ from 'lodash';
 import { CurrencyFormat } from '../Format/FormatNumber';
 
+const ROOM_USE_STATUS = ['Đã nhận phòng', 'Hủy đặt phòng'];
+
 const BookRoom = () => {
 
     const history = useHistory();
     const [showDetailModal, setShowDetailModal] = React.useState(false);
     const [newCustomer, setNewCustomer] = React.useState(true);
+
+    const [editBookRoom, setEditBookRoom] = React.useState('');
+
     const [bookRoomInfo, setBookRoomInfo] = useImmer({
         room_id: '',
         night_stay: '',
@@ -84,6 +89,12 @@ const BookRoom = () => {
             customer_category: "0",
             gender: 'Nam',
             nationality: 'Việt Nam'
+        });
+
+        setOldCustomerInfo({
+            id: '',
+            name: '',
+            phone: ''
         });
 
         setNewCustomer(true);
@@ -153,12 +164,7 @@ const BookRoom = () => {
     const fetchHotelRoomUseList = async () => {
         let { data: hotel_room_use } = await getHotelRoomUseList();
 
-        let _hotelRoomUse = hotel_room_use?.hotel_room_use_list.map(item => {
-            return {
-                ...item, isSelected: false
-            }
-        });
-        setHotelRoomUseList(_hotelRoomUse);
+        setHotelRoomUseList(hotel_room_use?.hotel_room_use_list);
         setHotelRoomsByCategories(hotel_room_use?.hotel_rooms_by_categories);
         setCustomerCategories(hotel_room_use?.customer_categories);
     }
@@ -166,6 +172,13 @@ const BookRoom = () => {
     const handleSelectRoomCategory = (room_category_id) => {
         let result = hotelRoomsByCategories.filter(item => item.id === room_category_id)[0];
         setSelectRoomCategory(result);
+    }
+
+    const handleSelectingBookRoomHistory = (item) => {
+        if (!ROOM_USE_STATUS.includes(item.status)) {
+            setEditBookRoom(item.id);
+            setShowDetailModal(true);
+        }
     }
 
     const GetCustomerInfo = React.useCallback(_.debounce(async () => {
@@ -185,8 +198,7 @@ const BookRoom = () => {
         GetCustomerInfo();
     }, [oldCustomerInfo]);
 
-    React.useState(() => {
-        console.log('check !');
+    React.useEffect(() => {
         if (newCustomer) {
             setOldCustomerInfo({
                 id: '',
@@ -448,11 +460,10 @@ const BookRoom = () => {
                                         return (
                                             <tr
                                                 key={`hotel-room-use-${item.id}`}
-                                                className={item.isSelected ? 'selected-row' : ''}
-                                                onClick={() => setShowDetailModal(true)}
-                                            // onClick={() => handleSelectingService(item)}
+                                                className={(item.status === 'Đã nhận phòng') ? 'already-received' : ((item.status === 'Hủy đặt phòng' ? 'room-book-cancel' : ''))}
+                                                onClick={() => handleSelectingBookRoomHistory(item)}
                                             >
-                                                <td>{item.room?.id}</td>
+                                                <td>{item.room?.name}</td>
                                                 <td>{item.customer?.name}</td>
                                                 <td>{item.customer?.phone}</td>
                                                 <td>{item.room?.category}</td>
@@ -471,6 +482,7 @@ const BookRoom = () => {
             <BookRoomDetail
                 show={showDetailModal}
                 setShow={setShowDetailModal}
+                data={editBookRoom}
             />
         </>
 

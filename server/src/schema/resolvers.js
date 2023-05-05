@@ -113,6 +113,10 @@ const resolvers = {
             return await HotelRoomUseServices.getAllHotelRoomUse();
         },
 
+        hotel_room_use_by_id: async (parent, args) => {
+            return await HotelRoomUseServices.getHotelRoomUseById(args.id);
+        },
+
         hotel_rooms_by_categories: async () => {
             return await HotelRoomUseServices.getHotelRoomsByRoomsCategory();
         },

@@ -7,6 +7,11 @@ $legend-text-size: 1.125rem;
         display        : flex;
         justify-content: space-between;
 
+        input:disabled,
+        select:disabled {
+            cursor: not-allowed;
+        }
+
         .border {
             border-color: $main-color !important;
         }
