@@ -64,22 +64,6 @@ $legend-text-size: 1.125rem;
                 }
             }
 
-            .checkbox-form {
-                .form-check-input {
-                    font-size : 20px;
-                    box-shadow: 0 0 0 0 white;
-
-                    &:checked {
-                        background-color: $main-color;
-                        border-color    : $main-color;
-                    }
-                }
-
-                .form-check-label {
-                    font-size: 18px;
-                }
-            }
-
             .book-btn {
                 width           : 100%;
                 color           : white;

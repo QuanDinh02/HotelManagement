@@ -41,7 +41,16 @@ const GET_CUSTOMER_BY_NAME_PHONE = gql`
       }
     }
   }
-
 `;
 
-export { GET_ALL_CUSTOMERS, GET_CUSTOMER_BY_NAME_PHONE }
+const GET_CUSTOMER_INFO_BY_PHONE = gql`
+  query GetCustomerInfoByPhone($value: String!) {
+    customer_info_by_phone(value: $value) {
+      id
+      name
+      phone
+    }
+  }
+`;
+
+export { GET_ALL_CUSTOMERS, GET_CUSTOMER_BY_NAME_PHONE, GET_CUSTOMER_INFO_BY_PHONE }

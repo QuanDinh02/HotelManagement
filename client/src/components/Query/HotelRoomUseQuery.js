@@ -19,6 +19,22 @@ const GET_ALL_HOTEL_ROOM_USE = gql`
             phone
         }
     }
+
+    hotel_rooms_by_categories {
+      id
+      name
+      price
+      people_maximum
+      rooms {
+        id
+        name
+      }
+    }
+
+    customer_categories {
+      id
+      name
+    }
   }
 `;
 

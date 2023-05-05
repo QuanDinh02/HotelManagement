@@ -104,6 +104,25 @@ const typeDefs = `#graphql
     customer: CustomerUse!
   }
 
+  type HotelRoomReponse {
+    id: ID!
+    name: String!
+  }
+
+  type HotelRoomByRoomCategory {
+    id: ID!
+    name: String!
+    price: Int!
+    people_maximum: Int!
+    rooms: [HotelRoomReponse!]
+  }
+
+  type CustomerInfoByPhone {
+    id: ID!
+    name: String!
+    phone: String!
+  }
+
   type Query {
     customers: [Customer!]
     customer(value: String!): [Customer]
@@ -127,6 +146,9 @@ const typeDefs = `#graphql
     room_search_by_category(value: String!): [HotelRoom!]
 
     hotel_room_use_list: [HotelRoomUse!]
+    hotel_rooms_by_categories: [HotelRoomByRoomCategory!]
+
+    customer_info_by_phone(value: String!): CustomerInfoByPhone
   }
 
   input CustomerInput {
@@ -224,7 +246,34 @@ const typeDefs = `#graphql
     people_maximum: Int!
   }
 
+  type CreateCustomerReponse {
+    id: ID!
+    name: String!
+    phone: String!
+  }
+
+  input CustomerCreateInput {
+    name: String!
+    citizen_id: String
+    phone: String!
+    dob: String
+    address: String
+    gender: String
+    nationality: String
+    customer_category: Int!
+  }
+
+  input BookRoomInput {
+    room_id: Int!
+    customer_id: Int!
+    night_stay: Int!,
+    receive_date: String!,
+    checkOut_date: String!,
+    status: String!
+  }
+
   type Mutation {
+    createCustomer(input: CustomerCreateInput!): CreateCustomerReponse
     updateCustomer(input: CustomerInput!): String
     deleteCustomer(id: ID!): String
 
@@ -250,7 +299,8 @@ const typeDefs = `#graphql
     createRoomCategory(input: HotelRoomCategoryInput!): Response
     updateRoomCategory(input: HotelRoomCategoryUpdateInput!): Response
     deleteRoomCategory(id: ID!): Response
-    
+
+    bookRoom(input: BookRoomInput!): Response
   }
 `;
 

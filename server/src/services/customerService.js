@@ -101,7 +101,66 @@ const deleteCustomer = async (customer_id) => {
     }
 }
 
+const getCustomerInfoByPhone = async (phoneNumber) => {
+    if (phoneNumber) {
+        let result = await db.Customer.findOne({
+            raw: true,
+            order: [
+                ['id', 'ASC']
+            ],
+            attribute: ['id', 'name', 'phone'],
+            where: {
+                phone: {
+                    [Op.like]: `${phoneNumber}`
+                }
+            }
+        });
+        return result;
+    } else {
+        return null;
+    }
+}
+
+const createNewCustomer = async (data) => {
+
+    let existedCustomer = await db.Customer.findOne({
+        where: {
+            phone: {
+                [Op.like]: `${data.phone}`
+            }
+        },
+        raw: true
+    })
+
+    if (existedCustomer) {
+        return {
+            id: '',
+            name: '',
+            phone: ''
+        }
+    } else {
+
+        let res = await db.Customer.create(data);
+
+        if (res) {
+            let result = res.get({ plain: true });
+
+            return {
+                id: result.id,
+                name: result.name,
+                phone: result.phone
+            }
+        } else {
+            return {
+                id: '',
+                name: '',
+                phone: ''
+            }
+        }
+    }
+}
+
 module.exports = {
     getAllCustomers, getAllCustomerCategory, getCustomerByNamePhone, updateCustomer,
-    deleteCustomer
+    deleteCustomer, getCustomerInfoByPhone, createNewCustomer
 }

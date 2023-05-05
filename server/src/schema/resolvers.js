@@ -112,9 +112,22 @@ const resolvers = {
         hotel_room_use_list: async () => {
             return await HotelRoomUseServices.getAllHotelRoomUse();
         },
+
+        hotel_rooms_by_categories: async () => {
+            return await HotelRoomUseServices.getHotelRoomsByRoomsCategory();
+        },
+
+        customer_info_by_phone: async (parent, args) => {
+            let customerInfo = await CustomerServices.getCustomerInfoByPhone(args.value);
+            return customerInfo;
+        },
     },
 
     Mutation: {
+        createCustomer: async (parent, args) => {
+            return await CustomerServices.createNewCustomer(args.input);
+        },
+
         updateCustomer: async (parent, args) => {
             return await CustomerServices.updateCustomer(args.input);
         },
@@ -189,6 +202,10 @@ const resolvers = {
 
         deleteRoomCategory: async (parent, args) => {
             return await HotelRoomsServices.deleteRoomCategory(args.id);
+        },
+
+        bookRoom: async (parent, args) => {
+            return await HotelRoomUseServices.createNewRoomUse(args.input);
         },
     }
 };
