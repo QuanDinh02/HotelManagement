@@ -48,10 +48,8 @@ const GET_HOTEL_ROOM_USE_BY_ID = gql`
       status
       room {
         id
-        name
         category {
           id
-          name
         }
       }
       customer {

@@ -124,6 +124,63 @@ const getHotelRoomUseById = async (room_use_id) => {
     return result;
 }
 
+const updateHotelRoomUse = async (data) => {
+    let existedRoomUse = await db.HotelRoomUse.findOne({
+        where: {
+            id: +data.id
+        },
+        raw: true
+    })
+
+    if (existedRoomUse) {
+        let { id: room_use_id } = data;
+        delete data.id;
+
+        await db.HotelRoomUse.update(data, {
+            where: {
+                id: +room_use_id
+            }
+        });
+        return {
+            errorCode: 0,
+            message: 'Update book room successfully !'
+        }
+    } else {
+        return {
+            errorCode: -1,
+            message: 'Book room is not existed !'
+        }
+    }
+}
+
+const deleteHotelRoomUse = async (room_use_id) => {
+    let existedRoomUse = await db.HotelRoomUse.findOne({
+        where: {
+            id: +room_use_id
+        },
+        raw: true
+    })
+
+    if (existedRoomUse) {
+        await db.HotelRoomUse.update({ status: 'Hủy đặt phòng' }, {
+            where: {
+                id: +room_use_id
+            }
+        });
+        return {
+            errorCode: 0,
+            message: 'Delete book room successfully !'
+        }
+    } else {
+        return {
+            errorCode: -1,
+            message: 'Book room is not existed !'
+        }
+    }
+}
+
 module.exports = {
-    getAllHotelRoomUse, getHotelRoomsByRoomsCategory, createNewRoomUse, getHotelRoomUseById
+    getAllHotelRoomUse, getHotelRoomsByRoomsCategory,
+    createNewRoomUse, getHotelRoomUseById,
+    updateHotelRoomUse, deleteHotelRoomUse
 }

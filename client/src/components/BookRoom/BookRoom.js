@@ -101,7 +101,7 @@ const BookRoom = () => {
         setSelectRoomCategory({});
     }
 
-    const handleBookRoom = async () => {
+    const handleBookRoom = async (book_room_status) => {
         if (newCustomer === true) {
             let { data: { createCustomer } } = await createNewCustomer({
 
@@ -121,7 +121,8 @@ const BookRoom = () => {
                             ...bookRoomInfo,
                             room_id: +bookRoomInfo.room_id,
                             night_stay: +bookRoomInfo.night_stay,
-                            customer_id: +createCustomer.id
+                            customer_id: +createCustomer.id,
+                            status: book_room_status
                         }
                     }
                 });
@@ -140,7 +141,8 @@ const BookRoom = () => {
                         ...bookRoomInfo,
                         room_id: +bookRoomInfo.room_id,
                         night_stay: +bookRoomInfo.night_stay,
-                        customer_id: +oldCustomerInfo.id
+                        customer_id: +oldCustomerInfo.id,
+                        status: book_room_status
                     }
                 }
             });
@@ -240,7 +242,7 @@ const BookRoom = () => {
                             </div>
                         </fieldset>
                         <fieldset className='second-form border rounded-2 px-4'>
-                            <legend className='reset legend-text'>Thông tin phòng đăng ký</legend>
+                            <legend className='reset legend-text'>Thông tin đặt phòng</legend>
                             <div className='row align-items-center'>
                                 <div className='form-group col-6'>
                                     <label className='form-label'>Loại phòng:</label>
@@ -432,11 +434,11 @@ const BookRoom = () => {
                                     </button>
                                 </div>
                                 <div className='pe-4 ps-3 col-6'>
-                                    <button className='btn book-btn' onClick={handleBookRoom}>Đặt phòng</button>
+                                    <button className='btn book-btn' onClick={() => handleBookRoom('Chờ nhận phòng')}>Đặt phòng</button>
                                 </div>
                             </div>
                             <div className='mt-4 ps-4 pe-3 col-6'>
-                                <button className='btn btn-outline-dark col-12'>Đặt và nhận phòng</button>
+                                <button className='btn btn-outline-dark col-12' onClick={() => handleBookRoom('Đã nhận phòng')}>Đặt và nhận phòng</button>
                             </div>
                         </fieldset>
                     </div>
@@ -483,6 +485,8 @@ const BookRoom = () => {
                 show={showDetailModal}
                 setShow={setShowDetailModal}
                 data={editBookRoom}
+                hotelRoomsByCategories={hotelRoomsByCategories}
+                fetchRoomUseList={updateHistoryAfterMutation}
             />
         </>
 
