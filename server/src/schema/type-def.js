@@ -176,6 +176,7 @@ const typeDefs = `#graphql
     hotel_room_use_list: [HotelRoomUse!]
     hotel_rooms_by_categories: [HotelRoomByRoomCategory!]
     hotel_room_use_by_id(id: ID!): HotelRoomUseById
+    book_room_search_by_customer(value: String!): [HotelRoomUse!]
 
     customer_info_by_phone(value: String!): CustomerInfoByPhone
   }

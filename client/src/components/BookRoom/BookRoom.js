@@ -6,7 +6,7 @@ import { IoMdRefresh } from 'react-icons/io';
 import { MdHotel } from 'react-icons/md';
 import React from 'react';
 import BookRoomDetail from '../Modal/BookRoomDetail/BookRoomDetail';
-import { GET_ALL_HOTEL_ROOM_USE } from '../Query/HotelRoomUseQuery';
+import { GET_ALL_HOTEL_ROOM_USE, GET_HOTEL_ROOM_USE_BY_CUSTOMER } from '../Query/HotelRoomUseQuery';
 import { GET_CUSTOMER_INFO_BY_PHONE } from '../Query/CustomerQuery';
 import { CREATE_CUSTOMER } from '../Mutation/ClientMutation';
 import { BOOK_ROOM } from '../Mutation/HotelRoomMutation';
@@ -48,6 +48,7 @@ const BookRoom = () => {
     const [hotelRoomsByCategories, setHotelRoomsByCategories] = React.useState([]);
     const [selectRoomCategory, setSelectRoomCategory] = React.useState({});
     const [customerCategories, setCustomerCategories] = React.useState([]);
+    const [search, setSearch] = React.useState('');
 
     const [oldCustomerInfo, setOldCustomerInfo] = useImmer({
         id: '',
@@ -57,6 +58,7 @@ const BookRoom = () => {
 
     const [getHotelRoomUseList, { refetch }] = useLazyQuery(GET_ALL_HOTEL_ROOM_USE);
     const [getCustomerInfoByPhone] = useLazyQuery(GET_CUSTOMER_INFO_BY_PHONE);
+    const [getBookRoomSearchByCustomer] = useLazyQuery(GET_HOTEL_ROOM_USE_BY_CUSTOMER);
 
     const [createNewCustomer] = useMutation(CREATE_CUSTOMER);
     const [bookRoom] = useMutation(BOOK_ROOM);
@@ -69,6 +71,15 @@ const BookRoom = () => {
             }
         });
         setHotelRoomUseList(_hotelRoomUse);
+    }
+
+    const handleBookRoomSearch = async () => {
+        let { data: { book_room_search_by_customer } } = await getBookRoomSearchByCustomer({
+            variables: {
+                value: search
+            }
+        });
+        setHotelRoomUseList(book_room_search_by_customer);
     }
 
     const handleRefreshNew = () => {
@@ -237,8 +248,10 @@ const BookRoom = () => {
                         <fieldset className='first-form border rounded-2 pt-2 px-4'>
                             <legend className='reset legend-text'>Tìm kiếm khách hàng</legend>
                             <div className="input-group mb-3">
-                                <input type="text" className="form-control" placeholder="Tên/ số điện thoại khách hàng" />
-                                <span className="input-group-text search-btn" title='Tìm kiếm'><HiOutlineSearch /></span>
+                                <input type="text" className="form-control" placeholder="Tên/ số điện thoại khách hàng" value={search}
+                                    onChange={(event) => setSearch(event.target.value)}
+                                />
+                                <span className="input-group-text search-btn" title='Tìm kiếm' onClick={handleBookRoomSearch}><HiOutlineSearch /></span>
                             </div>
                         </fieldset>
                         <fieldset className='second-form border rounded-2 px-4'>

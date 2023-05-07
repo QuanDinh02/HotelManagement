@@ -68,6 +68,28 @@ const GET_HOTEL_ROOM_USE_BY_ID = gql`
   }
 `;
 
+const GET_HOTEL_ROOM_USE_BY_CUSTOMER = gql`
+  query bookRoomSearch($value: String!) {
+    book_room_search_by_customer(value: $value) {
+      id
+      night_stay
+      receive_date
+      checkOut_date
+      status
+      room {
+        id
+        name
+        category
+      }
+      customer {
+        id
+        name
+        phone
+      }
+    }
+  }
+`;
+
 export {
-    GET_ALL_HOTEL_ROOM_USE, GET_HOTEL_ROOM_USE_BY_ID
+  GET_ALL_HOTEL_ROOM_USE, GET_HOTEL_ROOM_USE_BY_ID, GET_HOTEL_ROOM_USE_BY_CUSTOMER
 }

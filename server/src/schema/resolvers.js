@@ -125,6 +125,11 @@ const resolvers = {
             let customerInfo = await CustomerServices.getCustomerInfoByPhone(args.value);
             return customerInfo;
         },
+
+        book_room_search_by_customer: async (parent, args) => {
+            let bookRoom = await HotelRoomUseServices.getHotelRoomUseSearchByCustomer(args.value);
+            return bookRoom;
+        },
     },
 
     Mutation: {
