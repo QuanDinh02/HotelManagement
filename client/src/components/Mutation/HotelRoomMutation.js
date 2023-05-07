@@ -27,4 +27,25 @@ const DELETE_BOOK_ROOM = gql`
     }
 `;
 
-export { BOOK_ROOM, UPDATE_BOOK_ROOM, DELETE_BOOK_ROOM }
+const UPDATE_RECEIVE_ROOM = gql`
+    mutation UpdateReceiveRoom($roomUseId: ID!) {
+        updateReceiveRoom(id: $roomUseId) {
+            errorCode
+            message
+        }
+    }
+`;
+
+const UPDATE_RECEIVE_ROOM_INFO = gql`
+    mutation UpdateReceiveRoomInfo($input: BookRoomUpdateInput!) {
+        updateReceiveRoomInfo(input: $input) {
+            errorCode
+            message
+        }
+    }
+`;
+
+export {
+    BOOK_ROOM, UPDATE_BOOK_ROOM, DELETE_BOOK_ROOM,
+    UPDATE_RECEIVE_ROOM, UPDATE_RECEIVE_ROOM_INFO
+}

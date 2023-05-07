@@ -5,9 +5,11 @@ import { HiOutlineSearch } from 'react-icons/hi';
 import { FaKey } from 'react-icons/fa';
 import React from 'react';
 import { GET_RECEIVE_ROOM_LIST, GET_HOTEL_RECEIVE_ROOM_BY_CUSTOMER } from '../Query/HotelRoomUseQuery';
+import { UPDATE_RECEIVE_ROOM, UPDATE_RECEIVE_ROOM_INFO } from '../Mutation/HotelRoomMutation';
 import { useLazyQuery, useMutation } from '@apollo/client';
 import { useImmer } from "use-immer";
 import _ from 'lodash';
+import { CurrencyFormat } from '../Format/FormatNumber';
 
 const ReceiveRoom = () => {
 
@@ -39,6 +41,57 @@ const ReceiveRoom = () => {
 
     const [getReceiveRoomList, { refetch }] = useLazyQuery(GET_RECEIVE_ROOM_LIST);
     const [getReceiveRoomSearchByCustomer] = useLazyQuery(GET_HOTEL_RECEIVE_ROOM_BY_CUSTOMER);
+    const [updateReceiveRoom] = useMutation(UPDATE_RECEIVE_ROOM);
+    const [updateReceiveRoomInfo] = useMutation(UPDATE_RECEIVE_ROOM_INFO);
+
+    const updateHistoryAfterMutation = async () => {
+        let { data: hotel_room_use } = await refetch();
+
+        let _receive_rooms = hotel_room_use?.received_hotel_room_use_list.map(item => {
+            let _item = _.cloneDeep(item);
+            delete _item.__typename;
+            delete _item.room.__typename;
+            delete _item.room.category.__typename;
+            delete _item.customer.__typename;
+
+            return {
+                ..._item, isSelected: false
+            }
+        });
+
+        setHotelRoomUseList(_receive_rooms);
+    }
+
+    const handleOnChange = (attribute, value) => {
+        if (attribute === 'room_id') {
+            setBookRoomInfo(draft => {
+                draft.room.id = value;
+            })
+        }
+
+        else if (attribute === 'room_category') {
+            setBookRoomInfo(draft => {
+                draft.room.category.id = value;
+            })
+
+            if (hotelRoomsByCategories && hotelRoomsByCategories.length > 0) {
+                let rooms_by_category = hotelRoomsByCategories.filter(item => item.id === value)[0];
+                setRoomsByCategory(rooms_by_category.rooms);
+                let rooms = rooms_by_category.rooms;
+                setBookRoomInfo(draft => {
+                    draft.room.id = rooms[0].id;
+                    draft.room.price = rooms_by_category.price;
+                    draft.room.people_maximum = rooms_by_category.people_maximum;
+                })
+            }
+        }
+
+        else {
+            setBookRoomInfo(draft => {
+                draft[attribute] = value;
+            })
+        }
+    }
 
     const handleBookRoomSearch = async () => {
         let { data: { receive_room_search_by_customer } } = await getReceiveRoomSearchByCustomer({
@@ -49,8 +102,67 @@ const ReceiveRoom = () => {
         setHotelRoomUseList(receive_room_search_by_customer);
     }
 
-    const handleUpdateReceiveRoom = () => {
+    const handleReceiveRoom = async () => {
+        let result = await updateReceiveRoom({
+            variables: {
+                roomUseId: bookRoomInfo?.id
+            }
+        });
+        setBookRoomInfo({
+            id: '',
+            receive_date: '',
+            checkOut_date: '',
+            night_stay: 0,
+            status: '',
+            room: {
+                id: '',
+                name: '',
+                category: {
+                    id: '',
+                    name: '',
+                    price: 0,
+                    people_maximum: 0
+                }
+            }
+        });
+        setCustomerInfo({});
+        updateHistoryAfterMutation();
+        setEditAllowance(false);
+    }
+
+    const handleUpdateReceiveRoom = async () => {
         if (editAllowance) {
+            let result = await updateReceiveRoomInfo({
+                variables: {
+                    input: {
+                        id: bookRoomInfo.id,
+                        receive_date: bookRoomInfo.receive_date,
+                        checkOut_date: bookRoomInfo.checkOut_date,
+                        night_stay: +bookRoomInfo.night_stay,
+                        room_id: +bookRoomInfo.room.id
+                    }
+                }
+            });
+            setBookRoomInfo({
+                id: '',
+                receive_date: '',
+                checkOut_date: '',
+                night_stay: 0,
+                status: '',
+                room: {
+                    id: '',
+                    name: '',
+                    category: {
+                        id: '',
+                        name: '',
+                        price: 0,
+                        people_maximum: 0
+                    }
+                }
+            });
+            setCustomerInfo({});
+            setRoomsByCategory([]);
+            updateHistoryAfterMutation();
             setEditAllowance(false);
         } else {
             setEditAllowance(true);
@@ -59,6 +171,17 @@ const ReceiveRoom = () => {
 
     const handleSelectReceiveRoom = (item) => {
         console.log(item);
+        setHotelRoomUseList(draft => {
+            draft = draft.map(e => {
+                if (e.id === item.id) {
+                    e.isSelected = true;
+                    return e;
+                } else {
+                    e.isSelected = false;
+                    return e;
+                }
+            })
+        })
         setCustomerInfo(item.customer);
         setBookRoomInfo(draft => {
             let _price = 0;
@@ -102,8 +225,19 @@ const ReceiveRoom = () => {
     }
 
     React.useEffect(() => {
+        if (hotelRoomsByCategories && bookRoomInfo.id) {
+            let rooms_by_category = hotelRoomsByCategories.filter(item => item.id === bookRoomInfo?.room?.category?.id)[0];
+            setRoomsByCategory(rooms_by_category.rooms);
+        }
+    }, [bookRoomInfo]);
+
+    React.useEffect(() => {
         fetchHotelRoomUseList();
     }, []);
+
+    React.useEffect(() => {
+        setEditAllowance(false);
+    }, [bookRoomInfo.id]);
 
     return (
         <>
@@ -142,27 +276,57 @@ const ReceiveRoom = () => {
                             <div className='row mt-1 px-4'>
                                 <div className='form-group col-6'>
                                     <label className='form-label'>Số phòng nhận:</label>
-                                    <input type='text' className='form-control' disabled={!editAllowance} value={bookRoomInfo?.room?.name ? bookRoomInfo.room.name : ''} />
+                                    <select className="form-select"
+                                        value={bookRoomInfo?.room?.id ? bookRoomInfo.room.id : ''}
+                                        disabled={!editAllowance}
+                                        onChange={(event) => handleOnChange('room_id', event.target.value)}
+                                    >
+                                        {roomsByCategory && roomsByCategory.length > 0 &&
+                                            roomsByCategory.map(item => {
+                                                return (
+                                                    <option key={`receive-room-number-${item.id}`} value={item.id}>{item.name}</option>
+                                                )
+                                            })
+                                        }
+                                    </select>
                                 </div>
                                 <div className='form-group col-6'>
                                     <label className='form-label'>Loại phòng:</label>
-                                    <input type='text' className='form-control' disabled={!editAllowance} />
+                                    <select className="form-select"
+                                        value={bookRoomInfo?.room?.category?.id ? bookRoomInfo.room?.category.id : ''}
+                                        disabled={!editAllowance}
+                                        onChange={(event) => handleOnChange('room_category', event.target.value)}
+                                    >
+                                        {hotelRoomsByCategories && hotelRoomsByCategories.length > 0 &&
+                                            hotelRoomsByCategories.map(item => {
+                                                return (
+                                                    <option key={`room-receive-category-type-${item.id}`} value={item.id}>{item.name}</option>
+                                                )
+                                            })
+                                        }
+                                    </select>
                                 </div>
                             </div>
                             <div className='row mt-1 px-4'>
                                 <div className='form-group col-6'>
                                     <label className='form-label'>Ngày nhận:</label>
-                                    <input type='text' className='form-control' disabled={!editAllowance} value={bookRoomInfo?.receive_date ? bookRoomInfo.receive_date : ''} />
+                                    <input type='text' className='form-control' disabled={!editAllowance} value={bookRoomInfo?.receive_date ? bookRoomInfo.receive_date : ''}
+                                        onChange={(event) => handleOnChange('receive_date', event.target.value)}
+                                    />
                                 </div>
                                 <div className='form-group col-6'>
                                     <label className='form-label'>Ngày trả:</label>
-                                    <input type='text' className='form-control' disabled={!editAllowance} value={bookRoomInfo?.checkOut_date ? bookRoomInfo.checkOut_date : ''} />
+                                    <input type='text' className='form-control' disabled={!editAllowance} value={bookRoomInfo?.checkOut_date ? bookRoomInfo.checkOut_date : ''}
+                                        onChange={(event) => handleOnChange('checkOut_date', event.target.value)}
+                                    />
                                 </div>
                             </div>
                             <div className='row mt-1 px-4'>
                                 <div className='form-group col-6'>
                                     <label className='form-label'>Số đêm lưu trú:</label>
-                                    <input type='text' className='form-control' disabled={!editAllowance} value={bookRoomInfo?.night_stay ? bookRoomInfo.night_stay : ''} />
+                                    <input type='text' className='form-control' disabled={!editAllowance} value={bookRoomInfo?.night_stay ? bookRoomInfo.night_stay : ''}
+                                        onChange={(event) => handleOnChange('night_stay', event.target.value)}
+                                    />
                                 </div>
                                 <div className='form-group col-6'>
                                     <label className='form-label'>Số lượng người tối đa:</label>
@@ -172,10 +336,9 @@ const ReceiveRoom = () => {
                             <div className='row mt-1 px-4'>
                                 <div className='form-group col-6'>
                                     <label className='form-label'>Giá phòng:</label>
-                                    <input type='text' className='form-control' disabled value={bookRoomInfo?.room.price ? bookRoomInfo.room.price : ''} />
+                                    <input type='text' className='form-control' disabled value={bookRoomInfo?.room.price ? CurrencyFormat(bookRoomInfo.room.price) : ''} />
                                 </div>
                             </div>
-
                         </fieldset>
                         <fieldset className='border rounded-2 p-2'>
                             <legend className='reset legend-text'>Chức năng</legend>
@@ -186,15 +349,16 @@ const ReceiveRoom = () => {
                                     </button>
                                 </div>
                                 <div className='form-group col-6'>
-                                    <button className='btn receive-btn col-12' disabled={!bookRoomInfo.id ? true : (bookRoomInfo.status === 'Chờ nhận phòng' ? false : true)}>Nhận phòng</button>
+                                    <button className='btn receive-btn col-12' disabled={!bookRoomInfo.id ? true : (bookRoomInfo.status === 'Chờ nhận phòng' ? false : true)}
+                                        onClick={handleReceiveRoom}
+                                    >
+                                        Nhận phòng
+                                    </button>
                                 </div>
                             </div>
                             <div className='row px-4'>
                                 <div className='form-group col-6'>
                                     <button className='btn btn-primary col-12' disabled={!bookRoomInfo.id ? true : (bookRoomInfo.status === 'Đã nhận phòng' ? false : true)}>Đổi phòng</button>
-                                </div>
-                                <div className='form-group col-6'>
-                                    <button className='btn btn-danger col-12' disabled={!bookRoomInfo.id ? true : (bookRoomInfo.status === 'Đã nhận phòng' ? false : true)}>Hủy nhận phòng</button>
                                 </div>
                             </div>
                         </fieldset>
@@ -219,7 +383,7 @@ const ReceiveRoom = () => {
                                         return (
                                             <tr
                                                 key={`received-room-use-${item.id}`}
-                                                className={(item.status === 'Đã nhận phòng') ? 'already-received' : ''}
+                                                className={item.isSelected ? 'selected-row' : (item.status === 'Đã nhận phòng' ? 'already-received ' : '')}
                                                 onClick={() => handleSelectReceiveRoom(item)}
                                             >
                                                 <td>{item.room?.name}</td>

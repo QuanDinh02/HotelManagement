@@ -234,6 +234,14 @@ const resolvers = {
         deleteBookRoom: async (parent, args) => {
             return await HotelRoomUseServices.deleteHotelRoomUse(args.id);
         },
+
+        updateReceiveRoom: async (parent, args) => {
+            return await ReceiveRoomServices.updateHotelRoomUse(args.id);
+        },
+
+        updateReceiveRoomInfo: async (parent, args) => {
+            return await HotelRoomUseServices.updateHotelRoomUse(args.input);
+        },
     }
 };
 

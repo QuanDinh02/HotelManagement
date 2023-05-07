@@ -361,6 +361,9 @@ const typeDefs = `#graphql
     bookRoom(input: BookRoomInput!): Response
     updateBookRoom(input: BookRoomUpdateInput!): Response
     deleteBookRoom(id: ID!): Response
+
+    updateReceiveRoom(id: ID!): Response
+    updateReceiveRoomInfo(input: BookRoomUpdateInput!): Response
   }
 `;
 

@@ -108,6 +108,33 @@ const getHotelRoomUseSearchByCustomer = async (value) => {
     return result;
 }
 
+const updateHotelRoomUse = async (room_use_id) => {
+    let existedRoomUse = await db.HotelRoomUse.findOne({
+        where: {
+            id: +room_use_id
+        },
+        raw: true
+    })
+
+    if (existedRoomUse) {
+
+        await db.HotelRoomUse.update({status: 'Đã nhận phòng'}, {
+            where: {
+                id: +room_use_id
+            }
+        });
+        return {
+            errorCode: 0,
+            message: 'Receive room successfully !'
+        }
+    } else {
+        return {
+            errorCode: -1,
+            message: 'Receive room is not existed !'
+        }
+    }
+}
+
 module.exports = {
-    getAllHotelRoomUse, getHotelRoomUseSearchByCustomer
+    getAllHotelRoomUse, getHotelRoomUseSearchByCustomer, updateHotelRoomUse
 }
