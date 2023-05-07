@@ -4,6 +4,7 @@ const AccessPermissionServices = require('../services/accessPermissionService.js
 const HotelServices = require('../services/hotelServices.js');
 const HotelRoomsServices = require('../services/hotelRoomService.js');
 const HotelRoomUseServices = require('../services/hotelRoomUseService.js');
+const ReceiveRoomServices = require('../services/receiveRoomService.js');
 
 const resolvers = {
     Customer: {
@@ -129,6 +130,15 @@ const resolvers = {
         book_room_search_by_customer: async (parent, args) => {
             let bookRoom = await HotelRoomUseServices.getHotelRoomUseSearchByCustomer(args.value);
             return bookRoom;
+        },
+
+        received_hotel_room_use_list: async () => {
+            return await ReceiveRoomServices.getAllHotelRoomUse();
+        },
+
+        receive_room_search_by_customer: async (parent, args) => {
+            let receiveRoom = await ReceiveRoomServices.getHotelRoomUseSearchByCustomer(args.value);
+            return receiveRoom;
         },
     },
 

@@ -90,6 +90,70 @@ const GET_HOTEL_ROOM_USE_BY_CUSTOMER = gql`
   }
 `;
 
+const GET_RECEIVE_ROOM_LIST = gql`
+  query GetReceiveRoomList {
+    received_hotel_room_use_list {
+        id
+        night_stay
+        receive_date
+        checkOut_date
+        status
+        room {
+            id
+            name
+            category {
+              id
+              name
+            }
+        }
+        customer {
+            id
+            name
+            phone
+            citizen_id
+        }
+    }
+
+    hotel_rooms_by_categories {
+      id
+      name
+      price
+      people_maximum
+      rooms {
+        id
+        name
+      }
+    }
+  }
+`;
+
+const GET_HOTEL_RECEIVE_ROOM_BY_CUSTOMER = gql`
+  query receiveRoomSearch($value: String!) {
+    receive_room_search_by_customer(value: $value) {
+      id
+      night_stay
+      receive_date
+      checkOut_date
+      status
+      room {
+        id
+        name
+        category {
+          id
+          name
+        }
+      }
+      customer {
+        id
+        name
+        phone
+        citizen_id
+      }
+    }
+  }
+`;
+
 export {
-  GET_ALL_HOTEL_ROOM_USE, GET_HOTEL_ROOM_USE_BY_ID, GET_HOTEL_ROOM_USE_BY_CUSTOMER
+  GET_ALL_HOTEL_ROOM_USE, GET_HOTEL_ROOM_USE_BY_ID, GET_HOTEL_ROOM_USE_BY_CUSTOMER,
+  GET_RECEIVE_ROOM_LIST, GET_HOTEL_RECEIVE_ROOM_BY_CUSTOMER
 }
