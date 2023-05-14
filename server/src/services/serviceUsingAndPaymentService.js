@@ -47,6 +47,79 @@ const getAllHotelRoomUsePayment = async () => {
     return _result;
 }
 
+const getInvoiceByHotelRoomUse = async (room_use_id) => {
+
+    let invoice_info = await db.Invoice.findOne({
+        where: {
+            room_use_id: +room_use_id
+        },
+        raw: true,
+        attributes: ['id','total'],
+    })
+
+    let invoice = await db.HotelRoomUse.findOne({
+        where: {
+            id: +room_use_id
+        },
+        nest: true,
+        include: [
+            {
+                model: db.Surcharge,
+                attributes: ['id', 'name', 'description', 'price'],
+                through: { attributes: [] }
+            },
+            {
+                model: db.HotelRoom, attributes: ['name'],
+                raw: true,
+                nest: true,
+                include: {
+                    model: db.HotelRoomCategory, attributes: ['price']
+                }
+            },
+        ]
+    })
+
+    let service_invoice = await db.Service_RoomUse.findAll({
+        raw: true,
+        nest: true,
+        order: [
+            ['id', 'DESC']
+        ],
+        include: {
+            model: db.HotelService,
+            attributes: ['name', 'price']
+        },
+        attributes: ['id', 'quantity', 'total'],
+        where: {
+            room_use_id: +room_use_id
+        }
+    });
+
+    let _result = invoice.get({ plain: true });
+
+    let _service_invoice = service_invoice.map(item => {
+        let _item = _.cloneDeep(item);
+        _item.name = _item.HotelService.name;
+        _item.price = _item.HotelService.price;
+        delete _item.HotelService;
+
+        return _item;
+    });
+
+    _result.Services = _service_invoice;
+    _result.HotelRoom.price = _result.HotelRoom.HotelRoomCategory.price;
+    _result.invoice_total = invoice_info.total;
+    _result.id = invoice_info.id;
+    _result.room_use_id = +room_use_id;
+
+    delete _result.HotelRoom.HotelRoomCategory;
+    delete _result.status;
+    delete _result.customer_id;
+    delete _result.room_id;
+
+    return _result;
+}
+
 module.exports = {
-    getAllHotelRoomUsePayment
+    getAllHotelRoomUsePayment, getInvoiceByHotelRoomUse
 }

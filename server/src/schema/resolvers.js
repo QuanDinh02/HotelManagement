@@ -145,6 +145,10 @@ const resolvers = {
         hotel_room_use_list_payment: async () => {
             return await ServicePayment.getAllHotelRoomUsePayment();
         },
+
+        invoice: async (parent, args) => {
+            return await ServicePayment.getInvoiceByHotelRoomUse(args.id);
+        },
     },
 
     Mutation: {

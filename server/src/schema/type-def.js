@@ -168,6 +168,38 @@ const typeDefs = `#graphql
     phone: String!
   }
 
+  type Surcharge {
+    id: ID!
+    name: String!
+    description: String!
+    price: Int!
+  }
+
+  type RoomUseInfo {
+    name: String!
+    price: Int!
+  }
+
+  type ServiceUse {
+    id: ID!
+    quantity: Int!
+    total: Int!
+    name: String!
+    price: Int!
+  }
+
+  type RoomUseInvoice {
+    id: ID!
+    room_use_id: Int!
+    receive_date: String!
+    checkOut_date: String!
+    night_stay: Int!
+    invoice_total: Int!
+    Surcharges: [Surcharge!]
+    HotelRoom: RoomUseInfo!
+    Services: [ServiceUse!]
+  }
+
   type Query {
     customers: [Customer!]
     customer(value: String!): [Customer]
@@ -201,6 +233,8 @@ const typeDefs = `#graphql
     receive_room_search_by_customer(value: String!): [ReceiveRoom!]
     
     hotel_room_use_list_payment: [HotelRoomUse!]
+
+    invoice(id: ID!): RoomUseInvoice!
   }
 
   input CustomerInput {
