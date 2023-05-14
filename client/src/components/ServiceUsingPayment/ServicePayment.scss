@@ -31,14 +31,14 @@ $legend-text-size: 1.125rem;
     }
 
     .main {
-        height: 41.875rem;
+        height: 42.875rem;
 
         .border {
             border-color: $main-color !important;
         }
 
         .left-content {
-            width: 60%;
+            width: 50%;
 
             .reset {
                 all: revert;
@@ -49,63 +49,41 @@ $legend-text-size: 1.125rem;
                 color    : $main-color;
             }
 
-            .left {
-                width : 60%;
-                height: 41.875rem;
-
-                .search-btn {
-                    &:hover {
-                        cursor          : pointer;
-                        color           : white;
-                        background-color: $main-color;
-                        transition      : 0.25s;
-                    }
-                }
-
-                .room-list {
-                    overflow-y: auto;
-
-                    table {
-                        thead {
-                            tr {
-                                th {
-                                    vertical-align: middle;
-                                    text-align    : center;
-                                }
-                            }
-                        }
-
-                        tbody {
-                            tr {
-                                td {
-                                    vertical-align: middle;
-                                }
-
-                                &:hover {
-                                    cursor          : pointer;
-                                    background-color: $main-color;
-                                    color           : white;
-                                }
-                            }
-                        }
-                    }
+            .search-btn {
+                &:hover {
+                    cursor          : pointer;
+                    color           : white;
+                    background-color: $main-color;
+                    transition      : 0.25s;
                 }
             }
 
-            .right {
-                width : 40%;
-                height: 41.875rem;
+            .room-list {
+                overflow-y: auto;
+                flex-grow : 1;
 
-                .payment {
-                    flex-grow: 1;
-                }
+                table {
+                    thead {
+                        tr {
+                            th {
+                                vertical-align: middle;
+                                text-align    : center;
+                            }
+                        }
+                    }
 
-                .payment-btn {
-                    color           : white;
-                    background-color: $main-color;
+                    tbody {
+                        tr {
+                            td {
+                                vertical-align: middle;
+                            }
 
-                    &:hover {
-                        background-color: #b8662c;
+                            &:hover {
+                                cursor          : pointer;
+                                background-color: $main-color;
+                                color           : white;
+                            }
+                        }
                     }
                 }
             }
@@ -117,27 +95,34 @@ $legend-text-size: 1.125rem;
         }
 
         .right-content {
-            width       : 40%;
-            height      : 41.875rem;
+            width : 50%;
+            height: 42.875rem;
+
+            .payment-btn {
+                color           : white;
+                background-color: $main-color;
+
+                &:hover {
+                    background-color: #b8662c;
+                }
+            }
 
             .room-invoice {
-                height: 30%;
+                height: auto;
             }
 
             .policies {
-                height: 30%;
+                height: 20%;
             }
 
             .service {
-                height: 40%;
+                flex-grow: 1;
             }
 
-            .room-invoice,
             .policies,
             .service {
-                width       : 100%;
-                //overflow-x: auto;
-                overflow    : auto;
+                width   : 100%;
+                overflow: auto;
             }
 
             table {

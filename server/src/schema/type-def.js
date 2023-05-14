@@ -199,6 +199,8 @@ const typeDefs = `#graphql
     
     received_hotel_room_use_list: [ReceiveRoom!]
     receive_room_search_by_customer(value: String!): [ReceiveRoom!]
+    
+    hotel_room_use_list_payment: [HotelRoomUse!]
   }
 
   input CustomerInput {

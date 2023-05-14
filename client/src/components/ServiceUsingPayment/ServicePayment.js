@@ -5,9 +5,40 @@ import { HiOutlineSearch } from 'react-icons/hi';
 import { MdPayment } from 'react-icons/md';
 import React from 'react';
 import { CurrencyFormat } from '../Format/FormatNumber';
+import { GET_ALL_HOTEL_ROOMS } from '../Query/HotelRoomQuery';
+import { GET_ALL_HOTEL_ROOM_USE_PAYMENT } from '../Query/ServicePaymentQuery';
+import { useLazyQuery, useMutation } from '@apollo/client';
+import { useImmer } from "use-immer";
+import _ from 'lodash';
+
 const ServicePayment = () => {
 
     const history = useHistory();
+
+    const [getRoomList, { refetch }] = useLazyQuery(GET_ALL_HOTEL_ROOM_USE_PAYMENT);
+    const [hotelRoomUseList, setHotelRoomUseList] = useImmer([]);
+
+    const fetchHotelRoomUseList = async () => {
+        let { data: hotel_room_use } = await getRoomList();
+
+        let _rooms = hotel_room_use?.hotel_room_use_list_payment.map(item => {
+            let _item = _.cloneDeep(item);
+            delete _item.__typename;
+            delete _item.room.__typename;
+            delete _item.room.category.__typename;
+            delete _item.customer.__typename;
+
+            return {
+                ..._item, isSelected: false
+            }
+        });
+
+        setHotelRoomUseList(_rooms);
+    }
+
+    React.useEffect(() => {
+        fetchHotelRoomUseList();
+    }, []);
 
     return (
         <>
@@ -17,104 +48,51 @@ const ServicePayment = () => {
                     <span className='icon' onClick={() => history.push('/')}><TfiClose className='exit-icon' /></span>
                 </div>
                 <div className='main px-3 d-flex gap-3 mt-2 mb-2'>
-                    <div className='left-content d-flex justify-content-between gap-3'>
-                        <div className='left d-flex flex-column gap-2'>
-                            <fieldset className='search-box border rounded-2 p-2'>
-                                <legend className='reset legend-text'>Tìm kiếm phòng</legend>
-                                <div className="input-group">
-                                    <input type="text" className="form-control" placeholder="Số/ loại phòng" />
-                                    <span className="input-group-text search-btn" title='Tìm kiếm'><HiOutlineSearch /></span>
-                                </div>
-                            </fieldset>
-                            <fieldset className='room-list border rounded-2 p-2'>
-                                <legend className='reset legend-text'>Danh sách phòng</legend>
-                                <table className="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">Số phòng</th>
-                                            <th scope="col">Loại phòng</th>
-                                            <th scope="col">Giá</th>
-                                            <th scope="col">Số người tối đa</th>
-                                            <th scope="col">Trạng thái</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {
-                                            [...Array(4)].map((item, index) => {
-                                                return (
-                                                    <tr>
-                                                        <td>{index + 1}</td>
-                                                        <td>Phòng 1 người</td>
-                                                        <td>{CurrencyFormat(7000000)}</td>
-                                                        <td>1</td>
-                                                        <td>Có người</td>
-                                                    </tr>
-                                                )
-                                            })
-                                        }
-                                        {
-                                            [...Array(16)].map((item, index) => {
-                                                return (
-                                                    <tr>
-                                                        <td>{index + 5}</td>
-                                                        <td>Phòng 2 người</td>
-                                                        <td>{CurrencyFormat(10000000)}</td>
-                                                        <td>2</td>
-                                                        <td>Trống</td>
-                                                    </tr>
-                                                )
-                                            })
-                                        }
-                                    </tbody>
-                                </table>
-                            </fieldset>
-                        </div>
-                        <div className='right d-flex flex-column gap-2'>
-                            <fieldset className='service border rounded-2 p-2'>
-                                <legend className='reset legend-text'>Dịch vụ</legend>
-                                <div className='form-group px-4'>
-                                    <label className='form-label'>Loại dịch vụ:</label>
-                                    <select className="form-select">
-                                        <option defaultValue={'1'}>Ăn uống</option>
-                                        <option value="2">Tiện ích</option>
-                                        <option value="3">Giải trí</option>
-                                    </select>
-                                </div>
-                                <div className='form-group mt-2 px-4'>
-                                    <label className='form-label'>Dịch vụ:</label>
-                                    <select className="form-select">
-                                        <option defaultValue={'1'}>Spa</option>
-                                        <option value="2">Mì xào 2 trứng và xúc xích</option>
-                                        <option value="3">Giặt ủi quần áo</option>
-                                    </select>
-                                </div>
-                                <div className='form-group mt-2 px-4'>
-                                    <label className='form-label'>Giá:</label>
-                                    <input type='text' className='form-control' />
-                                </div>
-                                <div className='form-group mt-2 px-4'>
-                                    <label className='form-label'>Số lượng:</label>
-                                    <input type="number" className="form-control" min="1"></input>
-                                </div>
-                                <div className='form-group mt-3 pb-2 px-4'>
-                                    <button className='btn btn-success col-12'>Thêm dịch vụ</button>
-                                </div>
-                            </fieldset>
-                            <fieldset className='payment border rounded-2 p-2'>
-                                <legend className='reset legend-text'>Thanh toán</legend>
-                                <div className='form-group px-4'>
-                                    <label className='form-label'>Tổng tiền:</label>
-                                    <input type='text' className='form-control' />
-                                </div>
-                                <div className='form-group mt-2 px-4'>
-                                    <label className='form-label'>Giảm giá:</label>
-                                    <input type='text' className='form-control' />
-                                </div>
-                                <div className='form-group mt-3 pb-2 px-4'>
-                                    <button className='btn payment-btn col-12'>Thanh toán</button>
-                                </div>
-                            </fieldset>
-                        </div>
+                    <div className='left-content d-flex flex-column gap-3'>
+                        <fieldset className='search-box border rounded-2 p-2'>
+                            <legend className='reset legend-text'>Tìm kiếm phòng</legend>
+                            <div className="input-group">
+                                <input type="text" className="form-control" placeholder="Số/ loại phòng" />
+                                <span className="input-group-text search-btn" title='Tìm kiếm'><HiOutlineSearch /></span>
+                            </div>
+                        </fieldset>
+                        <fieldset className='room-list border rounded-2 p-2'>
+                            <legend className='reset legend-text'>Danh sách phòng</legend>
+                            <table className="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Số phòng</th>
+                                        <th scope="col">Họ và Tên</th>
+                                        <th scope="col">SĐT</th>
+                                        <th scope="col">Loại phòng</th>
+                                        <th scope="col">Ngày nhận</th>
+                                        <th scope="col">Ngày trả</th>
+                                        <th scope="col">Trạng thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {hotelRoomUseList && hotelRoomUseList.length > 0 &&
+                                        hotelRoomUseList.map((item, index) => {
+                                            return (
+                                                <tr
+                                                    key={`hotel-rooms-use-items-${item.id}`}
+                                                    className={item.isSelected ? 'selected-row' : (item.status === 'Đã nhận phòng' ? 'already-received ' : '')}
+                                                // onClick={() => handleSelectReceiveRoom(item)}
+                                                >
+                                                    <td>{item.room?.name}</td>
+                                                    <td>{item.customer?.name}</td>
+                                                    <td>{item.customer?.phone}</td>
+                                                    <td>{item.room?.category}</td>
+                                                    <td>{item.receive_date}</td>
+                                                    <td>{item.checkOut_date}</td>
+                                                    <td>{item.status}</td>
+                                                </tr>
+                                            )
+                                        })
+                                    }
+                                </tbody>
+                            </table>
+                        </fieldset>
                     </div>
                     <div className='right-content d-flex flex-column gap-2'>
                         <fieldset className='room-invoice border rounded-2 p-2' onScroll={(event) => { event.preventDefault() }}>
@@ -199,6 +177,19 @@ const ServicePayment = () => {
                                     }
                                 </tbody>
                             </table>
+                        </fieldset>
+                        <fieldset className='payment border rounded-2 p-2'>
+                            <div className='d-flex align-items-center'>
+                                <div className='form-group mt-3 pb-2 col-6 px-4'>
+                                    <button className='btn btn-success col-12'>+ Thêm dịch vụ</button>
+                                </div>
+                                <div className='form-group mt-3 pb-2 col-6 px-4'>
+                                    <button className='btn payment-btn col-12'>Thanh toán</button>
+                                </div>
+                            </div>
+                            <div className='form-group mt-3 pb-2 col-6 px-4'>
+                                <button className='btn btn-warning col-12'>+ Thêm phụ thu</button>
+                            </div>
                         </fieldset>
                     </div>
 
