@@ -195,6 +195,7 @@ const typeDefs = `#graphql
     checkOut_date: String!
     night_stay: Int!
     invoice_total: Int!
+    surcharge_total: Int!
     Surcharges: [Surcharge!]
     HotelRoom: RoomUseInfo!
     Services: [ServiceUse!]
@@ -234,7 +235,7 @@ const typeDefs = `#graphql
     
     hotel_room_use_list_payment: [HotelRoomUse!]
 
-    invoice(id: ID!): RoomUseInvoice!
+    invoice(id: ID!): RoomUseInvoice
   }
 
   input CustomerInput {
@@ -366,6 +367,13 @@ const typeDefs = `#graphql
     checkOut_date: String!
   }
 
+  input RoomUseInvoiceInput {
+    date: String!
+    staff_id: Int!
+    room_use_id: Int!
+    total: Int!
+  }
+
   type Mutation {
     createCustomer(input: CustomerCreateInput!): CreateCustomerReponse
     updateCustomer(input: CustomerInput!): String
@@ -400,6 +408,8 @@ const typeDefs = `#graphql
 
     updateReceiveRoom(id: ID!): Response
     updateReceiveRoomInfo(input: BookRoomUpdateInput!): Response
+
+    createRoomUseInvoice(input: RoomUseInvoiceInput!): Response
   }
 `;
 

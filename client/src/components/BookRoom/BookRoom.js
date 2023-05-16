@@ -157,6 +157,7 @@ const BookRoom = () => {
                     }
                 }
             });
+
             updateHistoryAfterMutation();
             handleRefreshNew();
         }

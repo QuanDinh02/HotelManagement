@@ -22,6 +22,57 @@ const GET_ALL_HOTEL_ROOM_USE_PAYMENT = gql`
   }
 `;
 
+const GET_ALL_HOTEL_ROOM_USE_INVOICE = gql`
+  query getInvoice($roomUseId: ID!) {
+    invoice(id: $roomUseId) {
+      id
+      room_use_id
+      receive_date
+      checkOut_date
+      night_stay
+      invoice_total
+      surcharge_total
+      Surcharges {
+        id
+        name
+        description
+        price
+      }
+      HotelRoom {
+        name
+        price
+      }
+      Services {
+        id
+        name
+        quantity
+        price
+        total
+      }
+    }
+  }
+`;
+
+const GET_HOTEL_SERVICES = gql`
+  query GetAllHotelServices {
+    hotel_services {
+      id
+      name
+      price
+      hotel_service_category {
+        id
+        name
+      }
+    }
+
+    hotel_service_categories {
+      id
+      name
+    }
+  }
+`;
+
 export {
-    GET_ALL_HOTEL_ROOM_USE_PAYMENT
+    GET_ALL_HOTEL_ROOM_USE_PAYMENT, GET_ALL_HOTEL_ROOM_USE_INVOICE,
+    GET_HOTEL_SERVICES
 }

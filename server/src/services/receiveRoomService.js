@@ -1,6 +1,7 @@
 const db = require('../models/index.js');
 const { Op } = require("sequelize");
 const _ = require('lodash');
+const ServicePayment = require('./serviceUsingAndPaymentService.js');
 
 const getAllHotelRoomUse = async () => {
 
@@ -118,11 +119,25 @@ const updateHotelRoomUse = async (room_use_id) => {
 
     if (existedRoomUse) {
 
-        await db.HotelRoomUse.update({status: 'Đã nhận phòng'}, {
+        await db.HotelRoomUse.update({ status: 'Đã nhận phòng' }, {
             where: {
                 id: +room_use_id
             }
         });
+
+        const date = new Date();
+
+        let day = date.getDate();
+        let month = date.getMonth() + 1;
+        let year = date.getFullYear();
+
+        await ServicePayment.createRoomUseInvoice({
+            date: `${day}/${month}/${year}`,
+            staff_id: 4,
+            room_use_id: +room_use_id,
+            total: 0
+        });
+
         return {
             errorCode: 0,
             message: 'Receive room successfully !'

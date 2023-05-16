@@ -54,72 +54,101 @@ const getInvoiceByHotelRoomUse = async (room_use_id) => {
             room_use_id: +room_use_id
         },
         raw: true,
-        attributes: ['id','total'],
+        attributes: ['id', 'total'],
     })
 
-    let invoice = await db.HotelRoomUse.findOne({
-        where: {
-            id: +room_use_id
-        },
-        nest: true,
-        include: [
-            {
-                model: db.Surcharge,
-                attributes: ['id', 'name', 'description', 'price'],
-                through: { attributes: [] }
+    if (invoice_info) {
+        let invoice = await db.HotelRoomUse.findOne({
+            where: {
+                id: +room_use_id
             },
-            {
-                model: db.HotelRoom, attributes: ['name'],
-                raw: true,
-                nest: true,
-                include: {
-                    model: db.HotelRoomCategory, attributes: ['price']
-                }
-            },
-        ]
-    })
+            nest: true,
+            include: [
+                {
+                    model: db.Surcharge,
+                    attributes: ['id', 'name', 'description', 'price'],
+                    through: { attributes: [] }
+                },
+                {
+                    model: db.HotelRoom, attributes: ['name'],
+                    raw: true,
+                    nest: true,
+                    include: {
+                        model: db.HotelRoomCategory, attributes: ['price']
+                    }
+                },
+            ]
+        })
 
-    let service_invoice = await db.Service_RoomUse.findAll({
-        raw: true,
-        nest: true,
-        order: [
-            ['id', 'DESC']
-        ],
-        include: {
-            model: db.HotelService,
-            attributes: ['name', 'price']
-        },
-        attributes: ['id', 'quantity', 'total'],
-        where: {
-            room_use_id: +room_use_id
+        let service_invoice = await db.Service_RoomUse.findAll({
+            raw: true,
+            nest: true,
+            order: [
+                ['id', 'DESC']
+            ],
+            include: {
+                model: db.HotelService,
+                attributes: ['name', 'price']
+            },
+            attributes: ['id', 'quantity', 'total'],
+            where: {
+                room_use_id: +room_use_id
+            }
+        });
+
+        let _result = invoice.get({ plain: true });
+
+        let _service_invoice = service_invoice.map(item => {
+            let _item = _.cloneDeep(item);
+            _item.name = _item.HotelService.name;
+            _item.price = _item.HotelService.price;
+            delete _item.HotelService;
+
+            return _item;
+        });
+
+        let surchargeTotal = 0;
+
+        _result.Surcharges.forEach(element => {
+            surchargeTotal += element.price;
+        });
+
+        _result.Services = _service_invoice;
+        _result.HotelRoom.price = _result.HotelRoom.HotelRoomCategory.price;
+        _result.invoice_total = invoice_info?.total;
+        _result.id = invoice_info.id;
+        _result.room_use_id = +room_use_id;
+        _result.surcharge_total = surchargeTotal;
+
+        delete _result.HotelRoom.HotelRoomCategory;
+        delete _result.status;
+        delete _result.customer_id;
+        delete _result.room_id;
+
+        return _result;
+    } else {
+        return null;
+    }
+}
+
+const createRoomUseInvoice = async (data) => {
+    let res = await db.Invoice.create(data);
+
+    if (res) {
+        return {
+            errorCode: 0,
+            message: 'Create room use invoice successfully !'
         }
-    });
-
-    let _result = invoice.get({ plain: true });
-
-    let _service_invoice = service_invoice.map(item => {
-        let _item = _.cloneDeep(item);
-        _item.name = _item.HotelService.name;
-        _item.price = _item.HotelService.price;
-        delete _item.HotelService;
-
-        return _item;
-    });
-
-    _result.Services = _service_invoice;
-    _result.HotelRoom.price = _result.HotelRoom.HotelRoomCategory.price;
-    _result.invoice_total = invoice_info.total;
-    _result.id = invoice_info.id;
-    _result.room_use_id = +room_use_id;
-
-    delete _result.HotelRoom.HotelRoomCategory;
-    delete _result.status;
-    delete _result.customer_id;
-    delete _result.room_id;
-
-    return _result;
+    }
+    else {
+        return {
+            errorCode: -2,
+            message: 'Create room use invoice failed !'
+        }
+    }
 }
 
 module.exports = {
-    getAllHotelRoomUsePayment, getInvoiceByHotelRoomUse
+    getAllHotelRoomUsePayment, getInvoiceByHotelRoomUse,
+    createRoomUseInvoice
 }

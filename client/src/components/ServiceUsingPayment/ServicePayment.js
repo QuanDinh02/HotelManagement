@@ -5,18 +5,78 @@ import { HiOutlineSearch } from 'react-icons/hi';
 import { MdPayment } from 'react-icons/md';
 import React from 'react';
 import { CurrencyFormat } from '../Format/FormatNumber';
-import { GET_ALL_HOTEL_ROOMS } from '../Query/HotelRoomQuery';
-import { GET_ALL_HOTEL_ROOM_USE_PAYMENT } from '../Query/ServicePaymentQuery';
+import { GET_ALL_HOTEL_ROOM_USE_PAYMENT, GET_ALL_HOTEL_ROOM_USE_INVOICE } from '../Query/ServicePaymentQuery';
 import { useLazyQuery, useMutation } from '@apollo/client';
 import { useImmer } from "use-immer";
 import _ from 'lodash';
+import ServiceAddNew from '../Modal/ServicePayment/ServiceAddNew';
 
 const ServicePayment = () => {
 
     const history = useHistory();
 
     const [getRoomList, { refetch }] = useLazyQuery(GET_ALL_HOTEL_ROOM_USE_PAYMENT);
+    const [getInvoice] = useLazyQuery(GET_ALL_HOTEL_ROOM_USE_INVOICE);
+    const [editAllowance, setEditAllowance] = React.useState(false);
     const [hotelRoomUseList, setHotelRoomUseList] = useImmer([]);
+    const [roomInvoice, setRoomInvoice] = React.useState({});
+    const [surchareList, setSurchargeList] = React.useState([]);
+    const [serviceList, setServiceList] = React.useState([]);
+
+    const [showAddNewModal, setShowAddNewModal] = React.useState(false);
+
+    const handleSelectRoomUse = async (room_use_id) => {
+        let { data: { invoice } } = await getInvoice({
+            variables: {
+                roomUseId: room_use_id
+            }
+        });
+
+        if (invoice) {
+            console.log(invoice);
+            setEditAllowance(true);
+            setHotelRoomUseList(draft => {
+                draft = draft.map(e => {
+                    if (e.id === room_use_id) {
+                        e.isSelected = true;
+                        return e;
+                    } else {
+                        e.isSelected = false;
+                        return e;
+                    }
+                })
+            })
+
+            let _surchargeList = invoice?.Surcharges.map(item => {
+                let _item = _.cloneDeep(item);
+                delete _item.__typename;
+                return _item;
+            });
+            setSurchargeList(_surchargeList);
+
+            let _serviceList = invoice?.Services.map(item => {
+                let _item = _.cloneDeep(item);
+                delete _item.__typename;
+                return _item;
+            });
+            setServiceList(_serviceList);
+
+            setRoomInvoice({
+                room_use_id: invoice.room_use_id,
+                room_number: invoice.HotelRoom.name,
+                price: invoice.HotelRoom.price,
+                receive_date: invoice.receive_date,
+                checkOut_date: invoice.checkOut_date,
+                room_price: invoice.HotelRoom.price * invoice.night_stay,
+                invoice_total: invoice.invoice_total,
+                surcharge_total: invoice.surcharge_total,
+            });
+        } else {
+            setServiceList({});
+            setSurchargeList({});
+            setRoomInvoice({});
+        }
+    }
 
     const fetchHotelRoomUseList = async () => {
         let { data: hotel_room_use } = await getRoomList();
@@ -76,8 +136,8 @@ const ServicePayment = () => {
                                             return (
                                                 <tr
                                                     key={`hotel-rooms-use-items-${item.id}`}
-                                                    className={item.isSelected ? 'selected-row' : (item.status === 'Đã nhận phòng' ? 'already-received ' : '')}
-                                                // onClick={() => handleSelectReceiveRoom(item)}
+                                                    className={item.isSelected ? 'selected-row' : ''}
+                                                    onClick={() => handleSelectRoomUse(item.id)}
                                                 >
                                                     <td>{item.room?.name}</td>
                                                     <td>{item.customer?.name}</td>
@@ -110,15 +170,17 @@ const ServicePayment = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>102</td>
-                                        <td>{CurrencyFormat(550000)}</td>
-                                        <td>12/03/2020</td>
-                                        <td>14/03/2020</td>
-                                        <td>{CurrencyFormat(1200000)}</td>
-                                        <td>{CurrencyFormat(100000)}</td>
-                                        <td>{CurrencyFormat(1850000)}</td>
-                                    </tr>
+                                    {!_.isEmpty(roomInvoice) &&
+                                        <tr key={`room-use-info-${roomInvoice.room_use_id}`}>
+                                            <td>{roomInvoice.room_number}</td>
+                                            <td>{CurrencyFormat(roomInvoice.price)}</td>
+                                            <td>{roomInvoice.receive_date}</td>
+                                            <td>{roomInvoice.checkOut_date}</td>
+                                            <td>{CurrencyFormat(roomInvoice.room_price)}</td>
+                                            <td>{CurrencyFormat(roomInvoice.surcharge_total)}</td>
+                                            <td>{CurrencyFormat(roomInvoice.invoice_total)}</td>
+                                        </tr>
+                                    }
                                 </tbody>
                             </table>
                         </fieldset>
@@ -134,18 +196,19 @@ const ServicePayment = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {
-                                        [...Array(5)].map((item, index) => {
+                                    {surchareList && surchareList.length > 0 &&
+                                        surchareList.map((item, index) => {
                                             return (
-                                                <tr>
-                                                    <td>{index + 1}</td>
-                                                    <td>QĐ 1.1</td>
-                                                    <td>{CurrencyFormat(10000)}</td>
-                                                    <td>Số người ở nhiều hơn 2 người ở phòng 2 người</td>
+                                                <tr key={`room-use-surcharge-${index}${roomInvoice.room_use_id}`}>
+                                                    <td className='text-center'>{index + 1}</td>
+                                                    <td>{item.name}</td>
+                                                    <td className='text-center'>{CurrencyFormat(item.price)}</td>
+                                                    <td>{item.descriptionF}</td>
                                                 </tr>
                                             )
                                         })
                                     }
+
                                 </tbody>
                             </table>
                         </fieldset>
@@ -162,15 +225,15 @@ const ServicePayment = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {
-                                        [...Array(5)].map((item, index) => {
+                                    {serviceList && serviceList.length > 0 &&
+                                        serviceList.map((item, index) => {
                                             return (
-                                                <tr>
-                                                    <td>{index + 1}</td>
-                                                    <td>Mì xào 2 trứng và xúc xích đức</td>
-                                                    <td>{CurrencyFormat(18000)}</td>
-                                                    <td>1</td>
-                                                    <td>{CurrencyFormat(18000)}</td>
+                                                <tr ey={`room-use-service-${index}${roomInvoice.room_use_id}`}>
+                                                    <td className='text-center'>{index + 1}</td>
+                                                    <td>{item.name}</td>
+                                                    <td className='text-center'>{CurrencyFormat(item.price)}</td>
+                                                    <td className='text-center'>{item.quantity}</td>
+                                                    <td className='text-center'>{CurrencyFormat(item.total)}</td>
                                                 </tr>
                                             )
                                         })
@@ -181,20 +244,24 @@ const ServicePayment = () => {
                         <fieldset className='payment border rounded-2 p-2'>
                             <div className='d-flex align-items-center'>
                                 <div className='form-group mt-3 pb-2 col-6 px-4'>
-                                    <button className='btn btn-success col-12'>+ Thêm dịch vụ</button>
+                                    <button className='btn btn-success col-12' disabled={!editAllowance} onClick={() => setShowAddNewModal(true)}>+ Thêm dịch vụ</button>
                                 </div>
                                 <div className='form-group mt-3 pb-2 col-6 px-4'>
-                                    <button className='btn payment-btn col-12'>Thanh toán</button>
+                                    <button className='btn payment-btn col-12' disabled={!editAllowance}>Thanh toán</button>
                                 </div>
                             </div>
                             <div className='form-group mt-3 pb-2 col-6 px-4'>
-                                <button className='btn btn-warning col-12'>+ Thêm phụ thu</button>
+                                <button className='btn btn-warning col-12' disabled={!editAllowance}>+ Thêm phụ thu</button>
                             </div>
                         </fieldset>
                     </div>
 
                 </div>
             </div>
+            <ServiceAddNew
+                show={showAddNewModal}
+                setShow={setShowAddNewModal}
+            />
         </>
 
     )

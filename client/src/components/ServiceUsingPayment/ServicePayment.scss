@@ -73,6 +73,11 @@ $legend-text-size: 1.125rem;
                     }
 
                     tbody {
+                        .selected-row {
+                            background-color: $main-color;
+                            color           : white;
+                        }
+
                         tr {
                             td {
                                 vertical-align: middle;

@@ -1,11 +1,36 @@
 const db = require('../models/index.js');
 const { Op } = require("sequelize");
 const _ = require('lodash');
+const ServicePayment = require('./serviceUsingAndPaymentService.js');
 
 const createNewRoomUse = async (data) => {
-    let res = await db.HotelRoomUse.create(data);
+    let res = await db.HotelRoomUse.create({
+        room_id: +data.room_id,
+        customer_id: +data.customer_id,
+        night_stay: +data.night_stay,
+        receive_date: data.receive_date,
+        checkOut_date: data.checkOut_date,
+        status: data.status
+    });
 
     if (res) {
+        let result = res.get({ plain: true });
+
+        if (data.status === 'Đã nhận phòng') {
+            const date = new Date();
+
+            let day = date.getDate();
+            let month = date.getMonth() + 1;
+            let year = date.getFullYear();
+
+            await ServicePayment.createRoomUseInvoice({
+                date: `${day}/${month}/${year}`,
+                staff_id: 4,
+                room_use_id: +result.id,
+                total: 0
+            });
+        }
+
         return {
             errorCode: 0,
             message: 'Book room successfully !'

@@ -251,6 +251,10 @@ const resolvers = {
         updateReceiveRoomInfo: async (parent, args) => {
             return await HotelRoomUseServices.updateHotelRoomUse(args.input);
         },
+
+        createRoomUseInvoice: async (parent, args) => {
+            return await ServicePayment.createRoomUseInvoice(args.input);
+        },
     }
 };
 
