@@ -32,6 +32,7 @@ const GET_ALL_HOTEL_ROOM_USE_INVOICE = gql`
       night_stay
       invoice_total
       surcharge_total
+      service_price_total
       Surcharges {
         id
         name
@@ -72,7 +73,18 @@ const GET_HOTEL_SERVICES = gql`
   }
 `;
 
+const GET_ALL_SURCHARGES = gql`
+  query surchargeList {
+    surcharge_list {
+      id
+      name
+      price
+      description
+    }
+  }
+`;
+
 export {
     GET_ALL_HOTEL_ROOM_USE_PAYMENT, GET_ALL_HOTEL_ROOM_USE_INVOICE,
-    GET_HOTEL_SERVICES
+    GET_HOTEL_SERVICES, GET_ALL_SURCHARGES
 }

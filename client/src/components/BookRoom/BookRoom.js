@@ -15,7 +15,14 @@ import { useImmer } from "use-immer";
 import _ from 'lodash';
 import { CurrencyFormat } from '../Format/FormatNumber';
 
-const ROOM_USE_STATUS = ['Đã nhận phòng', 'Hủy đặt phòng'];
+const ROOM_USE_STATUS = ['Đã nhận phòng', 'Hủy đặt phòng', 'Đã thanh toán'];
+
+const ROOM_USE_STATUS_COLOR =  {
+    'Đã nhận phòng': 'already-received',
+    'Hủy đặt phòng': 'room-book-cancel',
+    'Đã thanh toán': 'already-payment',
+    'Chờ nhận phòng': ''
+}
 
 const BookRoom = () => {
 
@@ -476,7 +483,7 @@ const BookRoom = () => {
                                         return (
                                             <tr
                                                 key={`hotel-room-use-${item.id}`}
-                                                className={(item.status === 'Đã nhận phòng') ? 'already-received' : ((item.status === 'Hủy đặt phòng' ? 'room-book-cancel' : ''))}
+                                                className={ROOM_USE_STATUS_COLOR[item.status]}
                                                 onClick={() => handleSelectingBookRoomHistory(item)}
                                             >
                                                 <td>{item.room?.name}</td>

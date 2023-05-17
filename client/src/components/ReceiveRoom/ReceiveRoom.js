@@ -11,6 +11,12 @@ import { useImmer } from "use-immer";
 import _ from 'lodash';
 import { CurrencyFormat } from '../Format/FormatNumber';
 
+const ROOM_USE_STATUS_COLOR =  {
+    'Đã nhận phòng': 'already-received',
+    'Đã thanh toán': 'already-payment',
+    'Chờ nhận phòng': ''
+}
+
 const ReceiveRoom = () => {
 
     const history = useHistory();
@@ -383,7 +389,7 @@ const ReceiveRoom = () => {
                                         return (
                                             <tr
                                                 key={`received-room-use-${item.id}`}
-                                                className={item.isSelected ? 'selected-row' : (item.status === 'Đã nhận phòng' ? 'already-received ' : '')}
+                                                className={item.isSelected ? 'selected-row' : (ROOM_USE_STATUS_COLOR[item.status])}
                                                 onClick={() => handleSelectReceiveRoom(item)}
                                             >
                                                 <td>{item.room?.name}</td>

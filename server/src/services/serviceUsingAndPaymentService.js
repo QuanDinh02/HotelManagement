@@ -26,7 +26,7 @@ const getAllHotelRoomUsePayment = async () => {
         ],
         where: {
             status: {
-                [Op.like]: 'Đã nhận phòng'
+                [Op.or]: ['Đã nhận phòng', 'Đã thanh toán']
             }
         }
     });
@@ -108,9 +108,14 @@ const getInvoiceByHotelRoomUse = async (room_use_id) => {
         });
 
         let surchargeTotal = 0;
+        let serviceTotal = 0;
 
         _result.Surcharges.forEach(element => {
             surchargeTotal += element.price;
+        });
+
+        _service_invoice.forEach(element => {
+            serviceTotal += element.total;
         });
 
         _result.Services = _service_invoice;
@@ -119,6 +124,7 @@ const getInvoiceByHotelRoomUse = async (room_use_id) => {
         _result.id = invoice_info.id;
         _result.room_use_id = +room_use_id;
         _result.surcharge_total = surchargeTotal;
+        _result.service_price_total = serviceTotal;
 
         delete _result.HotelRoom.HotelRoomCategory;
         delete _result.status;
@@ -148,7 +154,84 @@ const createRoomUseInvoice = async (data) => {
     }
 }
 
+const updatePayment = async (room_use_id, total_payment) => {
+    let existedRoomUse = await db.HotelRoomUse.findOne({
+        where: {
+            id: +room_use_id
+        },
+        raw: true
+    })
+
+    if (existedRoomUse) {
+
+        await db.HotelRoomUse.update({ status: 'Đã thanh toán' }, {
+            where: {
+                id: +room_use_id
+            }
+        });
+
+        await db.Invoice.update({ total: +total_payment }, {
+            where: {
+                room_use_id: +room_use_id
+            }
+        })
+
+        return {
+            errorCode: 0,
+            message: 'Room payment successfully !'
+        }
+    } else {
+        return {
+            errorCode: -1,
+            message: 'Room use is not existed !'
+        }
+    }
+}
+
+const addRoomService = async (data) => {
+    let res = await db.Service_RoomUse.create({
+        service_id: +data.service_id,
+        room_use_id: +data.room_use_id,
+        quantity: +data.quantity,
+        total: +data.total
+    });
+
+    if (res) {
+        return {
+            errorCode: 0,
+            message: 'Add room service successfully !'
+        }
+    }
+    else {
+        return {
+            errorCode: -2,
+            message: 'Add room service failed !'
+        }
+    }
+}
+
+const addRoomSurcharge = async (data) => {
+    let res = await db.Surcharge_RoomUse.create({
+        surcharge_id: +data.surcharge_id,
+        room_use_id: +data.room_use_id
+    });
+
+    if (res) {
+        return {
+            errorCode: 0,
+            message: 'Add room surcharge successfully !'
+        }
+    }
+    else {
+        return {
+            errorCode: -2,
+            message: 'Add room surcharge failed !'
+        }
+    }
+}
+
 module.exports = {
     getAllHotelRoomUsePayment, getInvoiceByHotelRoomUse,
-    createRoomUseInvoice
+    createRoomUseInvoice, updatePayment, addRoomService,
+    addRoomSurcharge
 }

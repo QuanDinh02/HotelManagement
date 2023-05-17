@@ -157,6 +157,17 @@ $legend-text-size: 1.125rem;
                     background-color: #90EE90;
                 }
             }
+
+            .already-payment {
+                background-color: #1A9FE4;
+                color           : white;
+
+                &:hover {
+                    cursor          : not-allowed;
+                    color           : white;
+                    background-color: #1A9FE4;
+                }
+            }
         }
     }
 }

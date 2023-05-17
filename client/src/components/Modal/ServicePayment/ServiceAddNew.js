@@ -5,12 +5,13 @@ import { useImmer } from "use-immer";
 import { CurrencyFormat } from '../../Format/FormatNumber';
 import _ from 'lodash';
 import { GET_HOTEL_SERVICES } from '../../Query/ServicePaymentQuery';
+import { CREATE_ROOM_SERVICE } from '../../Mutation/RoomPaymentMutation';
 import { useMutation, useLazyQuery } from '@apollo/client';
 import './Modal.scss';
 
 const ServiceAddNew = (props) => {
 
-    const { show, setShow, updateServiceList } = props;
+    const { show, setShow, room_use_id, updateInvoice } = props;
     const [hotelServices, setHotelServices] = useImmer([]);
 
     const [serviceCategories, setServiceCategories] = React.useState([]);
@@ -25,7 +26,31 @@ const ServiceAddNew = (props) => {
         total: ''
     });
 
-    const [getServiceList, { refetch }] = useLazyQuery(GET_HOTEL_SERVICES);
+    const [getServiceList] = useLazyQuery(GET_HOTEL_SERVICES);
+    const [createRoomService, { data: updateMsg }] = useMutation(CREATE_ROOM_SERVICE, {
+        onCompleted: async () => {
+            await updateInvoice(room_use_id, 'Đã nhận phòng', 'refetch');
+        }
+    });
+
+    const handleAddRoomService = async () => {
+        if (!newService.id) {
+            return;
+        } else {
+            let result = await createRoomService({
+                variables: {
+                    input: {
+                        service_id: +newService.id,
+                        room_use_id: +room_use_id,
+                        quantity: +newService.quantity,
+                        total: +newService.total
+                    }
+                }
+            });
+
+            handleCloseModal();
+        }
+    }
 
     const handleQuantity = (value) => {
         setNewService(draft => {
@@ -73,6 +98,15 @@ const ServiceAddNew = (props) => {
     }
 
     const handleCloseModal = () => {
+        setNewService({
+            id: '',
+            name: '',
+            quantity: '',
+            price: '',
+            total: ''
+        });
+        setCategory({});
+        setServiceByCategory([]);
         setShow(false);
     }
 
@@ -99,7 +133,7 @@ const ServiceAddNew = (props) => {
 
             >
                 <Modal.Header closeButton>
-                    <Modal.Title className='title'>Thêm dịch Vụ</Modal.Title>
+                    <Modal.Title className='title'>Thêm Dịch Vụ</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div className='main'>
@@ -150,7 +184,7 @@ const ServiceAddNew = (props) => {
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="success">Thêm mới</Button>
+                    <Button variant="success" onClick={handleAddRoomService}>Thêm mới</Button>
                     <Button variant="outline-secondary" onClick={handleCloseModal}>Hủy</Button>
                 </Modal.Footer>
             </Modal>

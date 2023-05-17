@@ -91,6 +91,17 @@ $legend-text-size: 1.125rem;
                         }
                     }
                 }
+
+                .already-payment {
+                    background-color: #1A9FE4;
+                    color           : white;
+
+                    &:hover {
+                        color           : yellow;
+                        background-color: #1A9FE4;
+                    }
+                }
+
             }
 
             .form-control:focus {

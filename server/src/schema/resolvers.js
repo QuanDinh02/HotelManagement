@@ -6,6 +6,7 @@ const HotelRoomsServices = require('../services/hotelRoomService.js');
 const HotelRoomUseServices = require('../services/hotelRoomUseService.js');
 const ReceiveRoomServices = require('../services/receiveRoomService.js');
 const ServicePayment = require('../services/serviceUsingAndPaymentService.js');
+const SurchargeServices = require('../services/surchargeService.js');
 
 const resolvers = {
     Customer: {
@@ -149,6 +150,10 @@ const resolvers = {
         invoice: async (parent, args) => {
             return await ServicePayment.getInvoiceByHotelRoomUse(args.id);
         },
+
+        surcharge_list: async () => {
+            return await SurchargeServices.getAllSurcharge();
+        },
     },
 
     Mutation: {
@@ -254,6 +259,18 @@ const resolvers = {
 
         createRoomUseInvoice: async (parent, args) => {
             return await ServicePayment.createRoomUseInvoice(args.input);
+        },
+
+        updatePayment: async (parent, args) => {
+            return await ServicePayment.updatePayment(args.id, args.total_payment);
+        },
+
+        addRoomService: async (parent, args) => {
+            return await ServicePayment.addRoomService(args.input);
+        },
+
+        addRoomSurcharge: async (parent, args) => {
+            return await ServicePayment.addRoomSurcharge(args.input);
         },
     }
 };
