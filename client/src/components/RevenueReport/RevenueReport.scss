@@ -1,0 +1,140 @@
+$main-color       : #D57834;
+$bg-color         : #ECECEC;
+$legend-text-size : 1.125rem;
+
+.revenue-report-container {
+    display       : flex;
+    flex-direction: column;
+    height        : auto;
+
+    .header {
+        background-color: $bg-color;
+
+        .title {
+            font-size: 2rem;
+            color    : $main-color;
+        }
+
+        .icon {
+            .exit-icon {
+                font-size: 2rem;
+                color    : red;
+                padding  : 5px;
+
+                &:hover {
+                    cursor          : pointer;
+                    background-color: rgb(247, 190, 190);
+                    border-radius   : 0.3125rem;
+                    transition      : 0.25s;
+                }
+            }
+        }
+    }
+
+    .main {
+        flex-grow: 1;
+
+        .border {
+            border-color: $main-color !important;
+        }
+
+        .reset {
+            all: revert;
+        }
+
+        .legend-text {
+            font-size: $legend-text-size;
+            color    : $main-color;
+        }
+
+        .left-content {
+            width: 50%;
+
+            .top {
+                .search-btn {
+                    &:hover {
+                        cursor          : pointer;
+                        color           : white;
+                        background-color: $main-color;
+                        transition      : 0.25s;
+                    }
+                }
+            }
+
+            .revenue-header {
+                font-size: 1.125rem;
+            }
+
+            .pie-chart {
+
+                .VictoryContainer {
+                    width: 50% !important;
+                }
+
+                .chart-note {
+                    .note-icon {
+                        font-size: 30px;
+                    }
+                }
+
+                .orange-bg-color {
+                    color: #E8A44E;
+                }
+
+                .blue-bg-color {
+                    color: #4763A5;
+                }
+
+                .red-bg-color {
+                    color: #EA5C5D;
+                }
+
+                .light-green-bg-color {
+                    color: #A6D854;
+                }
+
+                .blue-green-bg-color {
+                    color: #66C2A5;
+                }
+            }
+
+            .form-control:focus {
+                border-color: $main-color;
+                box-shadow  : 0 0 0 0.01rem $main-color;
+            }
+        }
+
+        .right-content {
+            width     : 50%;
+            max-height: 39.375rem;
+            overflow-y: auto;
+
+            table {
+                thead {
+                    tr {
+                        th {
+                            vertical-align: middle;
+                        }
+                    }
+                }
+
+                tbody {
+                    .selected-row {
+                        background-color: $main-color;
+                        color           : white;
+                    }
+
+                    tr {
+                        background-color: $bg-color;
+
+                        &:hover {
+                            cursor          : pointer;
+                            background-color: $main-color;
+                            color           : white;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

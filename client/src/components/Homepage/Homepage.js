@@ -68,7 +68,7 @@ const Homepage = () => {
                     </div>
                     <div className='item center-content'>
                         <div className='top-left'>
-                            <div className='top section d-flex flex-column p-2'>
+                            <div className='top section d-flex flex-column p-2' onClick={() => history.push('/revenue-report')}>
                                 <div className='image-box d-flex justify-content-center'>
                                     <div className='image'>
                                         <img src={Revenue} alt='' />

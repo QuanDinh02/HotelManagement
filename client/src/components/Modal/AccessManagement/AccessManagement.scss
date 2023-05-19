@@ -63,14 +63,6 @@ $access-color    : #ECECEC;
                             background-color: $main-color;
                             color           : white;
                         }
-
-                        // tr {
-                        //     &:hover {
-                        //         cursor          : pointer;
-                        //         background-color: $main-color;
-                        //         color           : white;
-                        //     }
-                        // }
                     }
                 }
 
@@ -86,8 +78,4 @@ $access-color    : #ECECEC;
         border-color: $main-color;
         box-shadow  : 0 0 0 0.01rem $main-color;
     }
-}
-
-.red {
-    border: 1px dashed red;
 }

@@ -15,6 +15,7 @@ import StaffManagement from './components/StaffManagement/StaffManagement';
 import ServiceManagement from './components/ServiceManagement/ServiceManagement';
 import CustomerManagement from './components/CustomerManagement/CustomerManagement';
 import ServicePayment from './components/ServiceUsingPayment/ServicePayment';
+import RevenueReport from './components/RevenueReport/RevenueReport';
 
 function App() {
   return (
@@ -33,6 +34,9 @@ function App() {
             </Route>
             <Route path="/receive-room">
               <ReceiveRoom />
+            </Route>
+            <Route path="/revenue-report">
+              <RevenueReport />
             </Route>
             <Route path="/room-management">
               <RoomManagement />
