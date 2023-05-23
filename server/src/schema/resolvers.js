@@ -156,8 +156,8 @@ const resolvers = {
             return await SurchargeServices.getAllSurcharge();
         },
 
-        revenue_report: async () => {
-            return await RevenueServices.getRevenueReport(); 
+        revenue_report: async (parent, args) => {
+            return await RevenueServices.getRevenueReport(args.month, args.year); 
         }
     },
 

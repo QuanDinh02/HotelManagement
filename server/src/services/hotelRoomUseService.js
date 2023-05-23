@@ -4,19 +4,23 @@ const _ = require('lodash');
 const ServicePayment = require('./serviceUsingAndPaymentService.js');
 
 const createNewRoomUse = async (data) => {
+
     let res = await db.HotelRoomUse.create({
-        room_id: +data.room_id,
-        customer_id: +data.customer_id,
-        night_stay: +data.night_stay,
+        room_id: data.room_id,
+        customer_id: data.customer_id,
+        night_stay: data.night_stay,
         receive_date: data.receive_date,
         checkOut_date: data.checkOut_date,
         status: data.status
     });
 
     if (res) {
-        let result = res.get({ plain: true });
 
-        if (data.status === 'Đã nhận phòng') {
+        let createResult = res.toJSON();
+
+        let result = _.cloneDeep(createResult);
+
+        if (result.status === 'Đã nhận phòng') {
             const date = new Date();
 
             let day = date.getDate();
@@ -29,6 +33,11 @@ const createNewRoomUse = async (data) => {
                 room_use_id: +result.id,
                 total: 0
             });
+
+            return {
+                errorCode: 0,
+                message: 'Book room successfully !'
+            }
         }
 
         return {

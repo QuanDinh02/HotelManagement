@@ -156,9 +156,10 @@ const BookRoom = () => {
 
                 variables: {
                     input: {
-                        ...bookRoomInfo,
                         room_id: +bookRoomInfo.room_id,
                         night_stay: +bookRoomInfo.night_stay,
+                        receive_date: bookRoomInfo.receive_date,
+                        checkOut_date: bookRoomInfo.checkOut_date,
                         customer_id: +oldCustomerInfo.id,
                         status: book_room_status
                     }

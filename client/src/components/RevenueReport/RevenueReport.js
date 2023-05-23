@@ -4,6 +4,7 @@ import { TfiClose } from 'react-icons/tfi';
 import { MdFilterList } from 'react-icons/md';
 import { TbRectangleFilled } from 'react-icons/tb';
 import React from 'react';
+import { useImmer } from "use-immer";
 import { CurrencyFormat } from '../Format/FormatNumber';
 import { VictoryPie } from "victory";
 import { GET_REVENUE_REPORT } from '../Query/RenenueQuery';
@@ -15,6 +16,14 @@ const RevenueReport = () => {
     const [endAngle, setEndAngle] = React.useState(0);
     const [revenueReportList, setRevenueReportList] = React.useState([]);
     const [roomCategories, setRoomCategories] = React.useState([]);
+    const [visualData, setVisualData] = React.useState([]);
+    const [searchMonth, setSearchMonth] = React.useState('');
+    const [searchYear, setSearchYear] = React.useState('');
+
+    const [filterLabel, setFilterLabel] = useImmer({
+        month: '',
+        year: ''
+    });
 
     const PIE_CHART_COLORS = ["#E8A44E", "#4763A5", "#EA5C5D", "#A6D854", "#66C2A5", "#E78AC3", "#F7B295", "#9E3533"];
     const PIE_CHART_CLASS_COLORS = [
@@ -23,13 +32,35 @@ const RevenueReport = () => {
         'seventh_color', 'eighth_color'
     ];
 
-    const [getRevenueReport, { refetch }] = useLazyQuery(GET_REVENUE_REPORT);
+    const [getRevenueReport] = useLazyQuery(GET_REVENUE_REPORT, {
+        fetchPolicy: "no-cache"
+    });
 
     const fetchRevenueReport = async () => {
-        let { data: { revenue_report } } = await getRevenueReport();
+        let { data: { revenue_report } } = await getRevenueReport({
+            variables: {
+                month: +searchMonth,
+                year: +searchYear
+            }
+        });
+
+        setFilterLabel(draft => {
+            if (!searchMonth || searchYear) {
+                draft.month = +searchMonth;
+                draft.year = +searchYear;
+            }
+        });
 
         setRevenueReportList(revenue_report?.revenue_results);
         setRoomCategories(revenue_report?.room_categories);
+
+        let data = revenue_report?.revenue_results.map(item => {
+            return {
+                x: `${item.rate}%`, y: +item.rate
+            }
+        }).filter(item => item.y !== 0);
+
+        setVisualData(data);
     }
 
     React.useEffect(() => {
@@ -56,7 +87,7 @@ const RevenueReport = () => {
                             <div className='d-flex gap-3 px-4'>
                                 <div className="form-group col-3">
                                     <label className='form-label'>Tháng:</label>
-                                    <select className="form-select">
+                                    <select className="form-select" onChange={(event) => setSearchMonth(event.target.value)}>
                                         <option key={`default-month`} value="0">Chọn tháng...</option>
                                         {
                                             [...Array(12)].map((item, index) => {
@@ -69,25 +100,24 @@ const RevenueReport = () => {
                                 </div>
                                 <div className="form-group col-3">
                                     <label className='form-label'>Năm:</label>
-                                    <select className="form-select">
+                                    <select className="form-select" onChange={(event) => setSearchYear(event.target.value)}>
                                         <option key={`default-year`} value="0">Chọn năm...</option>
                                         <option key={`year-2023`} value="2023">2023</option>
-                                        <option key={`year-2022`} value="2023">2022</option>
-                                        <option key={`year-2021`} value="2023">2021</option>
-                                        <option key={`year-2020`} value="2023">2020</option>
+                                        <option key={`year-2022`} value="2022">2022</option>
+                                        <option key={`year-2021`} value="2021">2021</option>
+                                        <option key={`year-2020`} value="2020">2020</option>
                                     </select>
                                 </div>
                                 <div className="form-group ms-3 col-6">
                                     <label className='form-label'>Thống kê:</label>
                                     <div className='d-flex gap-3'>
-                                        <button className='btn btn-outline-primary'><MdFilterList /> Theo tháng</button>
-                                        <button className='btn btn-outline-dark'><MdFilterList /> Theo năm</button>
+                                        <button className='btn btn-outline-primary' onClick={fetchRevenueReport}><MdFilterList /></button>
                                     </div>
                                 </div>
                             </div>
                         </fieldset>
                         <div className='revenue-header text-center'>
-                            <span className='title'>Tỉ lệ doanh thu theo loại phòng (04/2023)</span>
+                            <span className='title'>Tỉ lệ doanh thu theo loại phòng ({filterLabel.month ? `${filterLabel.month}/${filterLabel.year}` : searchYear})</span>
                         </div>
                         <div className='pie-chart d-flex justify-content-around pt-2 pb-3 red'>
                             <VictoryPie
@@ -96,20 +126,14 @@ const RevenueReport = () => {
                                 }}
                                 endAngle={endAngle}
                                 colorScale={PIE_CHART_COLORS}
-                                data={[
-                                    { x: "60%", y: 60 },
-                                    { x: "20%", y: 20 },
-                                    { x: "10%", y: 10 },
-                                    { x: "7%", y: 7 },
-                                    { x: "3%", y: 3 },
-                                ]}
+                                data={visualData}
                                 innerRadius={100}
                                 style={{
                                     data: {
                                         fillOpacity: 0.9, stroke: "#FFFFFF", strokeWidth: 3
                                     },
                                     labels: {
-                                        fontSize: 20, fill: "#D57834"
+                                        fontSize: 16, fill: "#D57834"
                                     }
                                 }}
                             />

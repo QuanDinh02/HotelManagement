@@ -189,25 +189,26 @@ const updatePayment = async (room_use_id, total_payment) => {
 }
 
 const addRoomService = async (data) => {
-    let res = await db.Service_RoomUse.create({
-        service_id: +data.service_id,
-        room_use_id: +data.room_use_id,
-        quantity: +data.quantity,
-        total: +data.total
-    });
+    try {
+        let res = await db.Service_RoomUse.create({
+            service_id: +data.service_id,
+            room_use_id: +data.room_use_id,
+            quantity: +data.quantity,
+            total: +data.total
+        });
 
-    if (res) {
         return {
             errorCode: 0,
             message: 'Add room service successfully !'
         }
-    }
-    else {
+    } catch (error) {
+        console.log(error);
         return {
             errorCode: -2,
             message: 'Add room service failed !'
         }
     }
+
 }
 
 const addRoomSurcharge = async (data) => {

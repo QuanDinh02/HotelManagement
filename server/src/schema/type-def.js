@@ -257,7 +257,7 @@ const typeDefs = `#graphql
 
     surcharge_list: [Surcharge!]
 
-    revenue_report: RevenueReport!
+    revenue_report(month: Int!, year: Int!): RevenueReport!
   }
 
   input CustomerInput {
