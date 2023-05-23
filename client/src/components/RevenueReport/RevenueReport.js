@@ -6,12 +6,35 @@ import { TbRectangleFilled } from 'react-icons/tb';
 import React from 'react';
 import { CurrencyFormat } from '../Format/FormatNumber';
 import { VictoryPie } from "victory";
+import { GET_REVENUE_REPORT } from '../Query/RenenueQuery';
+import { useLazyQuery } from '@apollo/client';
 
 const RevenueReport = () => {
 
     const history = useHistory();
-
     const [endAngle, setEndAngle] = React.useState(0);
+    const [revenueReportList, setRevenueReportList] = React.useState([]);
+    const [roomCategories, setRoomCategories] = React.useState([]);
+
+    const PIE_CHART_COLORS = ["#E8A44E", "#4763A5", "#EA5C5D", "#A6D854", "#66C2A5", "#E78AC3", "#F7B295", "#9E3533"];
+    const PIE_CHART_CLASS_COLORS = [
+        'first_color', 'second_color', 'third_color',
+        'fourth_color', 'fifth_color', 'sixth_color',
+        'seventh_color', 'eighth_color'
+    ];
+
+    const [getRevenueReport, { refetch }] = useLazyQuery(GET_REVENUE_REPORT);
+
+    const fetchRevenueReport = async () => {
+        let { data: { revenue_report } } = await getRevenueReport();
+
+        setRevenueReportList(revenue_report?.revenue_results);
+        setRoomCategories(revenue_report?.room_categories);
+    }
+
+    React.useEffect(() => {
+        fetchRevenueReport();
+    }, []);
 
     React.useEffect(() => {
         setTimeout(() => {
@@ -72,7 +95,7 @@ const RevenueReport = () => {
                                     duration: 2000
                                 }}
                                 endAngle={endAngle}
-                                colorScale={["#E8A44E", "#4763A5", "#EA5C5D", "#A6D854", "#66C2A5"]}
+                                colorScale={PIE_CHART_COLORS}
                                 data={[
                                     { x: "60%", y: 60 },
                                     { x: "20%", y: 20 },
@@ -91,26 +114,16 @@ const RevenueReport = () => {
                                 }}
                             />
                             <div className='chart-note'>
-                                <div>
-                                    <TbRectangleFilled className='note-icon orange-bg-color' />
-                                    <span className='ms-1'>Phòng Single</span>
-                                </div>
-                                <div>
-                                    <TbRectangleFilled className='note-icon blue-bg-color' />
-                                    <span className='ms-1'>Phòng Double</span>
-                                </div>
-                                <div>
-                                    <TbRectangleFilled className='note-icon red-bg-color' />
-                                    <span className='ms-1'>Phòng Twin</span>
-                                </div>
-                                <div>
-                                    <TbRectangleFilled className='note-icon light-green-bg-color' />
-                                    <span className='ms-1'>Phòng Triple</span>
-                                </div>
-                                <div>
-                                    <TbRectangleFilled className='note-icon blue-green-bg-color' />
-                                    <span className='ms-1'>Phòng Quad</span>
-                                </div>
+                                {roomCategories && roomCategories.length > 0 &&
+                                    roomCategories.map((item, index) => {
+                                        return (
+                                            <div key={`room-categories-revenue-type-${item.id}`}>
+                                                <TbRectangleFilled className={`note-icon ${PIE_CHART_CLASS_COLORS[index % 8]}`} />
+                                                <span className='ms-1'>{item.name}</span>
+                                            </div>
+                                        )
+                                    })
+                                }
                             </div>
                         </div>
                     </div>
@@ -125,31 +138,17 @@ const RevenueReport = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr key={`revenue-1`}>
-                                    <td>Phòng Single</td>
-                                    <td>60%</td>
-                                    <td>{CurrencyFormat(60000000)}</td>
-                                </tr>
-                                <tr key={`revenue-2`}>
-                                    <td>Phòng Double</td>
-                                    <td>20%</td>
-                                    <td>{CurrencyFormat(20000000)}</td>
-                                </tr>
-                                <tr key={`revenue-3`}>
-                                    <td>Phòng Twin</td>
-                                    <td>10%</td>
-                                    <td>{CurrencyFormat(10000000)}</td>
-                                </tr>
-                                <tr key={`revenue-4`}>
-                                    <td>Phòng Triple</td>
-                                    <td>7%</td>
-                                    <td>{CurrencyFormat(7000000)}</td>
-                                </tr>
-                                <tr key={`revenue-5`}>
-                                    <td>Phòng Quad</td>
-                                    <td>3%</td>
-                                    <td>{CurrencyFormat(3000000)}</td>
-                                </tr>
+                                {revenueReportList && revenueReportList.length > 0 &&
+                                    revenueReportList.map((item, index) => {
+                                        return (
+                                            <tr key={`room-category-revenue-${item.id}`}>
+                                                <td>{item.name}</td>
+                                                <td>{item.rate}%</td>
+                                                <td>{CurrencyFormat(item.revenue_total)}</td>
+                                            </tr>
+                                        )
+                                    })
+                                }
                             </tbody>
                         </table>
                     </fieldset>

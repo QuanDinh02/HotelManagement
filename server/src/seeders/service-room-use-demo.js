@@ -7,16 +7,30 @@ module.exports = {
             {
                 id: 1,
                 service_id: 1,
-                room_use_id: 3,
+                room_use_id: 1,
                 quantity: 1,
                 total: 20000,
             },
             {
                 id: 2,
                 service_id: 19,
-                room_use_id: 3,
+                room_use_id: 1,
                 quantity: 2,
                 total: 100000,
+            },
+            {
+                id: 3,
+                service_id: 1,
+                room_use_id: 19,
+                quantity: 1,
+                total: 20000,
+            },
+            {
+                id: 4,
+                service_id: 19,
+                room_use_id: 19,
+                quantity: 1,
+                total: 50000,
             }
         ]);
     },

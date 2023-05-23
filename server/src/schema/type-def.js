@@ -202,6 +202,23 @@ const typeDefs = `#graphql
     Services: [ServiceUse!]
   }
 
+  type RoomCategoryReport {
+    id: ID!
+    name: String!
+  }
+
+  type RevenueByRoomCategory {
+    id: ID!
+    name: String!
+    revenue_total: Int!
+    rate: Int!
+  }
+
+  type RevenueReport {
+    room_categories: [RoomCategoryReport!]
+    revenue_results: [RevenueByRoomCategory!]
+  }
+
   type Query {
     customers: [Customer!]
     customer(value: String!): [Customer]
@@ -239,6 +256,8 @@ const typeDefs = `#graphql
     invoice(id: ID!): RoomUseInvoice
 
     surcharge_list: [Surcharge!]
+
+    revenue_report: RevenueReport!
   }
 
   input CustomerInput {

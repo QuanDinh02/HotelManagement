@@ -7,6 +7,7 @@ const HotelRoomUseServices = require('../services/hotelRoomUseService.js');
 const ReceiveRoomServices = require('../services/receiveRoomService.js');
 const ServicePayment = require('../services/serviceUsingAndPaymentService.js');
 const SurchargeServices = require('../services/surchargeService.js');
+const RevenueServices = require('../services/revenueService.js');
 
 const resolvers = {
     Customer: {
@@ -154,6 +155,10 @@ const resolvers = {
         surcharge_list: async () => {
             return await SurchargeServices.getAllSurcharge();
         },
+
+        revenue_report: async () => {
+            return await RevenueServices.getRevenueReport(); 
+        }
     },
 
     Mutation: {
