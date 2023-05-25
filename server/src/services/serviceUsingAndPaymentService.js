@@ -208,22 +208,21 @@ const addRoomService = async (data) => {
             message: 'Add room service failed !'
         }
     }
-
 }
 
 const addRoomSurcharge = async (data) => {
-    let res = await db.Surcharge_RoomUse.create({
-        surcharge_id: +data.surcharge_id,
-        room_use_id: +data.room_use_id
-    });
+    try {
+        let res = await db.Surcharge_RoomUse.create({
+            surcharge_id: +data.surcharge_id,
+            room_use_id: +data.room_use_id
+        });
 
-    if (res) {
         return {
             errorCode: 0,
             message: 'Add room surcharge successfully !'
         }
-    }
-    else {
+    } catch (error) {
+        console.log(error);
         return {
             errorCode: -2,
             message: 'Add room surcharge failed !'

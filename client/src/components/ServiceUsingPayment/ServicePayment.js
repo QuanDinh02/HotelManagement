@@ -248,7 +248,7 @@ const ServicePayment = () => {
                                                     <td className='text-center'>{index + 1}</td>
                                                     <td>{item.name}</td>
                                                     <td className='text-center'>{CurrencyFormat(item.price)}</td>
-                                                    <td>{item.descriptionF}</td>
+                                                    <td>{item.description}</td>
                                                 </tr>
                                             )
                                         })

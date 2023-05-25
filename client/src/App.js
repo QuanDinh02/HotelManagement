@@ -16,6 +16,7 @@ import ServiceManagement from './components/ServiceManagement/ServiceManagement'
 import CustomerManagement from './components/CustomerManagement/CustomerManagement';
 import ServicePayment from './components/ServiceUsingPayment/ServicePayment';
 import RevenueReport from './components/RevenueReport/RevenueReport';
+import RegulationManagement from './components/RegulationManagement/RegulationManagement';
 
 function App() {
   return (
@@ -52,6 +53,9 @@ function App() {
             </Route>
             <Route path="/service-using-payment">
               <ServicePayment />
+            </Route>
+            <Route path="/regulation-management">
+              <RegulationManagement />
             </Route>
           </Switch>
         </Router>

@@ -1,0 +1,45 @@
+$main-color      : #D57834;
+$legend-text-size: 1.125rem;
+
+.service-room-use-modal {
+
+    .main {
+
+        .border {
+            border-color: $main-color !important;
+        }
+
+        .reset {
+            all: revert;
+        }
+
+        .legend-text {
+            font-size: $legend-text-size;
+            color    : $main-color;
+        }
+
+        input:disabled,
+        select:disabled {
+            cursor: not-allowed;
+        }
+    }
+
+    .form-control:focus {
+        border-color: $main-color;
+        box-shadow  : 0 0 0 0.01rem $main-color;
+    }
+}
+
+.room-delete-modal {
+    .modal-header {
+        .alert-icon {
+            color: red;
+            font-size: 1.5rem;
+        }
+    }
+
+    .modal-body {
+        font-weight: 600;
+        font-size  : 1.125rem;
+    }
+}

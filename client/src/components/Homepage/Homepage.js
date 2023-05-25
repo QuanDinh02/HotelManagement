@@ -123,7 +123,7 @@ const Homepage = () => {
                                 <span className='text-title'>Quản Lý Dịch Vụ</span>
                             </div>
                         </div>
-                        <div className='bottom-left section d-flex flex-column p-2'>
+                        <div className='bottom-left section d-flex flex-column p-2' onClick={() => history.push('/regulation-management')}>
                             <div className='image-box d-flex justify-content-center align-items-center'>
                                 <div className='image'>
                                     <img src={Policy} alt='' />

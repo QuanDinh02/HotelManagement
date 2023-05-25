@@ -8,6 +8,7 @@ const ReceiveRoomServices = require('../services/receiveRoomService.js');
 const ServicePayment = require('../services/serviceUsingAndPaymentService.js');
 const SurchargeServices = require('../services/surchargeService.js');
 const RevenueServices = require('../services/revenueService.js');
+const RegulationServices = require('../services/regulationService.js');
 
 const resolvers = {
     Customer: {
@@ -157,8 +158,12 @@ const resolvers = {
         },
 
         revenue_report: async (parent, args) => {
-            return await RevenueServices.getRevenueReport(args.month, args.year); 
-        }
+            return await RevenueServices.getRevenueReport(args.month, args.year);
+        },
+
+        searched_regulation: async (parent, args) => {
+            return await RegulationServices.getSearchedRegulation(args.value);
+        },
     },
 
     Mutation: {
@@ -276,6 +281,18 @@ const resolvers = {
 
         addRoomSurcharge: async (parent, args) => {
             return await ServicePayment.addRoomSurcharge(args.input);
+        },
+
+        createRegulation: async (parent, args) => {
+            return await RegulationServices.createNewRegulation(args.input);
+        },
+
+        updateRegulation: async (parent, args) => {
+            return await RegulationServices.updateRegulation(args.input);
+        },
+
+        deleteRegulation: async (parent, args) => {
+            return await RegulationServices.deleteRegulation(args.id);
         },
     }
 };

@@ -15,7 +15,6 @@ const RevenueReport = () => {
     const history = useHistory();
     const [endAngle, setEndAngle] = React.useState(0);
     const [revenueReportList, setRevenueReportList] = React.useState([]);
-    const [roomCategories, setRoomCategories] = React.useState([]);
     const [visualData, setVisualData] = React.useState([]);
     const [searchMonth, setSearchMonth] = React.useState('');
     const [searchYear, setSearchYear] = React.useState('');
@@ -24,6 +23,8 @@ const RevenueReport = () => {
         month: '',
         year: ''
     });
+
+    const [havedRevenueList, setHavedRevenueList] = React.useState([]);
 
     const PIE_CHART_COLORS = ["#E8A44E", "#4763A5", "#EA5C5D", "#A6D854", "#66C2A5", "#E78AC3", "#F7B295", "#9E3533"];
     const PIE_CHART_CLASS_COLORS = [
@@ -52,7 +53,9 @@ const RevenueReport = () => {
         });
 
         setRevenueReportList(revenue_report?.revenue_results);
-        setRoomCategories(revenue_report?.room_categories);
+
+        let _list = revenue_report?.revenue_results.filter(item => item.rate !== 0);
+        setHavedRevenueList(_list);
 
         let data = revenue_report?.revenue_results.map(item => {
             return {
@@ -138,14 +141,16 @@ const RevenueReport = () => {
                                 }}
                             />
                             <div className='chart-note'>
-                                {roomCategories && roomCategories.length > 0 &&
-                                    roomCategories.map((item, index) => {
-                                        return (
-                                            <div key={`room-categories-revenue-type-${item.id}`}>
-                                                <TbRectangleFilled className={`note-icon ${PIE_CHART_CLASS_COLORS[index % 8]}`} />
-                                                <span className='ms-1'>{item.name}</span>
-                                            </div>
-                                        )
+                                {havedRevenueList && havedRevenueList.length > 0 &&
+                                    havedRevenueList.map((item, index) => {
+                                        if (item.rate !== 0) {
+                                            return (
+                                                <div key={`room-categories-revenue-type-${item.id}`}>
+                                                    <TbRectangleFilled className={`note-icon ${PIE_CHART_CLASS_COLORS[index % 8]}`} />
+                                                    <span className='ms-1'>{item.name}</span>
+                                                </div>
+                                            )
+                                        }
                                     })
                                 }
                             </div>

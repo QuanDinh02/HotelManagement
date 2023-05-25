@@ -258,6 +258,7 @@ const typeDefs = `#graphql
     surcharge_list: [Surcharge!]
 
     revenue_report(month: Int!, year: Int!): RevenueReport!
+    searched_regulation(value: String!): [Surcharge!]
   }
 
   input CustomerInput {
@@ -408,6 +409,19 @@ const typeDefs = `#graphql
     room_use_id: Int!
   }
 
+  input RegulationInput {
+    name: String!
+    price: Int
+    description: String
+  }
+
+  input RegulationUpdateInput {
+    id: ID!
+    name: String!
+    price: Int
+    description: String
+  }
+
   type Mutation {
     createCustomer(input: CustomerCreateInput!): CreateCustomerReponse
     updateCustomer(input: CustomerInput!): String
@@ -448,6 +462,10 @@ const typeDefs = `#graphql
 
     addRoomService(input: RoomUseService!): Response
     addRoomSurcharge(input: RoomUseSurcharge!): Response
+
+    createRegulation(input: RegulationInput!): Response
+    updateRegulation(input: RegulationUpdateInput!): Response
+    deleteRegulation(id: ID!): Response
   }
 `;
 

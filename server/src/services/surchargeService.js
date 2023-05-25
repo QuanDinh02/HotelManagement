@@ -5,7 +5,10 @@ const _ = require('lodash');
 const getAllSurcharge = async () => {
 
     let result = await db.Surcharge.findAll({
-        raw: true
+        raw: true,
+        order: [
+            ['id', 'DESC']
+        ]
     });
 
     return result;
