@@ -17,7 +17,13 @@ const getAllHotelRoomUsePayment = async () => {
                 }
             },
             {
-                model: db.Customer, attributes: ['id', 'name', 'phone', 'citizen_id']
+                model: db.Customer,
+                attributes: ['id', 'name', 'phone', 'citizen_id', 'address', 'nationality'],
+                raw: true,
+                nest: true,
+                include: {
+                    model: db.CustomerCategory, attributes: ['id', 'name']
+                }
             },
         ],
         attributes: ['id', 'night_stay', 'receive_date', 'checkOut_date', 'status'],
@@ -33,6 +39,9 @@ const getAllHotelRoomUsePayment = async () => {
 
     let _result = result.map(item => {
         let _item = _.cloneDeep(item);
+        _item.Customer.customer_category = _item.Customer.CustomerCategory;
+        delete _item.Customer.CustomerCategory;
+
         _item.customer = _item.Customer;
         _item.HotelRoom.category = _item.HotelRoom.HotelRoomCategory.name;
         _item.room = _item.HotelRoom;
@@ -54,7 +63,12 @@ const getInvoiceByHotelRoomUse = async (room_use_id) => {
             room_use_id: +room_use_id
         },
         raw: true,
-        attributes: ['id', 'total'],
+        nest: true,
+        include: {
+            model: db.Staff,
+            attributes: ['name'],
+        },
+        attributes: ['id', 'total', 'date'],
     })
 
     if (invoice_info) {
@@ -122,6 +136,8 @@ const getInvoiceByHotelRoomUse = async (room_use_id) => {
         _result.HotelRoom.price = _result.HotelRoom.HotelRoomCategory.price;
         _result.invoice_total = invoice_info?.total;
         _result.id = invoice_info.id;
+        _result.invoice_date = invoice_info.date;
+        _result.staff = invoice_info.Staff.name;
         _result.room_use_id = +room_use_id;
         _result.surcharge_total = surchargeTotal;
         _result.service_price_total = serviceTotal;

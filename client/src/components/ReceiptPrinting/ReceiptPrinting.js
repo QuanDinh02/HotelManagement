@@ -5,15 +5,21 @@ import Button from 'react-bootstrap/Button';
 import HotelLogo from '../../assets/images/hotel-logo.png';
 import { GrPlayFill } from 'react-icons/gr';
 import { CurrencyFormat } from '../Format/FormatNumber';
+import _ from 'lodash';
 
-const ReceiptPrinting = (props) => {
+const ReceiptPrinting = React.forwardRef((props, ref) => {
 
-    const { show, setShow } = props;
+    const { show, setShow, print, data } = props;
 
     const handleCloseModal = () => {
-
         setShow(false);
     }
+
+    React.useEffect(() => {
+        if (!_.isEmpty(data)) {
+            console.log(data);
+        }
+    }, [data]);
 
     return (
         <>
@@ -28,7 +34,7 @@ const ReceiptPrinting = (props) => {
                     <Modal.Title className='title'>In Hóa Đơn</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <div className='receipt-printing-container position-relative'>
+                    <div className='receipt-printing-container position-relative px-4 py-2' ref={ref}>
                         <div className='receipt-header d-flex gap-4'>
                             <div className='hotel-logo'>
                                 <img src={HotelLogo} alt='' />
@@ -47,12 +53,12 @@ const ReceiptPrinting = (props) => {
                             <div className='receipt-title text-center mt-3'>
                                 <span>HÓA ĐƠN THANH TOÁN DỊCH VỤ</span>
                             </div>
-                            <div className='d-flex justify-content-between bottomBorder px-4 py-2'>
-                                <span>Mã hóa đơn: <span className='ms-2'>1230</span></span>
-                                <span>Nhân viên lập: <span className='ms-2'>Nguyễn Văn A</span></span>
-                                <span>Ngày lập: <span className='ms-2'>12/04/2023</span></span>
+                            <div className='d-flex justify-content-between bottomBorder py-2'>
+                                <span>Mã hóa đơn: <span className='ms-2'>{!_.isEmpty(data) ? data.invoice_info.id : ''}</span></span>
+                                <span>Nhân viên lập: <span className='ms-2'>{!_.isEmpty(data) ? data.invoice_info.staff_name : ''}</span></span>
+                                <span>Ngày lập: <span className='ms-2'>{!_.isEmpty(data) ? data.invoice_info.date : ''}</span></span>
                             </div>
-                            <div className='d-flex main-info bottomBorder px-4 py-3'>
+                            <div className='d-flex main-info bottomBorder py-3'>
                                 <div className='d-flex customer-info gap-4'>
                                     <div className='d-flex flex-column gap-3'>
                                         <span>Tên khách hàng: </span>
@@ -63,12 +69,12 @@ const ReceiptPrinting = (props) => {
                                         <span>Quốc tịch: </span>
                                     </div>
                                     <div className='d-flex flex-column gap-3'>
-                                        <strong>Trần Văn Nghĩa</strong>
-                                        <span>06270701453</span>
-                                        <span>091245336</span>
-                                        <span>Khách du lịch</span>
-                                        <span>Việt Nam</span>
-                                        <span>Việt Nam</span>
+                                        <strong>{!_.isEmpty(data) ? data.customer_info.name : ''}</strong>
+                                        <span>{!_.isEmpty(data) ? data.customer_info.citizen_id : ''}</span>
+                                        <span>{!_.isEmpty(data) ? data.customer_info.phone : ''}</span>
+                                        <span>{!_.isEmpty(data) ? data.customer_info.category : ''}</span>
+                                        <span>{!_.isEmpty(data) ? data.customer_info.address : ''}</span>
+                                        <span>{!_.isEmpty(data) ? data.customer_info.nationality : ''}</span>
                                     </div>
                                 </div>
                                 <div className='d-flex room-info gap-5 '>
@@ -81,17 +87,17 @@ const ReceiptPrinting = (props) => {
                                         <span>Số đêm: </span>
                                     </div>
                                     <div className='d-flex flex-column gap-3'>
-                                        <strong>Phòng 102</strong>
-                                        <span>Deluxe Room</span>
-                                        <strong>{CurrencyFormat(2000000)}</strong>
-                                        <span>12/04/2023</span>
-                                        <span>15/04/2023</span>
-                                        <span>3</span>
+                                        <strong>{!_.isEmpty(data) ? data.room_info.name : ''}</strong>
+                                        <span>{!_.isEmpty(data) ? data.room_info.category : ''}</span>
+                                        <strong>{CurrencyFormat(!_.isEmpty(data) ? data.room_info.price : 0)}</strong>
+                                        <span>{!_.isEmpty(data) ? data.room_info.receive_date : ''}</span>
+                                        <span>{!_.isEmpty(data) ? data.room_info.checkOut_date : ''}</span>
+                                        <span>{!_.isEmpty(data) ? data.room_info.night_stay : ''}</span>
                                     </div>
                                 </div>
                             </div>
-                            <div className='service-receipt bottomBorder px-4 py-2'>
-                                <table class="table">
+                            <div className='service-receipt bottomBorder  py-2'>
+                                <table className="table">
                                     <thead>
                                         <tr>
                                             <th scope="col">STT</th>
@@ -102,51 +108,43 @@ const ReceiptPrinting = (props) => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>1</td>
-                                            <td>Mì xào 2 trứng, 1 xúc xích</td>
-                                            <td>{CurrencyFormat(15000)}</td>
-                                            <td>2</td>
-                                            <td>{CurrencyFormat(30000)}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>2</td>
-                                            <td>Mì xào 2 trứng, 1 xúc xích</td>
-                                            <td>{CurrencyFormat(15000)}</td>
-                                            <td>2</td>
-                                            <td>{CurrencyFormat(30000)}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>3</td>
-                                            <td>Mì xào 2 trứng, 1 xúc xích</td>
-                                            <td>{CurrencyFormat(15000)}</td>
-                                            <td>2</td>
-                                            <td>{CurrencyFormat(30000)}</td>
-                                        </tr>
+                                        {!_.isEmpty(data) && data.services && data.services?.length > 0 &&
+                                            data.services.map((item, index) => {
+                                                return (
+                                                    <tr key={`service-receipt-item-${item.id}`}>
+                                                        <td>{index + 1}</td>
+                                                        <td>{item.name}</td>
+                                                        <td>{CurrencyFormat(item.price)}</td>
+                                                        <td>{item.quantity}</td>
+                                                        <td>{CurrencyFormat(item.total)}</td>
+                                                    </tr>
+                                                )
+                                            })
+                                        }
                                     </tbody>
                                 </table>
                             </div>
-                            <div className='d-flex justify-content-between payment bottomBorder px-4 py-3'>
+                            <div className='d-flex justify-content-between payment py-3'>
                                 <div className='d-flex section gap-4'>
                                     <div className='d-flex flex-column gap-3'>
                                         <span>Tiền phòng: </span>
                                         <span>Tổng tiền: </span>
                                     </div>
                                     <div className='d-flex flex-column gap-3'>
-                                        <span>{CurrencyFormat(6000000)}</span>
-                                        <strong className='total'>{CurrencyFormat(8000000)}</strong>
+                                        <span>{CurrencyFormat(!_.isEmpty(data) ? (data.room_info.price * data.room_info.night_stay) : 0)}</span>
+                                        <strong className='total'>{CurrencyFormat(!_.isEmpty(data) ? data.invoice_info.invoice_total : 0)}</strong>
                                     </div>
                                 </div>
                                 <div className='d-flex section gap-4'>
                                     <div className='d-flex gap-3'>
                                         <span>Phụ thu: </span>
-                                        <span>{CurrencyFormat(1000000)}</span>
+                                        <span>{CurrencyFormat(!_.isEmpty(data) ? data.invoice_info.surcharge_total : 0)}</span>
                                     </div>
                                 </div>
                                 <div className='d-flex section gap-4'>
                                     <div className='d-flex  gap-3'>
                                         <span>Tiền dịch vụ: </span>
-                                        <span>{CurrencyFormat(1000000)}</span>
+                                        <span>{CurrencyFormat(!_.isEmpty(data) ? data.invoice_info.service_price_total : 0)}</span>
                                     </div>
                                 </div>
                             </div>
@@ -154,18 +152,15 @@ const ReceiptPrinting = (props) => {
                                 <span className='label'>NEW WORLD SAIGON HOTEL</span>
                             </div>
                         </div>
-                        <div className='receipt-footer'>
-
-                        </div>
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="success">Xuất hóa đơn</Button>
+                    <Button variant="primary" onClick={() => print()}>Xuất hóa đơn</Button>
                     <Button variant="outline-secondary" onClick={handleCloseModal}>Hủy</Button>
                 </Modal.Footer>
             </Modal>
         </>
     )
-}
+});
 
 export default ReceiptPrinting;

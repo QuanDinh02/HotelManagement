@@ -92,6 +92,10 @@ const typeDefs = `#graphql
     id: ID!
     name: String!
     phone: String!
+    citizen_id: String!
+    address: String!
+    nationality: String!
+    customer_category: CustomerCategory!
   }
 
   type CustomerReceiveRoom {
@@ -193,6 +197,8 @@ const typeDefs = `#graphql
     room_use_id: Int!
     receive_date: String!
     checkOut_date: String!
+    invoice_date: String!
+    staff: String!
     night_stay: Int!
     invoice_total: Int!
     surcharge_total: Int!

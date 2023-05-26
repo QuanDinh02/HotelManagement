@@ -17,6 +17,13 @@ const GET_ALL_HOTEL_ROOM_USE_PAYMENT = gql`
             id
             name
             phone
+            citizen_id
+            address
+            nationality
+            customer_category {
+              id
+              name
+            }
         }
     }
   }
@@ -29,6 +36,8 @@ const GET_ALL_HOTEL_ROOM_USE_INVOICE = gql`
       room_use_id
       receive_date
       checkOut_date
+      invoice_date
+      staff
       night_stay
       invoice_total
       surcharge_total

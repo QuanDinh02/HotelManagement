@@ -4,7 +4,7 @@ import { TfiClose } from 'react-icons/tfi';
 import { HiOutlineSearch } from 'react-icons/hi';
 import { MdPayment } from 'react-icons/md';
 import { AiOutlinePrinter } from 'react-icons/ai';
-import React from 'react';
+import React, { useRef } from 'react';
 import { CurrencyFormat } from '../Format/FormatNumber';
 import { GET_ALL_HOTEL_ROOM_USE_PAYMENT, GET_ALL_HOTEL_ROOM_USE_INVOICE } from '../Query/ServicePaymentQuery';
 import { UPDATE_PAYMENT } from '../Mutation/RoomPaymentMutation';
@@ -14,6 +14,7 @@ import _ from 'lodash';
 import ServiceAddNew from '../Modal/ServicePayment/ServiceAddNew';
 import SurchargeModal from '../Modal/ServicePayment/SurchargeModal';
 import ReceiptPrinting from '../ReceiptPrinting/ReceiptPrinting';
+import { useReactToPrint } from 'react-to-print';
 
 const ServicePayment = () => {
 
@@ -24,6 +25,7 @@ const ServicePayment = () => {
     const [roomInvoice, setRoomInvoice] = React.useState({});
     const [surchareList, setSurchargeList] = React.useState([]);
     const [serviceList, setServiceList] = React.useState([]);
+    const [receiptData, setReceiptData] = React.useState({});
 
     const [showAddNewModal, setShowAddNewModal] = React.useState(false);
     const [showSurchargeModal, setShowSurchargeModal] = React.useState(false);
@@ -35,6 +37,12 @@ const ServicePayment = () => {
         onCompleted: async () => {
             await updateRoomUseListAfterMutation();
         }
+    });
+
+    const componentRef = useRef();
+
+    const handlePrint = useReactToPrint({
+        content: () => componentRef.current,
     });
 
     const handleSelectRoomUse = async (room_use_id, status, type) => {
@@ -51,6 +59,33 @@ const ServicePayment = () => {
                     draft = draft.map(e => {
                         if (e.id === room_use_id) {
                             e.isSelected = true;
+                            setReceiptData({
+                                invoice_info: {
+                                    id: invoice?.id,
+                                    staff_name: invoice?.staff,
+                                    date: invoice?.invoice_date,
+                                    invoice_total: invoice?.invoice_total,
+                                    service_price_total: invoice?.service_price_total,
+                                    surcharge_total: invoice?.surcharge_total
+                                },
+                                customer_info: {
+                                    name: e.customer.name,
+                                    citizen_id: e.customer.citizen_id,
+                                    phone: e.customer.phone,
+                                    category: e.customer.customer_category.name,
+                                    address: e.customer.address,
+                                    nationality: e.customer.nationality
+                                },
+                                room_info: {
+                                    name: e.room.name,
+                                    category: e.room.category,
+                                    price: invoice?.HotelRoom.price,
+                                    receive_date: invoice?.receive_date,
+                                    checkOut_date: invoice?.checkOut_date,
+                                    night_stay: invoice?.night_stay
+                                },
+                                services: invoice?.Services
+                            })
                             return e;
                         } else {
                             e.isSelected = false;
@@ -276,7 +311,7 @@ const ServicePayment = () => {
                                     {serviceList && serviceList.length > 0 &&
                                         serviceList.map((item, index) => {
                                             return (
-                                                <tr ey={`room-use-service-${index}${roomInvoice.room_use_id}`}>
+                                                <tr key={`room-use-service-${index}${roomInvoice.room_use_id}`}>
                                                     <td className='text-center'>{index + 1}</td>
                                                     <td>{item.name}</td>
                                                     <td className='text-center'>{CurrencyFormat(item.price)}</td>
@@ -308,7 +343,6 @@ const ServicePayment = () => {
                             </div>
                         </fieldset>
                     </div>
-
                 </div>
             </div>
             <ServiceAddNew
@@ -324,6 +358,9 @@ const ServicePayment = () => {
                 updateInvoice={handleSelectRoomUse}
             />
             <ReceiptPrinting
+                data={receiptData}
+                ref={componentRef}
+                print={handlePrint}
                 show={showPrintingInvoice}
                 setShow={setShowPrintingInvoice}
             />
