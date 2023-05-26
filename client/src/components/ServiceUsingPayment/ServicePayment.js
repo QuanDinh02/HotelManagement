@@ -3,6 +3,7 @@ import './ServicePayment.scss';
 import { TfiClose } from 'react-icons/tfi';
 import { HiOutlineSearch } from 'react-icons/hi';
 import { MdPayment } from 'react-icons/md';
+import { AiOutlinePrinter } from 'react-icons/ai';
 import React from 'react';
 import { CurrencyFormat } from '../Format/FormatNumber';
 import { GET_ALL_HOTEL_ROOM_USE_PAYMENT, GET_ALL_HOTEL_ROOM_USE_INVOICE } from '../Query/ServicePaymentQuery';
@@ -12,6 +13,7 @@ import { useImmer } from "use-immer";
 import _ from 'lodash';
 import ServiceAddNew from '../Modal/ServicePayment/ServiceAddNew';
 import SurchargeModal from '../Modal/ServicePayment/SurchargeModal';
+import ReceiptPrinting from '../ReceiptPrinting/ReceiptPrinting';
 
 const ServicePayment = () => {
 
@@ -25,6 +27,7 @@ const ServicePayment = () => {
 
     const [showAddNewModal, setShowAddNewModal] = React.useState(false);
     const [showSurchargeModal, setShowSurchargeModal] = React.useState(false);
+    const [showPrintingInvoice, setShowPrintingInvoice] = React.useState(false);
 
     const [getRoomList, { refetch }] = useLazyQuery(GET_ALL_HOTEL_ROOM_USE_PAYMENT);
     const [getInvoice] = useLazyQuery(GET_ALL_HOTEL_ROOM_USE_INVOICE);
@@ -292,11 +295,16 @@ const ServicePayment = () => {
                                     <button className='btn btn-success col-12' disabled={!editAllowance || roomInvoice?.status === 'Đã thanh toán'} onClick={() => setShowAddNewModal(true)}>+ Thêm dịch vụ</button>
                                 </div>
                                 <div className='form-group mt-3 pb-2 col-6 px-4'>
-                                    <button className='btn payment-btn col-12' disabled={!editAllowance || roomInvoice?.status === 'Đã thanh toán'} onClick={handlePaymentUpdate}>Thanh toán</button>
+                                    <button className='btn payment-btn col-12' disabled={!editAllowance || roomInvoice?.status === 'Đã thanh toán'} onClick={handlePaymentUpdate}><MdPayment /> Thanh toán</button>
                                 </div>
                             </div>
-                            <div className='form-group mt-3 pb-2 col-6 px-4'>
-                                <button className='btn btn-warning col-12' disabled={!editAllowance || roomInvoice?.status === 'Đã thanh toán'} onClick={() => setShowSurchargeModal(true)}>+ Thêm phụ thu</button>
+                            <div className='d-flex align-items-center'>
+                                <div className='form-group mt-3 pb-2 col-6 px-4'>
+                                    <button className='btn btn-warning col-12' disabled={!editAllowance || roomInvoice?.status === 'Đã thanh toán'} onClick={() => setShowSurchargeModal(true)}>+ Thêm phụ thu</button>
+                                </div>
+                                <div className='form-group mt-3 pb-2 col-6 px-4'>
+                                    <button className='btn btn-secondary col-12' onClick={() => setShowPrintingInvoice(true)}><AiOutlinePrinter /> In hóa đơn</button>
+                                </div>
                             </div>
                         </fieldset>
                     </div>
@@ -314,6 +322,10 @@ const ServicePayment = () => {
                 setShow={setShowSurchargeModal}
                 room_use_id={roomInvoice?.room_use_id}
                 updateInvoice={handleSelectRoomUse}
+            />
+            <ReceiptPrinting
+                show={showPrintingInvoice}
+                setShow={setShowPrintingInvoice}
             />
         </>
 
