@@ -14,12 +14,34 @@ import Policy from '../../assets/images/policy.png';
 import Customer from '../../assets/images/customer.png';
 import Profile from '../Modal/Profile/Profile';
 import React from 'react';
+import { LOGOUT } from '../Query/Login';
 import { useHistory } from 'react-router-dom';
+import { useDispatch } from "react-redux";
+import { useLazyQuery } from '@apollo/client';
+import { UserLogout } from '../../redux/action/actions';
+import { successToast } from '../Toast/Toast';
 
 const Homepage = () => {
+
     const item_class_name = 'item d-flex align-items-center gap-3 mt-3';
     const [showProfile, setShowProfile] = React.useState(false);
     const history = useHistory();
+    const dispatch = useDispatch();
+
+    const [logout] = useLazyQuery(LOGOUT, {
+        fetchPolicy: "no-cache"
+    });
+
+    const handleLogout = async () => {
+        let { data: { userLogout } } = await logout();
+        if (userLogout && userLogout?.errorCode === 0) {
+            successToast(userLogout.message);
+            dispatch(UserLogout());
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
+    }
 
     return (
         <div className='homepage-container'>
@@ -28,7 +50,7 @@ const Homepage = () => {
                     <AiOutlineUser className='icon' />
                     <span>Thông tin cá nhân</span>
                 </div>
-                <div className={item_class_name}><RxExit className='icon' /> <span>Đăng xuất</span></div>
+                <div className={item_class_name} onClick={handleLogout}><RxExit className='icon' /> <span>Đăng xuất</span></div>
                 <div className={item_class_name}><AiOutlineQuestionCircle className='icon' /> <span>Trợ giúp</span></div>
                 <div className={item_class_name}><RiInformationLine className='icon' /> <span>Giới thiệu</span></div>
             </div>

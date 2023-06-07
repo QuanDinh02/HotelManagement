@@ -31,8 +31,14 @@ const ServicePayment = () => {
     const [showSurchargeModal, setShowSurchargeModal] = React.useState(false);
     const [showPrintingInvoice, setShowPrintingInvoice] = React.useState(false);
 
-    const [getRoomList, { refetch }] = useLazyQuery(GET_ALL_HOTEL_ROOM_USE_PAYMENT);
-    const [getInvoice] = useLazyQuery(GET_ALL_HOTEL_ROOM_USE_INVOICE);
+    const [getRoomList] = useLazyQuery(GET_ALL_HOTEL_ROOM_USE_PAYMENT, {
+        fetchPolicy: "no-cache"
+    });
+
+    const [getInvoice] = useLazyQuery(GET_ALL_HOTEL_ROOM_USE_INVOICE, {
+        fetchPolicy: "no-cache"
+    });
+
     const [updatePayment] = useMutation(UPDATE_PAYMENT, {
         onCompleted: async () => {
             await updateRoomUseListAfterMutation();
@@ -145,7 +151,7 @@ const ServicePayment = () => {
     }
 
     const updateRoomUseListAfterMutation = async () => {
-        let { data: hotel_room_use } = await refetch();
+        let { data: hotel_room_use } = await getRoomList();
 
         let _rooms = hotel_room_use?.hotel_room_use_list_payment.map(item => {
             let _item = _.cloneDeep(item);

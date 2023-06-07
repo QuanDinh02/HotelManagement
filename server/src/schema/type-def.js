@@ -225,6 +225,19 @@ const typeDefs = `#graphql
     revenue_results: [RevenueByRoomCategory!]
   }
 
+  type TokenData {
+    id: ID
+    username: String
+    group: String
+    isAuthenticated: Boolean
+  }
+  
+  type Login {
+    errorCode: Int!
+    message: String!
+    data: TokenData
+  }
+
   type Query {
     customers: [Customer!]
     customer(value: String!): [Customer]
@@ -265,6 +278,10 @@ const typeDefs = `#graphql
 
     revenue_report(month: Int!, year: Int!): RevenueReport!
     searched_regulation(value: String!): [Surcharge!]
+
+    userLogin(account: String!, password: String!): Login
+    userLogout: Response
+    fetchAccountInfo: Login
   }
 
   input CustomerInput {

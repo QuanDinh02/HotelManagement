@@ -17,6 +17,9 @@ import CustomerManagement from './components/CustomerManagement/CustomerManageme
 import ServicePayment from './components/ServiceUsingPayment/ServicePayment';
 import RevenueReport from './components/RevenueReport/RevenueReport';
 import RegulationManagement from './components/RegulationManagement/RegulationManagement';
+import PrivateRoute from './components/Routes/PrivateRoute';
+import PageNotFound from './components/Routes/PageNotFound';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   return (
@@ -25,7 +28,9 @@ function App() {
         <Router>
           <Switch>
             <Route path="/" exact>
-              <Homepage />
+              <PrivateRoute>
+                <Homepage />
+              </PrivateRoute>
             </Route>
             <Route path="/login">
               <LoginPage />
@@ -57,9 +62,16 @@ function App() {
             <Route path="/regulation-management">
               <RegulationManagement />
             </Route>
+            <Route path="*">
+              <PageNotFound />
+            </Route>
           </Switch>
         </Router>
       </div>
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+      />
     </div>
   );
 }

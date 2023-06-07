@@ -1,0 +1,19 @@
+.page-not-found {
+    min-height: calc(100vh - 11.95rem);
+
+    .page-content {
+        padding        : 5rem 15rem;
+        display        : flex;
+        flex-direction : column;
+        justify-content: center;
+
+        h3 {
+            font-weight: 600;
+        }
+
+        .warning-icon {
+            font-size: 56px;
+            color: red;
+        }
+    }
+}

@@ -9,6 +9,10 @@ const ServicePayment = require('../services/serviceUsingAndPaymentService.js');
 const SurchargeServices = require('../services/surchargeService.js');
 const RevenueServices = require('../services/revenueService.js');
 const RegulationServices = require('../services/regulationService.js');
+const LoginServices = require('../services/LoginService.js');
+require('dotenv').config();
+
+const cookie = require('cookie');
 
 const resolvers = {
     Customer: {
@@ -164,6 +168,56 @@ const resolvers = {
         searched_regulation: async (parent, args) => {
             return await RegulationServices.getSearchedRegulation(args.value);
         },
+
+        fetchAccountInfo: async (parent, args, { req, res }) => {
+            if (req && req.headers && req.headers.cookie) {
+                const cookies = cookie.parse(req.headers.cookie);
+                let result = await LoginServices.fetchAccountInfo(cookies.__jwt__);
+                if (result) {
+                    return {
+                        data: result.data,
+                        errorCode: result.EC,
+                        message: result.EM
+                    };
+                } else {
+                    return null;
+                }
+            } else {
+                return null;
+            }
+        },
+
+        userLogin: async (parent, args, { req, res }) => {
+            let { account, password } = args;
+
+            let result = await LoginServices.userLogin({ account, password });
+            if (result) {
+                if (result.EC === 0) {
+                    res.cookie("__jwt__", result.token, {
+                        httpOnly: true,
+                        secure: true
+                    });
+                }
+                return {
+                    data: result.data,
+                    errorCode: result.EC,
+                    message: result.EM
+                };
+            } else {
+                return null;
+            }
+        },
+
+        userLogout: async (parent, args, { req, res }) => {
+            if (req && req.headers && req.headers.cookie) {
+                res.clearCookie("__jwt__");
+                return {
+                    errorCode: 0,
+                    message: 'Logout successfully'
+                };
+            }
+
+        }
     },
 
     Mutation: {

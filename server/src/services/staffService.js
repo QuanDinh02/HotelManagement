@@ -210,7 +210,48 @@ const getSearchedStaff = async (value) => {
     return _result;
 }
 
+const staffLogin = async (data) => {
+    let result = await db.StaffAccount.findOne({
+        raw: true,
+        nest: true,
+        include: {
+            model: db.Staff, attributes: ['id', 'name'],
+            nest: true,
+            include: {
+                model: db.StaffCategory, attributes: ['name']
+            }
+        },
+        where: {
+            [Op.and]: [
+                {
+                    account_name: {
+                        [Op.like]: `${data.account}`
+                    }
+                },
+                {
+                    password: {
+                        [Op.like]: `${data.password}`
+                    }
+                }
+            ]
+        }
+    });
+
+    if (result) {
+        let buildData = {
+            id: result.staff_id,
+            name: result.Staff.name,
+            category: result.Staff.StaffCategory.name
+        }
+        console.log(buildData);
+        return 'Login successfully';
+    } else {
+        return 'Login failed !';
+    }
+}
+
 module.exports = {
     getAllStaffs, getAllStaffCategory, createStaff,
-    updateStaff, deleteStaff, getSearchedStaff
+    updateStaff, deleteStaff, getSearchedStaff,
+    staffLogin
 }
