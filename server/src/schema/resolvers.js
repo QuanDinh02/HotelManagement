@@ -314,7 +314,7 @@ const resolvers = {
         },
 
         updateReceiveRoom: async (parent, args) => {
-            return await ReceiveRoomServices.updateHotelRoomUse(args.id);
+            return await ReceiveRoomServices.updateHotelRoomUse(args.id, args.staff_id);
         },
 
         updateReceiveRoomInfo: async (parent, args) => {

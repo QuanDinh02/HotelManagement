@@ -7,6 +7,7 @@ import React from 'react';
 import { CurrencyFormat } from '../Format/FormatNumber';
 import RoomCategory from '../Modal/RoomCategory/RoomCategory';
 import { GET_ALL_HOTEL_ROOMS, GET_SEARCHED_ROOM_BY_NAME, GET_SEARCHED_ROOM_BY_CATEGORY } from '../Query/HotelRoomQuery';
+import { FETCH_ACCOUNT } from '../Query/Login';
 import { UPDATE_ROOM, DELETE_ROOM } from '../Mutation/RoomMutation';
 import { useLazyQuery, useMutation } from '@apollo/client';
 import { useImmer } from "use-immer";
@@ -20,6 +21,7 @@ const RoomManagement = () => {
     const [showRoomCategory, setShowRoomCategory] = React.useState(false);
     const [showAddModal, setShowAddModal] = React.useState(false);
     const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+    const [managerPermission, setManagerPermission] = React.useState(false);
 
     const [hotelRooms, setHotelRooms] = useImmer([]);
     const [editRoom, setEditRoom] = useImmer({});
@@ -44,6 +46,19 @@ const RoomManagement = () => {
             await updateRoomListAfterMutation();
         }
     });
+
+    const [fetch_account] = useLazyQuery(FETCH_ACCOUNT, {
+        fetchPolicy: "no-cache"
+    });
+
+    const fetchManagerPermission = async () => {
+        let { data: { fetchAccountInfo } } = await fetch_account();
+        if (fetchAccountInfo && fetchAccountInfo.data) {
+            if (fetchAccountInfo.data.group === 'ADMIN') {
+                setManagerPermission(true);
+            }
+        }
+    }
 
     const handleSearchRoom = async (type) => {
         setEditRoom({});
@@ -167,6 +182,7 @@ const RoomManagement = () => {
 
     React.useEffect(() => {
         fetchRoomList();
+        fetchManagerPermission();
     }, []);
 
     return (
@@ -186,7 +202,7 @@ const RoomManagement = () => {
                                     <span className="input-group-text search-btn" title='Tìm kiếm' onClick={() => handleSearchRoom('NAME', nameSearch)}><HiOutlineSearch /></span>
                                 </div>
                                 <div className="input-group">
-                                <input type="text" className="form-control" placeholder="Loại phòng" value={categorySearch} onChange={(event) => setCategorySearch(event.target.value)} />
+                                    <input type="text" className="form-control" placeholder="Loại phòng" value={categorySearch} onChange={(event) => setCategorySearch(event.target.value)} />
                                     <span className="input-group-text search-btn" title='Tìm kiếm' onClick={() => handleSearchRoom('CATEGORY', categorySearch)}><HiOutlineSearch /></span>
                                 </div>
                             </div>
@@ -235,27 +251,29 @@ const RoomManagement = () => {
                                 </div>
                             </div>
                         </fieldset>
-                        <fieldset className='border rounded-2 p-2'>
-                            <legend className='reset legend-text'>Chức năng</legend>
-                            <div className='row mb-3 px-4'>
-                                <div className='form-group col-6'>
-                                    <button className='btn btn-success col-12' onClick={() => setShowAddModal(true)}>Thêm phòng</button>
+                        {managerPermission &&
+                            <fieldset className='border rounded-2 p-2'>
+                                <legend className='reset legend-text'>Chức năng</legend>
+                                <div className='row mb-3 px-4'>
+                                    <div className='form-group col-6'>
+                                        <button className='btn btn-success col-12' onClick={() => setShowAddModal(true)}>Thêm phòng</button>
+                                    </div>
+                                    <div className='form-group col-6'>
+                                        <button className='btn btn-outline-danger col-12' onClick={() => setShowDeleteModal(true)} disabled={_.isEmpty(editRoom) ? true : false}>Xóa phòng</button>
+                                    </div>
                                 </div>
-                                <div className='form-group col-6'>
-                                    <button className='btn btn-outline-danger col-12' onClick={() => setShowDeleteModal(true)} disabled={_.isEmpty(editRoom) ? true : false}>Xóa phòng</button>
+                                <div className='row px-4'>
+                                    <div className='form-group col-6'>
+                                        <button className='btn btn-primary col-12' onClick={() => setShowRoomCategory(true)}>Quản lý Loại phòng</button>
+                                    </div>
+                                    <div className='form-group col-6'>
+                                        <button className='btn btn-warning col-12' onClick={handleUpdateRoomInfo} disabled={_.isEmpty(editRoom) ? true : false}>
+                                            {editAllowance === false ? <span>Chỉnh sửa</span> : <span>Lưu chỉnh sửa</span>}
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className='row px-4'>
-                                <div className='form-group col-6'>
-                                    <button className='btn btn-primary col-12' onClick={() => setShowRoomCategory(true)}>Quản lý Loại phòng</button>
-                                </div>
-                                <div className='form-group col-6'>
-                                    <button className='btn btn-warning col-12' onClick={handleUpdateRoomInfo} disabled={_.isEmpty(editRoom) ? true : false}>
-                                        {editAllowance === false ? <span>Chỉnh sửa</span> : <span>Lưu chỉnh sửa</span>}
-                                    </button>
-                                </div>
-                            </div>
-                        </fieldset>
+                            </fieldset>
+                        }
                     </div>
                     <fieldset className='right-content border rounded-2 p-2' onScroll={(event) => { event.preventDefault() }}>
                         <legend className='reset legend-text'>Danh sách tất cả các phòng</legend>

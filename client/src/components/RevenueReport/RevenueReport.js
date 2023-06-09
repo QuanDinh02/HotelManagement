@@ -122,7 +122,7 @@ const RevenueReport = () => {
                         <div className='revenue-header text-center'>
                             <span className='title'>Tỉ lệ doanh thu theo loại phòng ({filterLabel.month ? `${filterLabel.month}/${filterLabel.year}` : searchYear})</span>
                         </div>
-                        <div className='pie-chart d-flex justify-content-around pt-2 pb-3 red'>
+                        <div className='pie-chart d-flex justify-content-around pt-2 pb-3'>
                             <VictoryPie
                                 animate={{
                                     duration: 2000

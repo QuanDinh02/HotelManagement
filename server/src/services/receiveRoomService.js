@@ -109,7 +109,7 @@ const getHotelRoomUseSearchByCustomer = async (value) => {
     return result;
 }
 
-const updateHotelRoomUse = async (room_use_id) => {
+const updateHotelRoomUse = async (room_use_id, staff_id) => {
     let existedRoomUse = await db.HotelRoomUse.findOne({
         where: {
             id: +room_use_id
@@ -133,7 +133,7 @@ const updateHotelRoomUse = async (room_use_id) => {
 
         await ServicePayment.createRoomUseInvoice({
             date: `${day}/${month}/${year}`,
-            staff_id: 4,
+            staff_id: +staff_id,
             room_use_id: +room_use_id,
             total: 0
         });

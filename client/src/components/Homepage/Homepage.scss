@@ -2,24 +2,28 @@ $main-color   : #D57834;
 $light-color-1: #d8874d;
 
 .homepage-container {
-    display: flex;
-    height : 100vh;
+    display           : flex;
+    position: fixed;
 
     .sidebar {
         flex-basis      : 15%;
+        height          : 100vh;
         background-color: $main-color;
 
         color: white;
 
         .item {
-            padding     : 0.3rem;
-            margin-left : 0.3rem;
-            margin-right: 0.3rem;
+            padding      : 0.3rem;
+            margin-left  : 0.3rem;
+            margin-right : 0.3rem;
+            margin-bottom: 0.3rem;
 
             &:hover {
                 cursor          : pointer;
                 border-radius   : 0.5rem;
                 background-color: $light-color-1;
+                color           : black;
+                font-weight     : 600;
             }
         }
 

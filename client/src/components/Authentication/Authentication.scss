@@ -41,15 +41,6 @@ $main-color : #D57834;
                 border-color: $main-color;
                 box-shadow  : 0 0 0 0.01rem $main-color;
             }
-
-            .form-check-input {
-                &:checked {
-                    background-color: $main-color;
-                    border-color    : $main-color;
-                }
-
-                box-shadow: 0 0 0 0 white;
-            }
         }
 
         .icon {

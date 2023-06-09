@@ -5,6 +5,7 @@ import { TfiClose } from 'react-icons/tfi';
 import { HiOutlineSearch } from 'react-icons/hi';
 import CustomerHistory from '../Modal/CustomerHistory/CustomerHistory';
 import { GET_ALL_CUSTOMERS, GET_CUSTOMER_BY_NAME_PHONE } from '../Query/CustomerQuery';
+import { FETCH_ACCOUNT } from '../Query/Login';
 import { UPDATE_CUSTOMER, DELETE_CUSTOMER } from '../Mutation/ClientMutation';
 import { useQuery, useLazyQuery, useMutation } from '@apollo/client';
 import { useImmer } from "use-immer";
@@ -16,6 +17,8 @@ const CustomerManagement = () => {
     const history = useHistory();
 
     const [showCustomerHistory, setShowCustomerHistory] = React.useState(false);
+    const [managerPermission, setManagerPermission] = React.useState(false);
+
     const [customerList, setCustomerList] = useImmer([]);
     const [editCustomer, setEditCustomer] = useImmer({});
     const [editAllowance, setEditAllowance] = React.useState(false);
@@ -35,6 +38,19 @@ const CustomerManagement = () => {
             { query: GET_ALL_CUSTOMERS }
         ],
     });
+
+    const [fetch_account] = useLazyQuery(FETCH_ACCOUNT, {
+        fetchPolicy: "no-cache"
+    });
+
+    const fetchManagerPermission = async () => {
+        let { data: { fetchAccountInfo } } = await fetch_account();
+        if (fetchAccountInfo && fetchAccountInfo.data) {
+            if (fetchAccountInfo.data.group === 'ADMIN') {
+                setManagerPermission(true);
+            }
+        }
+    }
 
     const handleSelectingCustomer = (selected_customer) => {
         let _editCustomer = _.cloneDeep(selected_customer);
@@ -116,6 +132,10 @@ const CustomerManagement = () => {
             setEditAllowance(false);
         }
     }
+
+    React.useEffect(() => {
+        fetchManagerPermission();
+    }, []);
 
     React.useEffect(() => {
         setEditAllowance(false);
@@ -231,9 +251,7 @@ const CustomerManagement = () => {
                             <legend className='reset legend-text'>Chức năng</legend>
                             <div className='row mb-3 px-4'>
                                 <div className='form-group col-6'>
-                                    <button className='btn btn-outline-danger col-12' onClick={() => setShowDeleteModal(true)} disabled={_.isEmpty(editCustomer) ? true : false}>
-                                        Xóa khách hàng
-                                    </button>
+                                    <button className='btn btn-secondary col-12' onClick={() => setShowCustomerHistory(true)} disabled={_.isEmpty(editCustomer) ? true : false}>Lịch sử Khách hàng</button>
                                 </div>
                                 <div className='form-group col-6'>
                                     <button className='btn btn-warning col-12' onClick={handleUpdateCustomer} disabled={_.isEmpty(editCustomer) ? true : false}>
@@ -241,11 +259,15 @@ const CustomerManagement = () => {
                                     </button>
                                 </div>
                             </div>
-                            <div className='row mb-3 px-4'>
-                                <div className='form-group col-6'>
-                                    <button className='btn btn-secondary col-12' onClick={() => setShowCustomerHistory(true)} disabled={_.isEmpty(editCustomer) ? true : false}>Lịch sử Khách hàng</button>
+                            {managerPermission &&
+                                <div className='row mb-3 px-4'>
+                                    <div className='form-group col-6'>
+                                        <button className='btn btn-outline-danger col-12' onClick={() => setShowDeleteModal(true)} disabled={_.isEmpty(editCustomer) ? true : false}>
+                                            Xóa khách hàng
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
+                            }
                         </fieldset>
                     </div>
                     <fieldset className='right-content border rounded-2 p-2' onScroll={(event) => { event.preventDefault() }}>

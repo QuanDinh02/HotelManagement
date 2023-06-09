@@ -477,7 +477,7 @@ const typeDefs = `#graphql
     updateBookRoom(input: BookRoomUpdateInput!): Response
     deleteBookRoom(id: ID!): Response
 
-    updateReceiveRoom(id: ID!): Response
+    updateReceiveRoom(id: ID!, staff_id: Int!): Response
     updateReceiveRoomInfo(input: BookRoomUpdateInput!): Response
 
     createRoomUseInvoice(input: RoomUseInvoiceInput!): Response

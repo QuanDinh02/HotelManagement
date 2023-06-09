@@ -20,8 +20,7 @@ const LoginPage = () => {
 
     const [account, setAccount] = useImmer({
         account_name: '',
-        password: '',
-        isRemembered: false
+        password: ''
     })
 
     const [login] = useLazyQuery(LOGIN, {
@@ -127,7 +126,7 @@ const LoginPage = () => {
                                 <label htmlFor="floatingInput">Tên đăng nhập</label>
                             </div>
                         </div>
-                        <div className="input-group mb-3">
+                        <div className="input-group mb-5">
                             <span className="input-group-text icon"><RiLockFill /></span>
                             <div className="form-floating">
                                 <input type="password" className="form-control" id="floatingPassword" placeholder="Password"
@@ -137,13 +136,6 @@ const LoginPage = () => {
                                 />
                                 <label htmlFor="floatingPassword">Mật khẩu</label>
                             </div>
-                        </div>
-                        <div className="form-check d-flex gap-3">
-                            <input className="form-check-input checkbox-warning" type="checkbox" value="" id="flexCheckChecked"
-                                checked={account.isRemembered}
-                                onChange={(event) => handleOnChange('isRemembered', !account.isRemembered)}
-                            />
-                            <label className="form-check-label">Remember me</label>
                         </div>
                         <div className='login-btn-box d-flex mt-4'>
                             <button className='btn login-btn' onClick={handleLogin}>Đăng nhập</button>

@@ -1,4 +1,3 @@
-import './App.scss';
 import LoginPage from './components/Authentication/LoginPage';
 import BookRoom from './components/BookRoom/BookRoom';
 import Homepage from './components/Homepage/Homepage';
@@ -20,6 +19,7 @@ import RegulationManagement from './components/RegulationManagement/RegulationMa
 import PrivateRoute from './components/Routes/PrivateRoute';
 import PageNotFound from './components/Routes/PageNotFound';
 import { Toaster } from 'react-hot-toast';
+import ManagerRoute from './components/Routes/ManagerRoute';
 
 function App() {
   return (
@@ -36,19 +36,27 @@ function App() {
               <LoginPage />
             </Route>
             <Route path="/book-room">
-              <BookRoom />
+              <PrivateRoute>
+                <BookRoom />
+              </PrivateRoute>
             </Route>
             <Route path="/receive-room">
-              <ReceiveRoom />
+              <PrivateRoute>
+                <ReceiveRoom />
+              </PrivateRoute>
             </Route>
             <Route path="/revenue-report">
-              <RevenueReport />
+              <ManagerRoute>
+                <RevenueReport />
+              </ManagerRoute>
             </Route>
             <Route path="/room-management">
               <RoomManagement />
             </Route>
             <Route path="/staff-management">
-              <StaffManagement />
+              <ManagerRoute>
+                <StaffManagement />
+              </ManagerRoute>
             </Route>
             <Route path="/service-management">
               <ServiceManagement />
@@ -60,7 +68,9 @@ function App() {
               <ServicePayment />
             </Route>
             <Route path="/regulation-management">
-              <RegulationManagement />
+              <ManagerRoute>
+                <RegulationManagement />
+              </ManagerRoute>
             </Route>
             <Route path="*">
               <PageNotFound />

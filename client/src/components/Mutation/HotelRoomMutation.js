@@ -28,8 +28,8 @@ const DELETE_BOOK_ROOM = gql`
 `;
 
 const UPDATE_RECEIVE_ROOM = gql`
-    mutation UpdateReceiveRoom($roomUseId: ID!) {
-        updateReceiveRoom(id: $roomUseId) {
+    mutation UpdateReceiveRoom($roomUseId: ID!, $staff_id: Int!) {
+        updateReceiveRoom(id: $roomUseId, staff_id: $staff_id) {
             errorCode
             message
         }

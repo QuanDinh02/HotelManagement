@@ -10,6 +10,7 @@ import { useLazyQuery, useMutation } from '@apollo/client';
 import { useImmer } from "use-immer";
 import _ from 'lodash';
 import { CurrencyFormat } from '../Format/FormatNumber';
+import { useSelector } from 'react-redux';
 
 const ROOM_USE_STATUS_COLOR =  {
     'Đã nhận phòng': 'already-received',
@@ -20,6 +21,9 @@ const ROOM_USE_STATUS_COLOR =  {
 const ReceiveRoom = () => {
 
     const history = useHistory();
+
+    const userAccount = useSelector(state => state.user.account);
+
     const [hotelRoomUseList, setHotelRoomUseList] = useImmer([]);
     const [editAllowance, setEditAllowance] = React.useState(false);
     const [selectRoomCategory, setSelectRoomCategory] = React.useState({});
@@ -111,7 +115,8 @@ const ReceiveRoom = () => {
     const handleReceiveRoom = async () => {
         let result = await updateReceiveRoom({
             variables: {
-                roomUseId: bookRoomInfo?.id
+                roomUseId: bookRoomInfo?.id,
+                staff_id: +userAccount?.id
             }
         });
         setBookRoomInfo({

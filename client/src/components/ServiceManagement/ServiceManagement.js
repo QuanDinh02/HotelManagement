@@ -10,6 +10,7 @@ import {
     GET_ALL_HOTEL_SERVICES, GET_SEARCHED_SERVICE_BY_NAME,
     GET_SEARCHED_SERVICE_BY_CATEGORY
 } from '../Query/HotelServiceQuery';
+import { FETCH_ACCOUNT } from '../Query/Login';
 import { UPDATE_SERVICE, DELETE_SERVICE } from '../Mutation/ServiceMutation';
 import { useLazyQuery, useMutation } from '@apollo/client';
 import { useImmer } from "use-immer";
@@ -23,6 +24,7 @@ const ServiceManagement = () => {
     const [showServiceCategory, setShowServiceCategory] = React.useState(false);
     const [showServiceModal, setShowServiceModal] = React.useState(false);
     const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+    const [managerPermission, setManagerPermission] = React.useState(false);
 
     const [hotelServices, setHotelServices] = useImmer([]);
     const [editService, setEditService] = useImmer({});
@@ -48,6 +50,19 @@ const ServiceManagement = () => {
             await updateServiceListAfterMutation();
         }
     });
+
+    const [fetch_account] = useLazyQuery(FETCH_ACCOUNT, {
+        fetchPolicy: "no-cache"
+    });
+
+    const fetchManagerPermission = async () => {
+        let { data: { fetchAccountInfo } } = await fetch_account();
+        if (fetchAccountInfo && fetchAccountInfo.data) {
+            if (fetchAccountInfo.data.group === 'ADMIN') {
+                setManagerPermission(true);
+            }
+        }
+    }
 
     const updateServiceListAfterMutation = async () => {
         let { data: hotel_services_management } = await refetch();
@@ -172,6 +187,7 @@ const ServiceManagement = () => {
 
     React.useEffect(() => {
         fetchServiceList();
+        fetchManagerPermission();
     }, []);
 
     return (
@@ -235,27 +251,29 @@ const ServiceManagement = () => {
                                 </div>
                             </div>
                         </fieldset>
-                        <fieldset className='border rounded-2 p-2'>
-                            <legend className='reset legend-text'>Chức năng</legend>
-                            <div className='row mb-3 px-4'>
-                                <div className='form-group col-6'>
-                                    <button className='btn btn-success col-12' onClick={() => setShowServiceModal(true)}>Thêm dịch vụ</button>
+                        {managerPermission &&
+                            <fieldset className='border rounded-2 p-2'>
+                                <legend className='reset legend-text'>Chức năng</legend>
+                                <div className='row mb-3 px-4'>
+                                    <div className='form-group col-6'>
+                                        <button className='btn btn-success col-12' onClick={() => setShowServiceModal(true)}>Thêm dịch vụ</button>
+                                    </div>
+                                    <div className='form-group col-6'>
+                                        <button className='btn btn-outline-danger col-12' onClick={() => setShowDeleteModal(true)} disabled={_.isEmpty(editService) ? true : false}>Xóa dịch vụ</button>
+                                    </div>
                                 </div>
-                                <div className='form-group col-6'>
-                                    <button className='btn btn-outline-danger col-12' onClick={() => setShowDeleteModal(true)} disabled={_.isEmpty(editService) ? true : false}>Xóa dịch vụ</button>
+                                <div className='row mb-3 px-4'>
+                                    <div className='form-group col-6'>
+                                        <button className='btn btn-primary col-12' onClick={() => setShowServiceCategory(true)}>Quản lý Loại dịch vụ</button>
+                                    </div>
+                                    <div className='form-group col-6'>
+                                        <button className='btn btn-warning col-12' onClick={handleUpdateService} disabled={_.isEmpty(editService) ? true : false}>
+                                            {editAllowance === false ? <span>Chỉnh sửa</span> : <span>Lưu chỉnh sửa</span>}
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className='row mb-3 px-4'>
-                                <div className='form-group col-6'>
-                                    <button className='btn btn-primary col-12' onClick={() => setShowServiceCategory(true)}>Quản lý Loại dịch vụ</button>
-                                </div>
-                                <div className='form-group col-6'>
-                                    <button className='btn btn-warning col-12' onClick={handleUpdateService} disabled={_.isEmpty(editService) ? true : false}>
-                                        {editAllowance === false ? <span>Chỉnh sửa</span> : <span>Lưu chỉnh sửa</span>}
-                                    </button>
-                                </div>
-                            </div>
-                        </fieldset>
+                            </fieldset>
+                        }
                     </div>
                     <fieldset className='right-content border rounded-2 p-2' onScroll={(event) => { event.preventDefault() }}>
                         <legend className='reset legend-text'>Danh sách tất cả các dịch vụ</legend>
