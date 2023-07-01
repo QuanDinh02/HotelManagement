@@ -5,6 +5,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { useLazyQuery } from '@apollo/client';
 import { errorToast2 } from '../Toast/Toast';
+import _ from 'lodash';
+
 const ManagerRoute = (props) => {
 
     const dispatch = useDispatch();
@@ -18,15 +20,10 @@ const ManagerRoute = (props) => {
         fetchPolicy: "no-cache"
     });
 
-    if (userAccount && userAccount?.group !== "ADMIN") {
-        errorToast2("Your access is not allowed !");
-        history.push('/');
-    }
-
     const fetchAccountInfo = async () => {
         let { data: { fetchAccountInfo } } = await fetch_account();
         if (fetchAccountInfo && fetchAccountInfo?.data) {
-            setAllow(true);
+
             let data = {
                 isAuthenticated: fetchAccountInfo.data.isAuthenticated,
                 account: {
@@ -35,16 +32,29 @@ const ManagerRoute = (props) => {
                     group: fetchAccountInfo.data.group
                 }
             }
-
             dispatch(UserLogin(data));
+            if (fetchAccountInfo.data.group !== "ADMIN") {
+                errorToast2("Your access is not allowed !");
+                history.push('/');
+            } else {
+                setAllow(true);
+            }
         } else {
-            window.location.reload();
             history.push('/login');
         }
     }
 
     React.useEffect(() => {
-        fetchAccountInfo();
+        if (!_.isEmpty(userAccount)) {
+            if (userAccount.group !== "ADMIN") {
+                errorToast2("Your access is not allowed !");
+                history.push('/');
+            } else {
+                setAllow(true);
+            }
+        } else {
+            fetchAccountInfo();
+        }
     }, []);
 
     return (

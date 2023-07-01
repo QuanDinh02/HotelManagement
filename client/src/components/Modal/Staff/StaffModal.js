@@ -4,18 +4,17 @@ import Button from 'react-bootstrap/Button';
 import './StaffModal.scss';
 import { useImmer } from "use-immer";
 import _ from 'lodash';
-import { GET_ALL_STAFFS } from '../../Query/StaffQuery';
 import { CREATE_STAFF } from '../../Mutation/StaffMutation';
 import { useMutation } from '@apollo/client';
 
 const StaffModal = (props) => {
 
-    const { show, setShow, staffCategories } = props;
+    const { show, setShow, staffCategories, fetchStaffList } = props;
 
     const [createStaff] = useMutation(CREATE_STAFF, {
-        refetchQueries: [
-            { query: GET_ALL_STAFFS }
-        ],
+        onCompleted: async () => {
+            await fetchStaffList();
+        }
     });
 
     const [newStaff, setNewStaff] = useImmer({

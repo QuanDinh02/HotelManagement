@@ -17,7 +17,7 @@ import { CurrencyFormat } from '../Format/FormatNumber';
 
 const ROOM_USE_STATUS = ['Đã nhận phòng', 'Hủy đặt phòng', 'Đã thanh toán'];
 
-const ROOM_USE_STATUS_COLOR =  {
+const ROOM_USE_STATUS_COLOR = {
     'Đã nhận phòng': 'already-received',
     'Hủy đặt phòng': 'room-book-cancel',
     'Đã thanh toán': 'already-payment',
@@ -63,7 +63,9 @@ const BookRoom = () => {
         phone: ''
     });
 
-    const [getHotelRoomUseList, { refetch }] = useLazyQuery(GET_ALL_HOTEL_ROOM_USE);
+    const [getHotelRoomUseList] = useLazyQuery(GET_ALL_HOTEL_ROOM_USE, {
+        fetchPolicy: "no-cache"
+    });
     const [getCustomerInfoByPhone] = useLazyQuery(GET_CUSTOMER_INFO_BY_PHONE);
     const [getBookRoomSearchByCustomer] = useLazyQuery(GET_HOTEL_ROOM_USE_BY_CUSTOMER);
 
@@ -71,7 +73,7 @@ const BookRoom = () => {
     const [bookRoom] = useMutation(BOOK_ROOM);
 
     const updateHistoryAfterMutation = async () => {
-        let { data: hotel_room_use } = await refetch();
+        let { data: hotel_room_use } = await getHotelRoomUseList();
         let _hotelRoomUse = hotel_room_use?.hotel_room_use_list.map(item => {
             return {
                 ...item, isSelected: false

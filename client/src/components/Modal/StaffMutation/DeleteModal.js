@@ -1,8 +1,10 @@
 import React from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
+import { GoAlert } from 'react-icons/go';
+import './Modal.scss';
 
-const DeleteModal = (props) => {
+const DeleteStaffModal = (props) => {
 
     const { show, setShow, handleDeleteStaff } = props;
 
@@ -14,18 +16,20 @@ const DeleteModal = (props) => {
     return (
         <>
             <Modal
+                className='staff-delete-modal'
                 show={show}
                 onHide={() => setShow(false)}
                 backdrop="static"
                 keyboard={false}
                 centered
             >
-                <Modal.Header closeButton>
+                <Modal.Header className='modal-header' closeButton>
+                    <GoAlert className='alert-icon'/>
                 </Modal.Header>
-                <Modal.Body>
-                    <span>Bạn muốn xóa nhân viên này ?</span>
+                <Modal.Body className='modal-body'>
+                Bạn muốn xóa nhân viên này ?
                 </Modal.Body>
-                <Modal.Footer>
+                <Modal.Footer className='modal-footer'>
                     <Button variant="outline-danger" onClick={handleDelete}>Xóa</Button>
                     <Button variant="light" onClick={() => setShow(false)}>Hủy</Button>
                 </Modal.Footer>
@@ -34,4 +38,4 @@ const DeleteModal = (props) => {
     )
 }
 
-export default DeleteModal;
+export default DeleteStaffModal;

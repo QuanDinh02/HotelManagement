@@ -3,132 +3,159 @@ const { Op } = require("sequelize");
 const _ = require('lodash');
 
 const getAllHotelRooms = async () => {
-    let result = await db.HotelRoom.findAll({
-        raw: true,
-        nest: true,
-        include: {
-            model: db.HotelRoomCategory, attributes: ['id', 'name', 'description', 'price', 'people_maximum']
-        },
-        attributes: ['id', 'name', 'status'],
-        order: [
-            ['name', 'ASC']
-        ]
-    });
+    try {
+        let result = await db.HotelRoom.findAll({
+            raw: true,
+            nest: true,
+            include: {
+                model: db.HotelRoomCategory, attributes: ['id', 'name', 'description', 'price', 'people_maximum']
+            },
+            attributes: ['id', 'name', 'status'],
+            order: [
+                ['name', 'ASC']
+            ]
+        });
 
-    let _result = result.map(item => {
-        let category = item.HotelRoomCategory;
-        delete item.HotelRoomCategory;
+        let _result = result.map(item => {
+            let category = item.HotelRoomCategory;
+            delete item.HotelRoomCategory;
 
-        return {
-            ...item, room_category: category
-        }
-    });
+            return {
+                ...item, room_category: category
+            }
+        });
 
-    return _result;
+        return _result;
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
 }
 
 const getAllHotelRoomCategories = async () => {
-    let result = await db.HotelRoomCategory.findAll({
-        raw: true,
-        order: [
-            ['id', 'ASC']
-        ]
-    });
-    return result;
+    try {
+        let result = await db.HotelRoomCategory.findAll({
+            raw: true,
+            order: [
+                ['id', 'ASC']
+            ]
+        });
+        return result;
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
 }
 
 const createNewRoom = async (data) => {
-    let { name, room_category } = data;
+    try {
+        let { name: room_name } = data;
 
-    let existedRoomName = await db.HotelRoom.findOne({
-        where: {
-            name: {
-                [Op.like]: `${name}`
+        let existedRoomName = await db.HotelRoom.findOne({
+            where: {
+                name: {
+                    [Op.like]: `${room_name}`
+                }
+            },
+            raw: true
+        })
+
+        if (existedRoomName) {
+            return {
+                errorCode: -1,
+                message: 'Room name is existed !'
             }
-        },
-        raw: true
-    })
+        } else {
 
-    if (existedRoomName) {
-        return {
-            errorCode: -1,
-            message: 'Room name is existed !'
-        }
-    } else {
+            await db.HotelRoom.create({
+                name: data.name,
+                status: 'Trống',
+                room_category: +data.room_category
+            });
 
-        let res = await db.HotelRoom.create({
-            name: name,
-            status: 'Trống',
-            room_category: room_category
-        });
-
-        if (res) {
             return {
                 errorCode: 0,
                 message: 'Create room successfully !'
             }
         }
-        else {
-            return {
-                errorCode: -2,
-                message: 'Create room failed !'
-            }
-        }
+    } catch (error) {
 
+        return {
+            errorCode: -2,
+            message: 'Error with service !'
+        }
     }
+
 }
 
 const updateRoom = async (data) => {
-    let existedRoom = await db.HotelRoom.findOne({
-        where: {
-            id: +data.id
-        },
-        raw: true
-    })
-
-    if (existedRoom) {
-        let { id: room_id } = data;
-        delete data.id;
-
-        await db.HotelRoom.update(data, {
+    try {
+        let existedRoom = await db.HotelRoom.findOne({
             where: {
-                id: +room_id
+                id: +data.id
+            },
+            raw: true
+        })
+
+        if (existedRoom) {
+            let { id: room_id } = data;
+            delete data.id;
+
+            await db.HotelRoom.update(data, {
+                where: {
+                    id: +room_id
+                }
+            });
+            return {
+                errorCode: 0,
+                message: 'Update room successfully !'
             }
-        });
-        return {
-            errorCode: 0,
-            message: 'Update room successfully !'
+        } else {
+            return {
+                errorCode: -1,
+                message: 'Room is not existed !'
+            }
         }
-    } else {
+    } catch (error) {
+        console.log(error);
         return {
-            errorCode: -1,
-            message: 'Room is not existed !'
+            errorCode: -2,
+            message: 'Error with service !'
         }
     }
+
 }
 
 const deleteRoom = async (room_id) => {
-    let existedRoom = await db.HotelRoom.findOne({
-        where: {
-            id: +room_id
-        },
-        raw: true
-    })
-
-    if (existedRoom) {
-        await db.HotelRoom.destroy({
+    try {
+        let existedRoom = await db.HotelRoom.findOne({
             where: {
                 id: +room_id
+            },
+            raw: true
+        })
+
+        if (existedRoom) {
+            await db.HotelRoom.destroy({
+                where: {
+                    id: +room_id
+                }
+            });
+            return {
+                errorCode: 0,
+                message: 'Delete room successfully !'
             }
-        });
-        return {
-            errorCode: 0,
-            message: 'Delete room successfully !'
+        } else {
+            return {
+                errorCode: -1,
+                message: 'Room is not existed !'
+            }
         }
-    } else {
+    } catch (error) {
+        console.log(error);
         return {
-            errorCode: -1,
-            message: 'Room is not existed !'
+            errorCode: -2,
+            message: 'Error with service !'
         }
     }
 }
@@ -264,7 +291,41 @@ const deleteRoomCategory = async (category_id) => {
 }
 
 const getRoomSearchByName = async (value) => {
-    if (value) {
+    try {
+        if (value) {
+            let result = await db.HotelRoom.findAll({
+                raw: true,
+                nest: true,
+                include: {
+                    model: db.HotelRoomCategory, attributes: ['id', 'name', 'description', 'price', 'people_maximum']
+                },
+                attributes: ['id', 'name', 'status'],
+                order: [
+                    ['name', 'ASC']
+                ],
+                where: {
+                    name: {
+                        [Op.substring]: `${value}`
+                    }
+                }
+            });
+
+            if (result) {
+                let _result = result.map(item => {
+                    let category = item.HotelRoomCategory;
+                    delete item.HotelRoomCategory;
+
+                    return {
+                        ...item, room_category: category
+                    }
+                });
+
+                return _result;
+            }
+            return result;
+
+        }
+
         let result = await db.HotelRoom.findAll({
             raw: true,
             nest: true,
@@ -274,66 +335,66 @@ const getRoomSearchByName = async (value) => {
             attributes: ['id', 'name', 'status'],
             order: [
                 ['name', 'ASC']
-            ],
-            where: {
-                name: {
-                    [Op.substring]: `${value}`
-                }
+            ]
+        });
+
+        let _result = result.map(item => {
+            let category = item.HotelRoomCategory;
+            delete item.HotelRoomCategory;
+
+            return {
+                ...item, room_category: category
             }
         });
 
-        if (result) {
-            let _result = result.map(item => {
-                let category = item.HotelRoomCategory;
-                delete item.HotelRoomCategory;
-
-                return {
-                    ...item, room_category: category
-                }
-            });
-
-            return _result;
-        }
-        return result;
-
+        return _result;
+    } catch (error) {
+        console.log(error);
+        return null;
     }
 
-    let result = await db.HotelRoom.findAll({
-        raw: true,
-        nest: true,
-        include: {
-            model: db.HotelRoomCategory, attributes: ['id', 'name', 'description', 'price', 'people_maximum']
-        },
-        attributes: ['id', 'name', 'status'],
-        order: [
-            ['name', 'ASC']
-        ]
-    });
-
-    let _result = result.map(item => {
-        let category = item.HotelRoomCategory;
-        delete item.HotelRoomCategory;
-
-        return {
-            ...item, room_category: category
-        }
-    });
-
-    return _result;
 }
 
 const getRoomSearchByCategory = async (value) => {
-    if (value) {
+    try {
+        if (value) {
+            let result = await db.HotelRoom.findAll({
+                raw: true,
+                nest: true,
+                include: {
+                    model: db.HotelRoomCategory, attributes: ['id', 'name', 'description', 'price', 'people_maximum'],
+                    where: {
+                        name: {
+                            [Op.substring]: `${value}`
+                        }
+                    }
+                },
+                attributes: ['id', 'name', 'status'],
+                order: [
+                    ['name', 'ASC']
+                ]
+            });
+
+            if (result) {
+                let _result = result.map(item => {
+                    let category = item.HotelRoomCategory;
+                    delete item.HotelRoomCategory;
+
+                    return {
+                        ...item, room_category: category
+                    }
+                });
+                return _result;
+            }
+            return result;
+
+        }
+
         let result = await db.HotelRoom.findAll({
             raw: true,
             nest: true,
             include: {
-                model: db.HotelRoomCategory, attributes: ['id', 'name', 'description', 'price', 'people_maximum'],
-                where: {
-                    name: {
-                        [Op.substring]: `${value}`
-                    }
-                }
+                model: db.HotelRoomCategory, attributes: ['id', 'name', 'description', 'price', 'people_maximum']
             },
             attributes: ['id', 'name', 'status'],
             order: [
@@ -341,43 +402,21 @@ const getRoomSearchByCategory = async (value) => {
             ]
         });
 
-        if (result) {
-            let _result = result.map(item => {
-                let category = item.HotelRoomCategory;
-                delete item.HotelRoomCategory;
+        let _result = result.map(item => {
+            let category = item.HotelRoomCategory;
+            delete item.HotelRoomCategory;
 
-                return {
-                    ...item, room_category: category
-                }
-            });
-            return _result;
-        }
-        return result;
+            return {
+                ...item, room_category: category
+            }
+        });
 
+        return _result;
+    } catch (error) {
+        console.log(error);
+        return null;
     }
 
-    let result = await db.HotelRoom.findAll({
-        raw: true,
-        nest: true,
-        include: {
-            model: db.HotelRoomCategory, attributes: ['id', 'name', 'description', 'price', 'people_maximum']
-        },
-        attributes: ['id', 'name', 'status'],
-        order: [
-            ['name', 'ASC']
-        ]
-    });
-
-    let _result = result.map(item => {
-        let category = item.HotelRoomCategory;
-        delete item.HotelRoomCategory;
-
-        return {
-            ...item, room_category: category
-        }
-    });
-
-    return _result;
 }
 
 module.exports = {

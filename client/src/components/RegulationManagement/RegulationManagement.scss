@@ -2,10 +2,9 @@ $main-color       : #D57834;
 $bg-color         : #ECECEC;
 $legend-text-size : 1.125rem;
 
-.service-management-container {
+.regulation-management-container {
     display       : flex;
     flex-direction: column;
-    height        : auto;
 
     .header {
         background-color: $bg-color;
@@ -32,15 +31,16 @@ $legend-text-size : 1.125rem;
     }
 
     .main {
-        flex-grow: 1;
+        flex-grow : 1;
+        height: calc(100vh - 64px);
 
         .border {
             border-color: $main-color !important;
         }
 
         .left-content {
-            width: 40%;
-
+            width : 40%;
+        
             input:disabled,
             select:disabled {
                 cursor: not-allowed;
@@ -67,6 +67,16 @@ $legend-text-size : 1.125rem;
                 }
             }
 
+            .middle {
+                height: 100%;
+
+                .description {
+                    textarea {
+                        height: 150px;
+                    }
+                }
+            }
+
             .form-control:focus {
                 border-color: $main-color;
                 box-shadow  : 0 0 0 0.01rem $main-color;
@@ -75,7 +85,6 @@ $legend-text-size : 1.125rem;
 
         .right-content {
             width     : 60%;
-            max-height: 39.375rem;
             overflow-y: auto;
 
             table {

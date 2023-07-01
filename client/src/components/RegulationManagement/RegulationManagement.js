@@ -9,11 +9,12 @@ import { GET_SEARCHED_REGULATION } from '../Query/RegulationQuery';
 import { useLazyQuery, useMutation } from '@apollo/client';
 import { useImmer } from "use-immer";
 import { UPDATE_REGULATION, DELETE_REGULATION } from '../Mutation/RegulationMutation';
+import { FETCH_ACCOUNT } from '../Query/Login';
 import DeleteModal from '../Modal/RegulationManagment/DeleteModal';
 import _ from 'lodash';
 import RegulationAddNew from '../Modal/RegulationManagment/RegulationAddNew';
 
-const RegulationmManagement = () => {
+const RegulationManagement = () => {
 
     const history = useHistory();
 
@@ -21,6 +22,7 @@ const RegulationmManagement = () => {
     const [showDeleteModal, setShowDeleteModal] = React.useState(false);
 
     const [regulationList, setRegulationList] = useImmer([]);
+    const [managerPermission, setManagerPermission] = React.useState(false);
 
     const [editRegulation, setEditRegulation] = useImmer({});
     const [editAllowance, setEditAllowance] = React.useState(false);
@@ -41,10 +43,14 @@ const RegulationmManagement = () => {
         }
     });
 
-    const [deleteRegulation, { data: deleteMsg }] = useMutation(DELETE_REGULATION, {
+    const [deleteRegulation] = useMutation(DELETE_REGULATION, {
         onCompleted: async () => {
             await fetchRegulationList();
         }
+    });
+
+    const [fetch_account] = useLazyQuery(FETCH_ACCOUNT, {
+        fetchPolicy: "no-cache"
     });
 
     const handleSearchRegulation = async () => {
@@ -125,6 +131,19 @@ const RegulationmManagement = () => {
         setRegulationList(surcharge_list);
     }
 
+    const fetchManagerPermission = async () => {
+        let { data: { fetchAccountInfo } } = await fetch_account();
+        if (fetchAccountInfo && fetchAccountInfo.data) {
+            if (fetchAccountInfo.data.group === 'ADMIN') {
+                setManagerPermission(true);
+            }
+        }
+    }
+
+    React.useEffect(() => {
+        fetchManagerPermission();
+    }, []);
+
     React.useEffect(() => {
         setEditAllowance(false);
     }, [editRegulation?.id]);
@@ -135,7 +154,7 @@ const RegulationmManagement = () => {
 
     return (
         <>
-            <div className='service-management-container'>
+            <div className='regulation-management-container'>
                 <div className='header py-2 ps-5 pe-3 d-flex justify-content-between align-items-center'>
                     <span className='title'>Quản Lý Quy Định</span>
                     <span className='icon' onClick={() => history.push('/')}><TfiClose className='exit-icon' /></span>
@@ -170,34 +189,36 @@ const RegulationmManagement = () => {
                                     />
                                 </div>
                             </div>
-                            <div className='form-group col-12 mt-2 px-4'>
+                            <div className='description form-group col-12 mt-2 px-4'>
                                 <label className='form-label'>Mô tả:</label>
                                 <textarea type='text' className='form-control' disabled={!editAllowance} value={editRegulation?.description ? editRegulation.description : ''}
                                     onChange={(event) => handleEditRegulation('description', event.target.value)}
                                 />
                             </div>
                         </fieldset>
-                        <fieldset className='border rounded-2 p-2'>
-                            <legend className='reset legend-text'>Chức năng</legend>
-                            <div className='row mb-3 px-4'>
-                                <div className='form-group col-6'>
-                                    <button className='btn btn-warning col-12' disabled={_.isEmpty(editRegulation) ? true : false}
-                                        onClick={handleUpdateRegulation}
-                                    >
-                                        {editAllowance === false ? <span>Chỉnh sửa</span> : <span>Lưu chỉnh sửa</span>}
-                                    </button>
-                                </div>
+                        {managerPermission &&
+                            <fieldset className='border rounded-2 p-2'>
+                                <legend className='reset legend-text'>Chức năng</legend>
+                                <div className='row mb-3 px-4'>
+                                    <div className='form-group col-6'>
+                                        <button className='btn btn-warning col-12' disabled={_.isEmpty(editRegulation) ? true : false}
+                                            onClick={handleUpdateRegulation}
+                                        >
+                                            {editAllowance === false ? <span>Chỉnh sửa</span> : <span>Lưu chỉnh sửa</span>}
+                                        </button>
+                                    </div>
 
-                                <div className='form-group col-6'>
-                                    <button className='btn btn-outline-danger col-12' disabled={_.isEmpty(editRegulation) ? true : false} onClick={() => setShowDeleteModal(true)}>Xóa quy định</button>
+                                    <div className='form-group col-6'>
+                                        <button className='btn btn-outline-danger col-12' disabled={_.isEmpty(editRegulation) ? true : false} onClick={() => setShowDeleteModal(true)}>Xóa quy định</button>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className='row mb-3 px-4'>
-                                <div className='form-group col-6'>
-                                    <button className='btn btn-success col-12' onClick={() => setShowAddNewModal(true)}>Thêm mới quy định</button>
+                                <div className='row mb-3 px-4'>
+                                    <div className='form-group col-6'>
+                                        <button className='btn btn-success col-12' onClick={() => setShowAddNewModal(true)}>Thêm mới quy định</button>
+                                    </div>
                                 </div>
-                            </div>
-                        </fieldset>
+                            </fieldset>
+                        }
                     </div>
                     <fieldset className='right-content border rounded-2 p-2' onScroll={(event) => { event.preventDefault() }}>
                         <legend className='reset legend-text'>Danh sách các quy định</legend>
@@ -246,4 +267,4 @@ const RegulationmManagement = () => {
     )
 }
 
-export default RegulationmManagement;
+export default RegulationManagement;

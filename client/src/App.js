@@ -68,9 +68,7 @@ function App() {
               <ServicePayment />
             </Route>
             <Route path="/regulation-management">
-              <ManagerRoute>
-                <RegulationManagement />
-              </ManagerRoute>
+              <RegulationManagement />
             </Route>
             <Route path="*">
               <PageNotFound />

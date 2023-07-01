@@ -21,6 +21,7 @@ const RoomManagement = () => {
     const [showRoomCategory, setShowRoomCategory] = React.useState(false);
     const [showAddModal, setShowAddModal] = React.useState(false);
     const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+
     const [managerPermission, setManagerPermission] = React.useState(false);
 
     const [hotelRooms, setHotelRooms] = useImmer([]);
@@ -31,19 +32,27 @@ const RoomManagement = () => {
     const [nameSearch, setNameSearch] = React.useState('');
     const [categorySearch, setCategorySearch] = React.useState('');
 
-    const [getRoomList, { refetch }] = useLazyQuery(GET_ALL_HOTEL_ROOMS);
-    const [getSearchedRoomByName] = useLazyQuery(GET_SEARCHED_ROOM_BY_NAME);
-    const [getSearchedRoomByCategory] = useLazyQuery(GET_SEARCHED_ROOM_BY_CATEGORY);
+    const [getRoomList] = useLazyQuery(GET_ALL_HOTEL_ROOMS, {
+        fetchPolicy: "no-cache"
+    });
 
-    const [updateRoom, { data: updateMsg }] = useMutation(UPDATE_ROOM, {
+    const [getSearchedRoomByName] = useLazyQuery(GET_SEARCHED_ROOM_BY_NAME,{
+        fetchPolicy: "no-cache"
+    });
+
+    const [getSearchedRoomByCategory] = useLazyQuery(GET_SEARCHED_ROOM_BY_CATEGORY,{
+        fetchPolicy: "no-cache"
+    });
+
+    const [updateRoom] = useMutation(UPDATE_ROOM, {
         onCompleted: async () => {
-            await updateRoomListAfterMutation();
+            await fetchRoomList();
         }
     });
 
-    const [deleteRoom, { data: deleteMsg }] = useMutation(DELETE_ROOM, {
+    const [deleteRoom] = useMutation(DELETE_ROOM, {
         onCompleted: async () => {
-            await updateRoomListAfterMutation();
+            await fetchRoomList();
         }
     });
 
@@ -81,17 +90,6 @@ const RoomManagement = () => {
             setHotelRooms(room_search_by_category);
         }
 
-    }
-
-    const updateRoomListAfterMutation = async () => {
-        let { data: hotel_rooms_management } = await refetch();
-        let _hotelRooms = hotel_rooms_management?.hotel_rooms.map(item => {
-            return {
-                ...item, isSelected: false
-            }
-        });
-        setHotelRooms(_hotelRooms);
-        setRoomCategories(hotel_rooms_management?.hotel_room_categories);
     }
 
     const handleEditRoom = (attribute, value) => {
@@ -252,7 +250,7 @@ const RoomManagement = () => {
                             </div>
                         </fieldset>
                         {managerPermission &&
-                            <fieldset className='border rounded-2 p-2'>
+                            <fieldset className='function-box border rounded-2 p-2'>
                                 <legend className='reset legend-text'>Chức năng</legend>
                                 <div className='row mb-3 px-4'>
                                     <div className='form-group col-6'>
@@ -314,13 +312,13 @@ const RoomManagement = () => {
             <RoomCategory
                 show={showRoomCategory}
                 setShow={setShowRoomCategory}
-                updateRoomList={updateRoomListAfterMutation}
+                updateRoomList={fetchRoomList}
             />
             <RoomAddModal
                 show={showAddModal}
                 setShow={setShowAddModal}
                 roomCategories={roomCategories}
-                updateRoomList={updateRoomListAfterMutation}
+                updateRoomList={fetchRoomList}
             />
             <DeleteModal
                 show={showDeleteModal}

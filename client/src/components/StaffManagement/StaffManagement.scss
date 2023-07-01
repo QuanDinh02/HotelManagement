@@ -33,6 +33,7 @@ $legend-text-size : 1.125rem;
 
     .main {
         flex-grow: 1;
+        height   : calc(100vh - 64px);
 
         .border {
             border-color: $main-color !important;
@@ -85,13 +86,15 @@ $legend-text-size : 1.125rem;
                 }
             }
 
-            .bottom-left {}
+            .bottom-left {
+                height: 100%;
+            }
 
         }
 
         .right-content {
             width     : 60%;
-            max-height: 39.375rem;
+            height    : 100%;
             overflow-y: auto;
 
             table {

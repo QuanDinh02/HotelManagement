@@ -6,7 +6,7 @@ import { FaUserTie } from 'react-icons/fa';
 import React from 'react';
 import AccessManagement from '../Modal/AccessManagement/AccessManagement';
 import { GET_ALL_STAFFS, GET_SEARCHED_STAFF } from '../Query/StaffQuery';
-import { useQuery, useLazyQuery, useMutation } from '@apollo/client';
+import { useLazyQuery, useMutation } from '@apollo/client';
 import { UPDATE_STAFF, DELETE_STAFF } from '../Mutation/StaffMutation';
 import { useImmer } from "use-immer";
 import _ from 'lodash';
@@ -27,20 +27,24 @@ const StaffManagement = () => {
     const [search, setSearch] = React.useState('');
     const [staffCategories, setStaffCategories] = React.useState([]);
 
-    const { data: staffData } = useQuery(GET_ALL_STAFFS);
-
-    const [getSearchedStaff] = useLazyQuery(GET_SEARCHED_STAFF);
-
-    const [updateStaff, { data: updateMsg }] = useMutation(UPDATE_STAFF, {
-        refetchQueries: [
-            { query: GET_ALL_STAFFS }
-        ],
+    const [getStaffList] = useLazyQuery(GET_ALL_STAFFS, {
+        fetchPolicy: "no-cache"
     });
 
-    const [deleteStaff, { data: deleteMsg }] = useMutation(DELETE_STAFF, {
-        refetchQueries: [
-            { query: GET_ALL_STAFFS }
-        ],
+    const [getSearchedStaff] = useLazyQuery(GET_SEARCHED_STAFF, {
+        fetchPolicy: "no-cache"
+    });
+
+    const [updateStaff] = useMutation(UPDATE_STAFF, {
+        onCompleted: async () => {
+            await fetchStaffList();
+        }
+    });
+
+    const [deleteStaff] = useMutation(DELETE_STAFF, {
+        onCompleted: async () => {
+            await fetchStaffList();
+        }
     });
 
     const handleStaffSearch = async () => {
@@ -99,8 +103,6 @@ const StaffManagement = () => {
             let _editStaff = _.cloneDeep(editStaff);
             delete _editStaff.staff_account_name;
 
-            console.log(_editStaff);
-
             let result = await updateStaff({
                 variables: {
                     input: {
@@ -133,7 +135,8 @@ const StaffManagement = () => {
         setEditAllowance(false);
     }, [editStaff?.id]);
 
-    React.useEffect(() => {
+    const fetchStaffList = async () => {
+        let { data: staffData } = await getStaffList();
         if (staffData && staffData.staffs) {
             let _staffList = staffData.staffs.map(item => {
                 return {
@@ -143,7 +146,11 @@ const StaffManagement = () => {
             setStaffList(_staffList);
             setStaffCategories(staffData.staff_categories);
         }
-    }, [staffData]);
+    }
+
+    React.useState(() => {
+        fetchStaffList();
+    }, []);
 
     return (
         <>
@@ -200,19 +207,19 @@ const StaffManagement = () => {
                             </div>
                             <fieldset className='right border rounded-2 pb-3'>
                                 <legend className='reset legend-text'>Thông tin nhân viên</legend>
-                                <div className='form-group col-12 px-4 mt-2'>
+                                <div className='form-group col-12 px-4 mt-1'>
                                     <label className='form-label'>Tên:</label>
                                     <input type='text' className='form-control' disabled={!editAllowance} value={editStaff?.name ? editStaff.name : ''}
                                         onChange={(event) => handleEditStaff('name', event.target.value)}
                                     />
                                 </div>
-                                <div className='form-group col-12 px-4 mt-2'>
+                                <div className='form-group col-12 px-4 mt-1'>
                                     <label className='form-label'>Số CCCD/ CMND:</label>
                                     <input type='text' className='form-control' disabled={!editAllowance} value={editStaff?.citizen_id ? editStaff.citizen_id : ''}
                                         onChange={(event) => handleEditStaff('citizen_id', event.target.value)}
                                     />
                                 </div>
-                                <div className='form-group col-12 px-4 mt-2'>
+                                <div className='form-group col-12 px-4 mt-1'>
                                     <label className='form-label'>Giới tính:</label>
                                     <select className="form-select" disabled={!editAllowance} value={editStaff?.gender ? editStaff.gender : ''}
                                         onChange={(event) => handleEditStaff('gender', event.target.value)}
@@ -222,19 +229,19 @@ const StaffManagement = () => {
                                         <option value="Khác">Khác</option>
                                     </select>
                                 </div>
-                                <div className='form-group col-12 px-4 mt-2'>
+                                <div className='form-group col-12 px-4 mt-1'>
                                     <label className='form-label'>Ngày sinh:</label>
                                     <input type='text' className='form-control' disabled={!editAllowance} value={editStaff?.dob ? editStaff.dob : ''}
                                         onChange={(event) => handleEditStaff('dob', event.target.value)}
                                     />
                                 </div>
-                                <div className='form-group col-12 px-4 mt-2'>
+                                <div className='form-group col-12 px-4 mt-1'>
                                     <label className='form-label'>Số điện thoại:</label>
                                     <input type='text' className='form-control' disabled={!editAllowance} value={editStaff?.phone ? editStaff.phone : ''}
                                         onChange={(event) => handleEditStaff('phone', event.target.value)}
                                     />
                                 </div>
-                                <div className='form-group col-12 px-4 mt-2'>
+                                <div className='form-group col-12 px-4 mt-1'>
                                     <label className='form-label'>Địa chỉ:</label>
                                     <input type='text' className='form-control' disabled={!editAllowance} value={editStaff?.address ? editStaff.address : ''}
                                         onChange={(event) => handleEditStaff('address', event.target.value)}
@@ -314,6 +321,7 @@ const StaffManagement = () => {
                 show={showAddNewModal}
                 setShow={setShowAddNewModal}
                 staffCategories={staffCategories}
+                fetchStaffList={fetchStaffList}
             />
         </>
 

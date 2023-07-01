@@ -19,7 +19,11 @@ const RoomAddModal = (props) => {
         }
     });
 
-    const [createNewRoom] = useMutation(CREATE_NEW_ROOM);
+    const [createNewRoom] = useMutation(CREATE_NEW_ROOM, {
+        onCompleted: async () => {
+            await updateRoomList();
+        }
+    });
 
     const handleOnChange = (attribute, value) => {
         if (attribute === 'room_category') {
@@ -50,7 +54,7 @@ const RoomAddModal = (props) => {
         if (newRoom.room_category.id === "0") {
             return;
         }
-        let result = await createNewRoom({
+        await createNewRoom({
 
             variables: {
                 input: {
@@ -60,7 +64,6 @@ const RoomAddModal = (props) => {
             }
         });
 
-        updateRoomList();
         handleCloseModal();
     }
 

@@ -7,7 +7,7 @@ import CustomerHistory from '../Modal/CustomerHistory/CustomerHistory';
 import { GET_ALL_CUSTOMERS, GET_CUSTOMER_BY_NAME_PHONE } from '../Query/CustomerQuery';
 import { FETCH_ACCOUNT } from '../Query/Login';
 import { UPDATE_CUSTOMER, DELETE_CUSTOMER } from '../Mutation/ClientMutation';
-import { useQuery, useLazyQuery, useMutation } from '@apollo/client';
+import { useLazyQuery, useMutation } from '@apollo/client';
 import { useImmer } from "use-immer";
 import _ from 'lodash';
 import DeleteModal from '../Modal/CustomerMutation/DeleteModal';
@@ -26,17 +26,24 @@ const CustomerManagement = () => {
     const [search, setSearch] = React.useState('');
     const [showDeleteModal, setShowDeleteModal] = React.useState(false);
 
-    const { data: customersData } = useQuery(GET_ALL_CUSTOMERS);
-    const [getCustomerByValue] = useLazyQuery(GET_CUSTOMER_BY_NAME_PHONE);
-    const [updateCustomer, { data: updateMsg }] = useMutation(UPDATE_CUSTOMER, {
-        refetchQueries: [
-            { query: GET_ALL_CUSTOMERS }
-        ],
+    const [getCustomerList] = useLazyQuery(GET_ALL_CUSTOMERS, {
+        fetchPolicy: "no-cache"
     });
-    const [deleteCustomer, { data: deleteMsg }] = useMutation(DELETE_CUSTOMER, {
-        refetchQueries: [
-            { query: GET_ALL_CUSTOMERS }
-        ],
+
+    const [getCustomerByValue] = useLazyQuery(GET_CUSTOMER_BY_NAME_PHONE,{
+        fetchPolicy: "no-cache"
+    });
+
+    const [updateCustomer] = useMutation(UPDATE_CUSTOMER, {
+        onCompleted: async () => {
+            await fetchCustomerList();
+        }
+    });
+
+    const [deleteCustomer] = useMutation(DELETE_CUSTOMER, {
+        onCompleted: async () => {
+            await fetchCustomerList();
+        }
     });
 
     const [fetch_account] = useLazyQuery(FETCH_ACCOUNT, {
@@ -113,7 +120,6 @@ const CustomerManagement = () => {
                     }
                 }
             });
-            console.log(result);
             setEditCustomer({});
             setEditAllowance(false);
         } else {
@@ -141,7 +147,8 @@ const CustomerManagement = () => {
         setEditAllowance(false);
     }, [editCustomer?.id]);
 
-    React.useEffect(() => {
+    const fetchCustomerList = async () => {
+        let { data: customersData } = await getCustomerList();
         if (customersData && customersData.customers) {
             let _customerList = customersData.customers.map(item => {
                 return {
@@ -151,7 +158,11 @@ const CustomerManagement = () => {
             setCustomerList(_customerList);
             setCustomerCategories(customersData.customer_categories);
         }
-    }, [customersData]);
+    }
+
+    React.useState(() => {
+        fetchCustomerList();
+    }, []);
 
     return (
         <>
@@ -250,24 +261,19 @@ const CustomerManagement = () => {
                         <fieldset className='border rounded-2 p-2'>
                             <legend className='reset legend-text'>Chức năng</legend>
                             <div className='row mb-3 px-4'>
-                                <div className='form-group col-6'>
-                                    <button className='btn btn-secondary col-12' onClick={() => setShowCustomerHistory(true)} disabled={_.isEmpty(editCustomer) ? true : false}>Lịch sử Khách hàng</button>
-                                </div>
+                                {managerPermission &&
+                                    <div className='form-group col-6'>
+                                        <button className='btn btn-outline-danger col-12' onClick={() => setShowDeleteModal(true)} disabled={_.isEmpty(editCustomer) ? true : false}>
+                                            Xóa khách hàng
+                                        </button>
+                                    </div>
+                                }
                                 <div className='form-group col-6'>
                                     <button className='btn btn-warning col-12' onClick={handleUpdateCustomer} disabled={_.isEmpty(editCustomer) ? true : false}>
                                         {editAllowance === false ? <span>Chỉnh sửa</span> : <span>Lưu chỉnh sửa</span>}
                                     </button>
                                 </div>
                             </div>
-                            {managerPermission &&
-                                <div className='row mb-3 px-4'>
-                                    <div className='form-group col-6'>
-                                        <button className='btn btn-outline-danger col-12' onClick={() => setShowDeleteModal(true)} disabled={_.isEmpty(editCustomer) ? true : false}>
-                                            Xóa khách hàng
-                                        </button>
-                                    </div>
-                                </div>
-                            }
                         </fieldset>
                     </div>
                     <fieldset className='right-content border rounded-2 p-2' onScroll={(event) => { event.preventDefault() }}>
