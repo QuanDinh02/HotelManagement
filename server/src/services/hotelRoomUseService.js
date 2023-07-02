@@ -5,91 +5,109 @@ const ServicePayment = require('./serviceUsingAndPaymentService.js');
 
 const createNewRoomUse = async (data) => {
 
-    let res = await db.HotelRoomUse.create({
-        room_id: data.room_id,
-        customer_id: data.customer_id,
-        night_stay: data.night_stay,
-        receive_date: data.receive_date,
-        checkOut_date: data.checkOut_date,
-        status: data.status
-    });
+    try {
+        let lastItem = await db.HotelRoomUse.findOne({
+            order: [['id', 'DESC']],
+            raw: true
+        })
 
-    if (res) {
+        let res = await db.HotelRoomUse.create({
+            id: lastItem.id + 1,
+            room_id: data.room_id,
+            customer_id: data.customer_id,
+            night_stay: data.night_stay,
+            receive_date: data.receive_date,
+            checkOut_date: data.checkOut_date,
+            status: data.status
+        });
 
-        let createResult = res.toJSON();
+        if (res) {
 
-        let result = _.cloneDeep(createResult);
+            let createResult = JSON.parse(JSON.stringify(res));
 
-        if (result.status === 'Đã nhận phòng') {
-            const date = new Date();
+            let result = _.cloneDeep(createResult);
 
-            let day = date.getDate();
-            let month = date.getMonth() + 1;
-            let year = date.getFullYear();
+            if (result.status === 'Đã nhận phòng') {
+                const date = new Date();
 
-            await ServicePayment.createRoomUseInvoice({
-                date: `${day}/${month}/${year}`,
-                staff_id: 4,
-                room_use_id: +result.id,
-                total: 0
-            });
+                let day = date.getDate();
+                let month = date.getMonth() + 1;
+                let year = date.getFullYear();
+
+                await ServicePayment.createRoomUseInvoice({
+                    date: `${day}/${month}/${year}`,
+                    staff_id: data.staffId,
+                    room_use_id: +result.id,
+                    total: 0
+                });
+
+                return {
+                    errorCode: 0,
+                    message: 'Book room successfully !'
+                }
+            }
 
             return {
                 errorCode: 0,
                 message: 'Book room successfully !'
             }
         }
-
-        return {
-            errorCode: 0,
-            message: 'Book room successfully !'
+        else {
+            return {
+                errorCode: -2,
+                message: 'Book room failed !'
+            }
         }
-    }
-    else {
+    } catch (error) {
+        console.log(error);
         return {
             errorCode: -2,
-            message: 'Book room failed !'
+            message: 'Error with service !'
         }
     }
 }
 
 const getAllHotelRoomUse = async () => {
+    try {
+        let result = await db.HotelRoomUse.findAll({
+            raw: true,
+            nest: true,
+            include: [
+                {
+                    model: db.HotelRoom, attributes: ['id', 'name'],
+                    raw: true,
+                    nest: true,
+                    include: {
+                        model: db.HotelRoomCategory, attributes: ['name']
+                    }
+                },
+                {
+                    model: db.Customer, attributes: ['id', 'name', 'phone']
+                },
+            ],
+            attributes: ['id', 'night_stay', 'receive_date', 'checkOut_date', 'status'],
+            order: [
+                ['id', 'DESC']
+            ]
+        });
 
-    let result = await db.HotelRoomUse.findAll({
-        raw: true,
-        nest: true,
-        include: [
-            {
-                model: db.HotelRoom, attributes: ['id', 'name'],
-                raw: true,
-                nest: true,
-                include: {
-                    model: db.HotelRoomCategory, attributes: ['name']
-                }
-            },
-            {
-                model: db.Customer, attributes: ['id', 'name', 'phone']
-            },
-        ],
-        attributes: ['id', 'night_stay', 'receive_date', 'checkOut_date', 'status'],
-        order: [
-            ['id', 'DESC']
-        ]
-    });
+        let _result = result.map(item => {
+            let _item = _.cloneDeep(item);
+            _item.customer = _item.Customer;
+            _item.HotelRoom.category = _item.HotelRoom.HotelRoomCategory.name;
+            _item.room = _item.HotelRoom;
 
-    let _result = result.map(item => {
-        let _item = _.cloneDeep(item);
-        _item.customer = _item.Customer;
-        _item.HotelRoom.category = _item.HotelRoom.HotelRoomCategory.name;
-        _item.room = _item.HotelRoom;
+            delete _item.HotelRoom;
+            delete _item.room.HotelRoomCategory;
+            delete _item.Customer;
 
-        delete _item.HotelRoom;
-        delete _item.room.HotelRoomCategory;
-        delete _item.Customer;
-
-        return _item;
-    })
-    return _result;
+            return _item;
+        })
+        return _result;
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
 }
 
 const getHotelRoomsByRoomsCategory = async () => {
@@ -159,115 +177,136 @@ const getHotelRoomUseById = async (room_use_id) => {
 }
 
 const updateHotelRoomUse = async (data) => {
-    let existedRoomUse = await db.HotelRoomUse.findOne({
-        where: {
-            id: +data.id
-        },
-        raw: true
-    })
-
-    if (existedRoomUse) {
-        let { id: room_use_id } = data;
-        delete data.id;
-
-        await db.HotelRoomUse.update(data, {
+    try {
+        let existedRoomUse = await db.HotelRoomUse.findOne({
             where: {
-                id: +room_use_id
+                id: +data.id
+            },
+            raw: true
+        })
+
+        if (existedRoomUse) {
+            let { id: room_use_id } = data;
+            delete data.id;
+
+            await db.HotelRoomUse.update(data, {
+                where: {
+                    id: +room_use_id
+                }
+            });
+            return {
+                errorCode: 0,
+                message: 'Update book room successfully !'
             }
-        });
-        return {
-            errorCode: 0,
-            message: 'Update book room successfully !'
+        } else {
+            return {
+                errorCode: -1,
+                message: 'Book room is not existed !'
+            }
         }
-    } else {
+    } catch (error) {
+        console.log(error);
         return {
-            errorCode: -1,
-            message: 'Book room is not existed !'
+            errorCode: -2,
+            message: 'Error with service !'
         }
     }
 }
 
 const deleteHotelRoomUse = async (room_use_id) => {
-    let existedRoomUse = await db.HotelRoomUse.findOne({
-        where: {
-            id: +room_use_id
-        },
-        raw: true
-    })
-
-    if (existedRoomUse) {
-        await db.HotelRoomUse.update({ status: 'Hủy đặt phòng' }, {
+    try {
+        let existedRoomUse = await db.HotelRoomUse.findOne({
             where: {
                 id: +room_use_id
+            },
+            raw: true
+        })
+
+        if (existedRoomUse) {
+            await db.HotelRoomUse.update({ status: 'Hủy đặt phòng' }, {
+                where: {
+                    id: +room_use_id
+                }
+            });
+            return {
+                errorCode: 0,
+                message: 'Delete book room successfully !'
             }
-        });
-        return {
-            errorCode: 0,
-            message: 'Delete book room successfully !'
+        } else {
+            return {
+                errorCode: -1,
+                message: 'Book room is not existed !'
+            }
         }
-    } else {
+    } catch (error) {
+        console.log(error);
         return {
-            errorCode: -1,
-            message: 'Book room is not existed !'
+            errorCode: -2,
+            message: 'Error with service !'
         }
     }
 }
 
 const getHotelRoomUseSearchByCustomer = async (value) => {
-    if (value) {
-        let result = await db.HotelRoomUse.findAll({
-            raw: true,
-            nest: true,
-            include: [
-                {
-                    model: db.HotelRoom, attributes: ['id', 'name'],
-                    raw: true,
-                    nest: true,
-                    include: {
-                        model: db.HotelRoomCategory, attributes: ['name']
-                    }
-                },
-                {
-                    model: db.Customer, attributes: ['id', 'name', 'phone'],
-                    where: {
-                        [Op.or]: [
-                            {
-                                name: {
-                                    [Op.substring]: `${value}`
+    try {
+        if (value) {
+            let result = await db.HotelRoomUse.findAll({
+                raw: true,
+                nest: true,
+                include: [
+                    {
+                        model: db.HotelRoom, attributes: ['id', 'name'],
+                        raw: true,
+                        nest: true,
+                        include: {
+                            model: db.HotelRoomCategory, attributes: ['name']
+                        }
+                    },
+                    {
+                        model: db.Customer, attributes: ['id', 'name', 'phone'],
+                        where: {
+                            [Op.or]: [
+                                {
+                                    name: {
+                                        [Op.substring]: `${value}`
+                                    }
+                                },
+                                {
+                                    phone: {
+                                        [Op.substring]: `${value}`
+                                    }
                                 }
-                            },
-                            {
-                                phone: {
-                                    [Op.substring]: `${value}`
-                                }
-                            }
-                        ]
-                    }
-                },
-            ],
-            attributes: ['id', 'night_stay', 'receive_date', 'checkOut_date', 'status'],
-            order: [
-                ['id', 'DESC']
-            ]
-        });
+                            ]
+                        }
+                    },
+                ],
+                attributes: ['id', 'night_stay', 'receive_date', 'checkOut_date', 'status'],
+                order: [
+                    ['id', 'DESC']
+                ]
+            });
 
-        let _result = result.map(item => {
-            let _item = _.cloneDeep(item);
-            _item.customer = _item.Customer;
-            _item.HotelRoom.category = _item.HotelRoom.HotelRoomCategory.name;
-            _item.room = _item.HotelRoom;
+            let _result = result.map(item => {
+                let _item = _.cloneDeep(item);
+                _item.customer = _item.Customer;
+                _item.HotelRoom.category = _item.HotelRoom.HotelRoomCategory.name;
+                _item.room = _item.HotelRoom;
 
-            delete _item.HotelRoom;
-            delete _item.room.HotelRoomCategory;
-            delete _item.Customer;
+                delete _item.HotelRoom;
+                delete _item.room.HotelRoomCategory;
+                delete _item.Customer;
 
-            return _item;
-        })
-        return _result;
+                return _item;
+            })
+            return _result;
+        }
+
+        let result = await getAllHotelRoomUse();
+        return result;
+    } catch (error) {
+        console.log(error);
+        return null;
     }
-
-    let result = await getAllHotelRoomUse();
-    return result;
 }
 
 module.exports = {

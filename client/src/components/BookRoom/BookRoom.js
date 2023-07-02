@@ -14,6 +14,7 @@ import { useLazyQuery, useMutation } from '@apollo/client';
 import { useImmer } from "use-immer";
 import _ from 'lodash';
 import { CurrencyFormat } from '../Format/FormatNumber';
+import { useSelector } from 'react-redux';
 
 const ROOM_USE_STATUS = ['Đã nhận phòng', 'Hủy đặt phòng', 'Đã thanh toán'];
 
@@ -29,6 +30,8 @@ const BookRoom = () => {
     const history = useHistory();
     const [showDetailModal, setShowDetailModal] = React.useState(false);
     const [newCustomer, setNewCustomer] = React.useState(true);
+
+    const userAccount = useSelector(state => state.user.account);
 
     const [editBookRoom, setEditBookRoom] = React.useState('');
 
@@ -66,21 +69,22 @@ const BookRoom = () => {
     const [getHotelRoomUseList] = useLazyQuery(GET_ALL_HOTEL_ROOM_USE, {
         fetchPolicy: "no-cache"
     });
-    const [getCustomerInfoByPhone] = useLazyQuery(GET_CUSTOMER_INFO_BY_PHONE);
-    const [getBookRoomSearchByCustomer] = useLazyQuery(GET_HOTEL_ROOM_USE_BY_CUSTOMER);
+
+    const [getCustomerInfoByPhone] = useLazyQuery(GET_CUSTOMER_INFO_BY_PHONE,{
+        fetchPolicy: "no-cache"
+    });
+    
+    const [getBookRoomSearchByCustomer] = useLazyQuery(GET_HOTEL_ROOM_USE_BY_CUSTOMER, {
+        fetchPolicy: "no-cache"
+    });
 
     const [createNewCustomer] = useMutation(CREATE_CUSTOMER);
-    const [bookRoom] = useMutation(BOOK_ROOM);
 
-    const updateHistoryAfterMutation = async () => {
-        let { data: hotel_room_use } = await getHotelRoomUseList();
-        let _hotelRoomUse = hotel_room_use?.hotel_room_use_list.map(item => {
-            return {
-                ...item, isSelected: false
-            }
-        });
-        setHotelRoomUseList(_hotelRoomUse);
-    }
+    const [bookRoom] = useMutation(BOOK_ROOM, {
+        onCompleted: async () => {
+            await fetchHotelRoomUseList();
+        }
+    });
 
     const handleBookRoomSearch = async () => {
         let { data: { book_room_search_by_customer } } = await getBookRoomSearchByCustomer({
@@ -142,11 +146,12 @@ const BookRoom = () => {
                             room_id: +bookRoomInfo.room_id,
                             night_stay: +bookRoomInfo.night_stay,
                             customer_id: +createCustomer.id,
-                            status: book_room_status
+                            status: book_room_status,
+                            staffId: +userAccount.id
                         }
                     }
                 });
-                updateHistoryAfterMutation();
+                fetchHotelRoomUseList();
                 handleRefreshNew();
             }
 
@@ -163,12 +168,13 @@ const BookRoom = () => {
                         receive_date: bookRoomInfo.receive_date,
                         checkOut_date: bookRoomInfo.checkOut_date,
                         customer_id: +oldCustomerInfo.id,
-                        status: book_room_status
+                        status: book_room_status,
+                        staffId: +userAccount.id
                     }
                 }
             });
 
-            updateHistoryAfterMutation();
+            fetchHotelRoomUseList();
             handleRefreshNew();
         }
     }
@@ -349,10 +355,11 @@ const BookRoom = () => {
                                     <>
                                         <div className='row mb-2'>
                                             <div className='form-group col-6'>
-                                                <label className='form-label'>Họ và Tên:</label>
+                                                <label className='form-label'>Họ và Tên: <span className='required'>(*)</span></label>
                                                 <input type='text' className='form-control'
                                                     value={newCustomerInfo.name}
                                                     onChange={(event) => handleNewCustomerInfo('name', event.target.value)}
+                                                    required
                                                 />
                                             </div>
                                             <div className='form-group col-6'>
@@ -381,7 +388,7 @@ const BookRoom = () => {
                                         </div>
                                         <div className='row mb-2'>
                                             <div className='form-group col-6'>
-                                                <label className='form-label'>Loại khách hàng:</label>
+                                                <label className='form-label'>Loại khách hàng: <span className='required'>(*)</span></label>
                                                 <select className="form-select"
                                                     onChange={(event) => handleNewCustomerInfo('customer_category', event.target.value)}
                                                 >
@@ -409,10 +416,11 @@ const BookRoom = () => {
                                         </div>
                                         <div className='row mb-2'>
                                             <div className='form-group col-6'>
-                                                <label className='form-label'>Số điện thoại:</label>
+                                                <label className='form-label'>Số điện thoại: <span className='required'>(*)</span></label>
                                                 <input type='text' className='form-control'
                                                     value={newCustomerInfo.phone}
                                                     onChange={(event) => handleNewCustomerInfo('phone', event.target.value)}
+                                                    required
                                                 />
                                             </div>
                                             <div className='form-group col-6'>
@@ -436,7 +444,7 @@ const BookRoom = () => {
                                                 <input type='text' className='form-control' value={oldCustomerInfo.name} disabled />
                                             </div>
                                             <div className='form-group col-6'>
-                                                <label className='form-label'>Số điện thoại:</label>
+                                                <label className='form-label'>Số điện thoại: <span className='required'>(*)</span></label>
                                                 <input type='text' className='form-control' value={oldCustomerInfo.phone}
                                                     onChange={(event) => {
                                                         setOldCustomerInfo(draft => {
@@ -510,7 +518,7 @@ const BookRoom = () => {
                 setShow={setShowDetailModal}
                 data={editBookRoom}
                 hotelRoomsByCategories={hotelRoomsByCategories}
-                fetchRoomUseList={updateHistoryAfterMutation}
+                fetchRoomUseList={fetchHotelRoomUseList}
             />
         </>
 

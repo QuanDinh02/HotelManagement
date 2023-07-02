@@ -26,8 +26,11 @@ const ServiceAddNew = (props) => {
         total: ''
     });
 
-    const [getServiceList] = useLazyQuery(GET_HOTEL_SERVICES);
-    const [createRoomService, { data: updateMsg }] = useMutation(CREATE_ROOM_SERVICE, {
+    const [getServiceList] = useLazyQuery(GET_HOTEL_SERVICES, {
+        fetchPolicy: "no-cache"
+    });
+
+    const [createRoomService] = useMutation(CREATE_ROOM_SERVICE, {
         onCompleted: async () => {
             await updateInvoice(room_use_id, 'Đã nhận phòng', 'refetch');
         }

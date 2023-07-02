@@ -5,6 +5,7 @@ module.exports = {
     async up(queryInterface, Sequelize) {
         return queryInterface.bulkInsert('Customer', [
             {
+                id: 1,
                 name: 'John Wick',
                 citizen_id: '123456',
                 phone: '012345646',
@@ -15,6 +16,7 @@ module.exports = {
                 customer_category: 1,
             },
             {
+                id: 2,
                 name: 'Bobb Elisa',
                 citizen_id: '123456',
                 phone: '012345888',
@@ -25,6 +27,7 @@ module.exports = {
                 customer_category: 1,
             },
             {
+                id: 3,
                 name: 'Nguyễn Văn A',
                 citizen_id: '123456',
                 phone: '012385646',
@@ -35,6 +38,7 @@ module.exports = {
                 customer_category: 1,
             },
             {
+                id: 4,
                 name: 'Ema Phạm',
                 citizen_id: '123456',
                 phone: '012225646',
@@ -45,6 +49,7 @@ module.exports = {
                 customer_category: 1,
             },
             {
+                id: 5,
                 name: 'Steve Helen',
                 citizen_id: '123456',
                 phone: '082335646',

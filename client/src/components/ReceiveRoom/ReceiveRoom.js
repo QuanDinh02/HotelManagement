@@ -26,7 +26,6 @@ const ReceiveRoom = () => {
 
     const [hotelRoomUseList, setHotelRoomUseList] = useImmer([]);
     const [editAllowance, setEditAllowance] = React.useState(false);
-    const [selectRoomCategory, setSelectRoomCategory] = React.useState({});
     const [hotelRoomsByCategories, setHotelRoomsByCategories] = React.useState([]);
     const [roomsByCategory, setRoomsByCategory] = React.useState([]);
     const [bookRoomInfo, setBookRoomInfo] = useImmer({
@@ -49,28 +48,25 @@ const ReceiveRoom = () => {
     const [customerInfo, setCustomerInfo] = React.useState({});
     const [search, setSearch] = React.useState('');
 
-    const [getReceiveRoomList, { refetch }] = useLazyQuery(GET_RECEIVE_ROOM_LIST);
-    const [getReceiveRoomSearchByCustomer] = useLazyQuery(GET_HOTEL_RECEIVE_ROOM_BY_CUSTOMER);
-    const [updateReceiveRoom] = useMutation(UPDATE_RECEIVE_ROOM);
-    const [updateReceiveRoomInfo] = useMutation(UPDATE_RECEIVE_ROOM_INFO);
+    const [getReceiveRoomList] = useLazyQuery(GET_RECEIVE_ROOM_LIST, {
+        fetchPolicy: "no-cache"
+    });
 
-    const updateHistoryAfterMutation = async () => {
-        let { data: hotel_room_use } = await refetch();
+    const [getReceiveRoomSearchByCustomer] = useLazyQuery(GET_HOTEL_RECEIVE_ROOM_BY_CUSTOMER, {
+        fetchPolicy: "no-cache"
+    });
 
-        let _receive_rooms = hotel_room_use?.received_hotel_room_use_list.map(item => {
-            let _item = _.cloneDeep(item);
-            delete _item.__typename;
-            delete _item.room.__typename;
-            delete _item.room.category.__typename;
-            delete _item.customer.__typename;
-
-            return {
-                ..._item, isSelected: false
-            }
-        });
-
-        setHotelRoomUseList(_receive_rooms);
-    }
+    const [updateReceiveRoom] = useMutation(UPDATE_RECEIVE_ROOM, {
+        onCompleted: async () => {
+            await fetchHotelRoomUseList();
+        }
+    });
+    
+    const [updateReceiveRoomInfo] = useMutation(UPDATE_RECEIVE_ROOM_INFO, {
+        onCompleted: async () => {
+            await fetchHotelRoomUseList();
+        }
+    });
 
     const handleOnChange = (attribute, value) => {
         if (attribute === 'room_id') {
@@ -137,7 +133,6 @@ const ReceiveRoom = () => {
             }
         });
         setCustomerInfo({});
-        updateHistoryAfterMutation();
         setEditAllowance(false);
     }
 
@@ -173,7 +168,6 @@ const ReceiveRoom = () => {
             });
             setCustomerInfo({});
             setRoomsByCategory([]);
-            updateHistoryAfterMutation();
             setEditAllowance(false);
         } else {
             setEditAllowance(true);
@@ -367,15 +361,10 @@ const ReceiveRoom = () => {
                                     </button>
                                 </div>
                             </div>
-                            <div className='row px-4'>
-                                <div className='form-group col-6'>
-                                    <button className='btn btn-primary col-12' disabled={!bookRoomInfo.id ? true : (bookRoomInfo.status === 'Đã nhận phòng' ? false : true)}>Đổi phòng</button>
-                                </div>
-                            </div>
                         </fieldset>
                     </div>
                     <fieldset className='right-content border rounded-2 p-2' onScroll={(event) => { event.preventDefault() }}>
-                        <legend className='reset legend-text'>Danh sách nhận phòng trong ngày</legend>
+                        <legend className='reset legend-text'>Danh sách nhận phòng</legend>
                         <table className="table table-bordered">
                             <thead>
                                 <tr>

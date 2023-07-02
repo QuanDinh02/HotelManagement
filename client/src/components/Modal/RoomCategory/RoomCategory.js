@@ -24,36 +24,27 @@ const RoomCategory = (props) => {
         description: ''
     });
 
-    const [getRoomCateogryList, { refetch }] = useLazyQuery(GET_ALL_HOTEL_ROOMS_CATEOGRY);
+    const [getRoomCateogryList] = useLazyQuery(GET_ALL_HOTEL_ROOMS_CATEOGRY, {
+        fetchPolicy: "no-cache"
+    });
 
     const [createNewRoomCategory] = useMutation(CREATE_NEW_ROOM_CATEGORY, {
         onCompleted: async () => {
-            await updateListAfterMutation();
+            await fetchRoomCategoryList();
         }
     });
 
-    const [updateRoomCategory, { data: updateMsg }] = useMutation(UPDATE_ROOM_CATEGORY, {
+    const [updateRoomCategory] = useMutation(UPDATE_ROOM_CATEGORY, {
         onCompleted: async () => {
-            await updateListAfterMutation();
+            await fetchRoomCategoryList();
         }
     });
 
-    const [deleteRoomCategory, { data: deleteMsg }] = useMutation(DELETE_ROOM_CATEGORY, {
+    const [deleteRoomCategory] = useMutation(DELETE_ROOM_CATEGORY, {
         onCompleted: async () => {
-            await updateListAfterMutation();
+            await fetchRoomCategoryList();
         }
     });
-
-    const updateListAfterMutation = async () => {
-        let { data: category } = await refetch();
-
-        let _categories = category?.hotel_room_categories.map(item => {
-            return {
-                ...item, isSelected: false
-            }
-        });
-        setCategoryList(_categories);
-    }
 
     const dataValidation = () => {
         if (!editRoomCategory) {

@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
          * The `models/index` file will call this method automatically.
          */
         static associate(models) {
-            Surcharge.belongsToMany(models.HotelRoomUse, { through: 'Surcharge_RoomUse', foreignKey: 'surcharge_id' });
+            Surcharge.hasMany(models.Surcharge_RoomUse, { foreignKey: 'surcharge_id' });
         }
     }
     Surcharge.init({

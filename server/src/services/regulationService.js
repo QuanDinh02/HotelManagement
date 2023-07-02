@@ -6,6 +6,11 @@ const createNewRegulation = async (data) => {
     try {
         let { name: newRegulationName } = data;
 
+        let lastItem =  await db.Surcharge.findOne({
+            order: [ [ 'id', 'DESC' ]],
+            raw: true
+        })
+
         let existedRegulationName = await db.Surcharge.findOne({
             where: {
                 name: {
@@ -21,7 +26,10 @@ const createNewRegulation = async (data) => {
                 message: 'Regulation name is existed !'
             }
         } else {
-            await db.Surcharge.create(data);
+            await db.Surcharge.create({
+                id: lastItem.id + 1,
+                ...data
+            });
 
             return {
                 errorCode: 0,

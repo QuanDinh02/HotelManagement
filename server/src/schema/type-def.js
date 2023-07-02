@@ -402,7 +402,8 @@ const typeDefs = `#graphql
     night_stay: Int!,
     receive_date: String!,
     checkOut_date: String!,
-    status: String!
+    status: String!,
+    staffId: Int!
   }
 
   input BookRoomUpdateInput {

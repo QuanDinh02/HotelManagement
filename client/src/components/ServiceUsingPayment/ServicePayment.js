@@ -41,7 +41,7 @@ const ServicePayment = () => {
 
     const [updatePayment] = useMutation(UPDATE_PAYMENT, {
         onCompleted: async () => {
-            await updateRoomUseListAfterMutation();
+            await fetchHotelRoomUseList();
         }
     });
 
@@ -145,30 +145,6 @@ const ServicePayment = () => {
             return {
                 ..._item, isSelected: false
             }
-        });
-
-        setHotelRoomUseList(_rooms);
-    }
-
-    const updateRoomUseListAfterMutation = async () => {
-        let { data: hotel_room_use } = await getRoomList();
-
-        let _rooms = hotel_room_use?.hotel_room_use_list_payment.map(item => {
-            let _item = _.cloneDeep(item);
-            delete _item.__typename;
-            delete _item.room.__typename;
-            delete _item.room.category.__typename;
-            delete _item.customer.__typename;
-
-            if (_item.id === `${roomInvoice.room_use_id}`) {
-                return {
-                    ..._item, isSelected: true
-                }
-            }
-            return {
-                ..._item, isSelected: false
-            }
-
         });
 
         setHotelRoomUseList(_rooms);

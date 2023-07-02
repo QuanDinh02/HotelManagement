@@ -5,7 +5,6 @@ module.exports = {
         await queryInterface.createTable('HotelRoomUse', {
             id: {
                 allowNull: false,
-                autoIncrement: true,
                 primaryKey: true,
                 type: Sequelize.INTEGER
             },

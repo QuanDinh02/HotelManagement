@@ -34,13 +34,20 @@ $legend-text-size: 1.125rem;
 
     .main {
         flex-grow: 1;
+        height   : calc(100vh - 64px);
+
+        .required {
+            color: red;
+        }
 
         .border {
             border-color: $main-color !important;
         }
 
         .left-content {
-            width: 40%;
+            width     : 40%;
+            height    : 100%;
+            overflow-y: scroll;
 
             input:disabled,
             select:disabled {
@@ -103,7 +110,7 @@ $legend-text-size: 1.125rem;
 
         .right-content {
             width     : 60%;
-            max-height: 65.625rem;
+            height    : 100%;
             overflow-y: auto;
 
             table {

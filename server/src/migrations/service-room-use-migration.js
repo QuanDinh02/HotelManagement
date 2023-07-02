@@ -5,7 +5,6 @@ module.exports = {
         await queryInterface.createTable('Service_RoomUse', {
             id: {
                 allowNull: false,
-                autoIncrement: true,
                 primaryKey: true,
                 type: Sequelize.INTEGER
             },

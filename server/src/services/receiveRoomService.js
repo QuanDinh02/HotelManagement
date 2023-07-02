@@ -110,41 +110,49 @@ const getHotelRoomUseSearchByCustomer = async (value) => {
 }
 
 const updateHotelRoomUse = async (room_use_id, staff_id) => {
-    let existedRoomUse = await db.HotelRoomUse.findOne({
-        where: {
-            id: +room_use_id
-        },
-        raw: true
-    })
-
-    if (existedRoomUse) {
-
-        await db.HotelRoomUse.update({ status: 'Đã nhận phòng' }, {
+    try {
+        let existedRoomUse = await db.HotelRoomUse.findOne({
             where: {
                 id: +room_use_id
+            },
+            raw: true
+        })
+
+        if (existedRoomUse) {
+
+            await db.HotelRoomUse.update({ status: 'Đã nhận phòng' }, {
+                where: {
+                    id: +room_use_id
+                }
+            });
+
+            const date = new Date();
+
+            let day = date.getDate();
+            let month = date.getMonth() + 1;
+            let year = date.getFullYear();
+
+            await ServicePayment.createRoomUseInvoice({
+                date: `${day}/${month}/${year}`,
+                staff_id: +staff_id,
+                room_use_id: +room_use_id,
+                total: 0
+            });
+
+            return {
+                errorCode: 0,
+                message: 'Receive room successfully !'
             }
-        });
-
-        const date = new Date();
-
-        let day = date.getDate();
-        let month = date.getMonth() + 1;
-        let year = date.getFullYear();
-
-        await ServicePayment.createRoomUseInvoice({
-            date: `${day}/${month}/${year}`,
-            staff_id: +staff_id,
-            room_use_id: +room_use_id,
-            total: 0
-        });
-
-        return {
-            errorCode: 0,
-            message: 'Receive room successfully !'
+        } else {
+            return {
+                errorCode: -1,
+                message: 'Receive room is not existed !'
+            }
         }
-    } else {
+    } catch (error) {
+        console.log(error);
         return {
-            errorCode: -1,
+            errorCode: -2,
             message: 'Receive room is not existed !'
         }
     }

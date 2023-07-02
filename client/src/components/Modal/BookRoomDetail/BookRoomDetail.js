@@ -16,7 +16,9 @@ const BookRoomDetail = (props) => {
     const [roomsByCategory, setRoomsByCategory] = React.useState([]);
     const [showDeleteModal, setShowDeleteModal] = React.useState(false);
 
-    const [getRoomUseById, { refetch }] = useLazyQuery(GET_HOTEL_ROOM_USE_BY_ID);
+    const [getRoomUseById] = useLazyQuery(GET_HOTEL_ROOM_USE_BY_ID, {
+        fetchPolicy: "no-cache"
+    });
 
     const [updateBookRoom] = useMutation(UPDATE_BOOK_ROOM);
     const [deleteBookRoom] = useMutation(DELETE_BOOK_ROOM);
@@ -64,7 +66,7 @@ const BookRoomDetail = (props) => {
                     }
                 }
             });
-            let { data: { hotel_room_use_by_id } } = await refetch({
+            let { data: { hotel_room_use_by_id } } = await getRoomUseById({
                 variables: {
                     hotelRoomUseById: +data
                 }

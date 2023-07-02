@@ -33,6 +33,7 @@ $legend-text-size : 1.125rem;
 
     .main {
         flex-grow: 1;
+        height   : calc(100vh - 64px);
 
         .border {
             border-color: $main-color !important;
@@ -40,7 +41,9 @@ $legend-text-size : 1.125rem;
 
         .left-content {
             width: 40%;
-
+            height: auto;
+            overflow-y: scroll;
+            
             input:disabled,
             select:disabled {
                 cursor: not-allowed;
@@ -85,7 +88,7 @@ $legend-text-size : 1.125rem;
 
         .right-content {
             width     : 60%;
-            max-height: 39.375rem;
+            height    : 100%;
             overflow-y: auto;
 
             table {

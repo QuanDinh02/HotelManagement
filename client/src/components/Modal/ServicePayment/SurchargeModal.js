@@ -14,8 +14,11 @@ const SurchargeModal = (props) => {
     const [surchargeList, setSurchargeList] = React.useState([]);
     const [newSurcharge, setNewSurcharge] = React.useState({});
 
-    const [getSurchargeList, { refetch }] = useLazyQuery(GET_ALL_SURCHARGES);
-    const [createRoomSurcharge, { data: updateMsg }] = useMutation(CREATE_ROOM_SURCHARGE, {
+    const [getSurchargeList] = useLazyQuery(GET_ALL_SURCHARGES , {
+        fetchPolicy: "no-cache"
+    });
+
+    const [createRoomSurcharge] = useMutation(CREATE_ROOM_SURCHARGE, {
         onCompleted: async () => {
             await updateInvoice(room_use_id, 'Đã nhận phòng', 'refetch');
         }
@@ -43,7 +46,6 @@ const SurchargeModal = (props) => {
             setNewSurcharge({});
         } else {
             let _surcharge = surchargeList.filter(item => item.id === new_surcharge)[0];
-            console.log(_surcharge);
             setNewSurcharge(_surcharge);
         }
     }

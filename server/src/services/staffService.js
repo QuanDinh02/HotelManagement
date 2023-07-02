@@ -48,6 +48,16 @@ const createStaff = async (data) => {
     try {
         let { staffInfo, staffAccount } = data;
 
+        let lastItem = await db.Staff.findOne({
+            order: [['id', 'DESC']],
+            raw: true
+        })
+
+        let lastStaffAccount = await db.StaffAccount.findOne({
+            order: [['id', 'DESC']],
+            raw: true
+        })
+
         let existedStaff = await db.Staff.findOne({
             where: {
                 [Op.or]: [
@@ -73,11 +83,15 @@ const createStaff = async (data) => {
             }
         } else {
 
-            let res = await db.Staff.create(staffInfo);
+            let res = await db.Staff.create({
+                id: lastItem.id + 1,
+                ...staffInfo
+            });
             let item = JSON.parse(JSON.stringify(res.get({ plain: true })));
             let staffId = item.id;
 
             let buildData = {
+                id: lastStaffAccount.id + 1,
                 account_name: staffAccount.account_name,
                 password: staffAccount.password,
                 staff_id: +staffId

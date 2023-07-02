@@ -37,17 +37,19 @@ const ServiceManagement = () => {
     const [getSearchedServiceByName] = useLazyQuery(GET_SEARCHED_SERVICE_BY_NAME);
     const [getSearchedServiceByCategory] = useLazyQuery(GET_SEARCHED_SERVICE_BY_CATEGORY);
 
-    const [getServiceList, { refetch }] = useLazyQuery(GET_ALL_HOTEL_SERVICES);
+    const [getServiceList] = useLazyQuery(GET_ALL_HOTEL_SERVICES, {
+        fetchPolicy: "no-cache"
+    });
 
-    const [updateService, { data: updateMsg }] = useMutation(UPDATE_SERVICE, {
+    const [updateService] = useMutation(UPDATE_SERVICE, {
         onCompleted: async () => {
-            await updateServiceListAfterMutation();
+            await fetchServiceList();
         }
     });
 
-    const [deleteService, { data: deleteMsg }] = useMutation(DELETE_SERVICE, {
+    const [deleteService] = useMutation(DELETE_SERVICE, {
         onCompleted: async () => {
-            await updateServiceListAfterMutation();
+            await fetchServiceList();
         }
     });
 
@@ -62,17 +64,6 @@ const ServiceManagement = () => {
                 setManagerPermission(true);
             }
         }
-    }
-
-    const updateServiceListAfterMutation = async () => {
-        let { data: hotel_services_management } = await refetch();
-        let _hotelServices = hotel_services_management?.hotel_services.map(item => {
-            return {
-                ...item, isSelected: false
-            }
-        });
-        setHotelServices(_hotelServices);
-        setServiceCategories(hotel_services_management?.hotel_service_categories);
     }
 
     const handleSearchService = async (type) => {
@@ -309,7 +300,7 @@ const ServiceManagement = () => {
             <ServiceCategory
                 show={showServiceCategory}
                 setShow={setShowServiceCategory}
-                updateServiceList={updateServiceListAfterMutation}
+                updateServiceList={fetchServiceList}
             />
             <DeleteModal
                 show={showDeleteModal}
@@ -320,7 +311,7 @@ const ServiceManagement = () => {
                 show={showServiceModal}
                 setShow={setShowServiceModal}
                 serviceCategories={serviceCategories}
-                updateServiceList={updateServiceListAfterMutation}
+                updateServiceList={fetchServiceList}
             />
         </>
 

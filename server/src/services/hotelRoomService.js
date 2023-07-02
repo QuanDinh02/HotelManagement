@@ -51,6 +51,11 @@ const createNewRoom = async (data) => {
     try {
         let { name: room_name } = data;
 
+        let lastItem =  await db.HotelRoom.findOne({
+            order: [ [ 'id', 'DESC' ]],
+            raw: true
+        })
+
         let existedRoomName = await db.HotelRoom.findOne({
             where: {
                 name: {
@@ -68,6 +73,7 @@ const createNewRoom = async (data) => {
         } else {
 
             await db.HotelRoom.create({
+                id: lastItem.id + 1,
                 name: data.name,
                 status: 'Trống',
                 room_category: +data.room_category
@@ -161,131 +167,157 @@ const deleteRoom = async (room_id) => {
 }
 
 const createNewRoomCategory = async (data) => {
-    let existedRoomCategoryName = await db.HotelRoomCategory.findOne({
-        where: {
-            name: {
-                [Op.like]: `${data.name}`
-            }
-        },
-        raw: true
-    })
+    try {
+        let lastItem =  await db.HotelRoomCategory.findOne({
+            order: [ [ 'id', 'DESC' ]],
+            raw: true
+        })
 
-    if (existedRoomCategoryName) {
+        let existedRoomCategoryName = await db.HotelRoomCategory.findOne({
+            where: {
+                name: {
+                    [Op.like]: `${data.name}`
+                }
+            },
+            raw: true
+        })
+
+        if (existedRoomCategoryName) {
+            return {
+                errorCode: -1,
+                message: 'Room category name is existed !'
+            }
+        } else {
+
+            let res = await db.HotelRoomCategory.create({
+                id: lastItem.id + 1,
+                name: data.name,
+                price: +data.price,
+                people_maximum: +data.people_maximum,
+                description: data.description
+            });
+
+            if (res) {
+                return {
+                    errorCode: 0,
+                    message: 'Create room category successfully !'
+                }
+            }
+            else {
+                return {
+                    errorCode: -2,
+                    message: 'Create room category failed !'
+                }
+            }
+
+        }
+    } catch (error) {
+        console.log(error);
         return {
-            errorCode: -1,
-            message: 'Room category name is existed !'
+            errorCode: -2,
+            message: 'Error with service !'
         }
-    } else {
-
-        let res = await db.HotelRoomCategory.create({
-            name: data.name,
-            price: +data.price,
-            people_maximum: +data.people_maximum,
-            description: data.description
-        });
-
-        if (res) {
-            return {
-                errorCode: 0,
-                message: 'Create room category successfully !'
-            }
-        }
-        else {
-            return {
-                errorCode: -2,
-                message: 'Create room category failed !'
-            }
-        }
-
     }
 }
 
 const updateRoomCategory = async (data) => {
-
-    let existedCategoryName = await db.HotelRoomCategory.findOne({
-        where: {
-            [Op.and]: [
-                {
-                    [Op.not]: +data.id
-                },
-                {
-                    name: {
-                        [Op.like]: `${data.name}`
-                    }
-                }
-            ]
-        },
-        raw: true
-    })
-
-    if (existedCategoryName) {
-        return {
-            errorCode: -1,
-            message: 'Room category name is existed !'
-        }
-    } else {
-        let existedCategory = await db.HotelRoomCategory.findOne({
+    try {
+        let existedCategoryName = await db.HotelRoomCategory.findOne({
             where: {
-                id: +data.id
+                [Op.and]: [
+                    {
+                        [Op.not]: +data.id
+                    },
+                    {
+                        name: {
+                            [Op.like]: `${data.name}`
+                        }
+                    }
+                ]
             },
             raw: true
-        });
+        })
 
-        if (existedCategory) {
-            let { id: category_id } = data;
-            delete data.id;
+        if (existedCategoryName) {
+            return {
+                errorCode: -1,
+                message: 'Room category name is existed !'
+            }
+        } else {
+            let existedCategory = await db.HotelRoomCategory.findOne({
+                where: {
+                    id: +data.id
+                },
+                raw: true
+            });
 
-            await db.HotelRoomCategory.update(data, {
+            if (existedCategory) {
+                let { id: category_id } = data;
+                delete data.id;
+
+                await db.HotelRoomCategory.update(data, {
+                    where: {
+                        id: +category_id
+                    }
+                });
+                return {
+                    errorCode: 0,
+                    message: 'Update room category successfully !'
+                }
+            } else {
+                return {
+                    errorCode: -1,
+                    message: 'Room category is not existed!'
+                }
+            }
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            errorCode: -2,
+            message: 'Error with service'
+        }
+    }
+}
+
+const deleteRoomCategory = async (category_id) => {
+    try {
+        let existedRoomCategory = await db.HotelRoomCategory.findOne({
+            where: {
+                id: +category_id
+            },
+            raw: true
+        })
+
+        if (existedRoomCategory) {
+            await db.HotelRoom.destroy({
+                where: {
+                    room_category: +category_id
+                }
+            })
+
+            await db.HotelRoomCategory.destroy({
                 where: {
                     id: +category_id
                 }
             });
+
             return {
                 errorCode: 0,
-                message: 'Update room category successfully !'
+                message: 'Delete room category successfully !'
             }
+
         } else {
             return {
                 errorCode: -1,
-                message: 'Room category is not existed!'
+                message: 'Service room is not existed !'
             }
         }
-    }
-
-
-}
-
-const deleteRoomCategory = async (category_id) => {
-
-    let existedRoomCategory = await db.HotelRoomCategory.findOne({
-        where: {
-            id: +category_id
-        },
-        raw: true
-    })
-
-    if (existedRoomCategory) {
-        await db.HotelRoom.destroy({
-            where: {
-                room_category: +category_id
-            }
-        })
-
-        await db.HotelRoomCategory.destroy({
-            where: {
-                id: +category_id
-            }
-        });
-
+    } catch (error) {
+        console.log(error);
         return {
-            errorCode: 0,
-            message: 'Delete room category successfully !'
-        }
-
-    } else {
-        return {
-            errorCode: -1,
-            message: 'Service room is not existed !'
+            errorCode: -2,
+            message: 'Error with service'
         }
     }
 }

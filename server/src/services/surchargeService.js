@@ -1,17 +1,19 @@
 const db = require('../models/index.js');
-const { Op } = require("sequelize");
-const _ = require('lodash');
 
 const getAllSurcharge = async () => {
+    try {
+        let result = await db.Surcharge.findAll({
+            raw: true,
+            order: [
+                ['id', 'DESC']
+            ]
+        });
 
-    let result = await db.Surcharge.findAll({
-        raw: true,
-        order: [
-            ['id', 'DESC']
-        ]
-    });
-
-    return result;
+        return result;
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
 }
 
 module.exports = {

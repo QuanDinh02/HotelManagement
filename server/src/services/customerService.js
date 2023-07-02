@@ -131,27 +131,38 @@ const deleteCustomer = async (customer_id) => {
 }
 
 const getCustomerInfoByPhone = async (phoneNumber) => {
-    if (phoneNumber) {
-        let result = await db.Customer.findOne({
-            raw: true,
-            order: [
-                ['id', 'ASC']
-            ],
-            attribute: ['id', 'name', 'phone'],
-            where: {
-                phone: {
-                    [Op.like]: `${phoneNumber}`
+    try {
+        if (phoneNumber) {
+            let result = await db.Customer.findOne({
+                raw: true,
+                order: [
+                    ['id', 'ASC']
+                ],
+                attribute: ['id', 'name', 'phone'],
+                where: {
+                    phone: {
+                        [Op.like]: `${phoneNumber}`
+                    }
                 }
-            }
-        });
-        return result;
-    } else {
+            });
+            return result;
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.log(error);
         return null;
     }
+    
 }
 
 const createNewCustomer = async (data) => {
     try {
+        let lastItem =  await db.Customer.findOne({
+            order: [ [ 'id', 'DESC' ]],
+            raw: true
+        })
+
         let existedCustomer = await db.Customer.findOne({
             where: {
                 phone: {
@@ -169,7 +180,10 @@ const createNewCustomer = async (data) => {
             }
         } else {
 
-            let res = await db.Customer.create(data);
+            let res = await db.Customer.create({
+                id: lastItem.id + 1,
+                ...data
+            });
 
             if (res) {
                 let result = res.get({ plain: true });
