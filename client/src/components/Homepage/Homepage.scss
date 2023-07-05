@@ -2,7 +2,7 @@ $main-color   : #D57834;
 $light-color-1: #d8874d;
 
 .homepage-container {
-    display           : flex;
+    display : flex;
     position: fixed;
 
     .sidebar {
@@ -11,6 +11,18 @@ $light-color-1: #d8874d;
         background-color: $main-color;
 
         color: white;
+
+        .account_name {
+            padding      : 0.3rem;
+            margin-left  : 0.3rem;
+            margin-right : 0.3rem;
+            margin-bottom: 0.3rem;
+
+            .text {
+                font-size: 0.75rem;
+                color: yellow;
+            }
+        }
 
         .item {
             padding      : 0.3rem;
@@ -75,6 +87,24 @@ $light-color-1: #d8874d;
                     .left,
                     .right {
                         flex-basis: 48%;
+                    }
+
+                    .one-box {
+                        background-color: $light-color-1;
+                        width           : 100%;
+
+                        .image-box {
+                            flex-grow: 1;
+
+                            .image {
+                                width: 32%;
+                            }
+
+                            img {
+                                width : 100%;
+                                height: 100%;
+                            }
+                        }
                     }
 
                     .left,

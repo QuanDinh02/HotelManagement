@@ -1,7 +1,6 @@
 import './Homepage.scss';
-import { AiOutlineQuestionCircle } from 'react-icons/ai';
+import { FaUserAlt } from 'react-icons/fa';
 import { RxExit } from 'react-icons/rx';
-import { RiInformationLine } from 'react-icons/ri';
 import Calendar from '../../assets/images/calender_image.png';
 import Key from '../../assets/images/key.png';
 import Invoice from '../../assets/images/invoice.png';
@@ -15,7 +14,7 @@ import Customer from '../../assets/images/customer.png';
 import React from 'react';
 import { LOGOUT } from '../Query/Login';
 import { useHistory } from 'react-router-dom';
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useLazyQuery } from '@apollo/client';
 import { UserLogout } from '../../redux/action/actions';
 import { successToast } from '../Toast/Toast';
@@ -25,6 +24,8 @@ const Homepage = () => {
     const item_class_name = 'item d-flex align-items-center gap-3 mt-3';
     const history = useHistory();
     const dispatch = useDispatch();
+
+    const userAccount = useSelector(state => state.user.account);
 
     const [logout] = useLazyQuery(LOGOUT, {
         fetchPolicy: "no-cache"
@@ -43,10 +44,16 @@ const Homepage = () => {
 
     return (
         <div className='homepage-container'>
-            <div className='sidebar d-flex justify-content-end flex-column'>
+            <div className='sidebar d-flex justify-content-between flex-column'>
+                <div className="account_name d-flex align-items-center gap-3">
+                    <FaUserAlt />
+                    <div>
+                        <span>{userAccount ? (String(userAccount.username)).toUpperCase() : ''}</span>
+                        <br />
+                        <span className='text'>{userAccount ? userAccount.group : ''}</span>
+                    </div>
+                </div>
                 <div className={item_class_name} onClick={handleLogout}><RxExit className='icon' /> <span>Đăng xuất</span></div>
-                <div className={item_class_name}><AiOutlineQuestionCircle className='icon' /> <span>Trợ giúp</span></div>
-                <div className={item_class_name}><RiInformationLine className='icon' /> <span>Giới thiệu</span></div>
             </div>
             <div className='content'>
                 <div className='title'>
@@ -122,15 +129,15 @@ const Homepage = () => {
                     </div>
                     <div className='item right-content'>
                         <div className='top-left'>
-                            <div className='left section d-flex flex-column p-2'>
+                            {/* <div className='left section d-flex flex-column p-2'>
                                 <div className='image-box d-flex flex-column justify-content-center align-items-center'>
                                     <div className='image'>
                                         <img src={Invoice} alt='' />
                                     </div>
                                 </div>
                                 <span className='text-title'>Quản Lý Hóa Đơn</span>
-                            </div>
-                            <div className='right section d-flex flex-column p-2' onClick={() => history.push('/service-management')}>
+                            </div> */}
+                            <div className='one-box section d-flex flex-column p-2' onClick={() => history.push('/service-management')}>
                                 <div className='image-box d-flex flex-column justify-content-center align-items-center'>
                                     <div className='image'>
                                         <img src={Dish} alt='' />
