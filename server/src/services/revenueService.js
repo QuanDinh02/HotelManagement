@@ -1,15 +1,13 @@
 const db = require('../models/index.js');
-const { Op } = require("sequelize");
-const _ = require('lodash');
-
+const _ =  require('lodash');
 const checkMonthYear = (date, month, year) => {
-    let arr = date.split('/');
+    let arr = date.split('-');
     if (arr.length === 3) {
         if (month !== 0 && year !== 0) {
-            return +arr[1] === month && +arr[2] === year;
+            return +arr[1] === month && +arr[0] === year;
         }
         else if (year !== 0) {
-            return +arr[2] === year;
+            return +arr[0] === year;
         } else {
             return false;
         }

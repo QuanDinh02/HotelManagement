@@ -315,13 +315,13 @@ const ReceiveRoom = () => {
                             <div className='row mt-1 px-4'>
                                 <div className='form-group col-6'>
                                     <label className='form-label'>Ngày nhận:</label>
-                                    <input type='text' className='form-control' disabled={!editAllowance} value={bookRoomInfo?.receive_date ? bookRoomInfo.receive_date : ''}
+                                    <input type='date' className='form-control' disabled={!editAllowance} value={bookRoomInfo?.receive_date ? bookRoomInfo.receive_date : ''}
                                         onChange={(event) => handleOnChange('receive_date', event.target.value)}
                                     />
                                 </div>
                                 <div className='form-group col-6'>
                                     <label className='form-label'>Ngày trả:</label>
-                                    <input type='text' className='form-control' disabled={!editAllowance} value={bookRoomInfo?.checkOut_date ? bookRoomInfo.checkOut_date : ''}
+                                    <input type='date' min={bookRoomInfo?.receive_date} className='form-control' disabled={!editAllowance} value={bookRoomInfo?.checkOut_date ? bookRoomInfo.checkOut_date : ''}
                                         onChange={(event) => handleOnChange('checkOut_date', event.target.value)}
                                     />
                                 </div>

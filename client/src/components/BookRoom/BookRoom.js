@@ -328,14 +328,14 @@ const BookRoom = () => {
                                 </div>
                                 <div className='form-group col-4'>
                                     <label className='form-label'>Ngày nhận phòng:</label>
-                                    <input type='text' className='form-control' placeholder='Vd: 12/03/2022'
+                                    <input type='date' className='form-control' placeholder='Vd: 12/03/2022'
                                         value={bookRoomInfo.receive_date}
                                         onChange={(event) => handleBookRoomInfo('receive_date', event.target.value)}
                                     />
                                 </div>
                                 <div className='form-group col-4'>
                                     <label className='form-label'>Ngày trả phòng:</label>
-                                    <input type='text' className='form-control' placeholder='Vd: 12/03/2022'
+                                    <input type='date' min={bookRoomInfo.receive_date} className='form-control' placeholder='Vd: 12/03/2022'
                                         value={bookRoomInfo.checkOut_date}
                                         onChange={(event) => handleBookRoomInfo('checkOut_date', event.target.value)}
                                     />
@@ -346,13 +346,13 @@ const BookRoom = () => {
                             <legend className='reset legend-text'>
                                 {newCustomer ? <span>Thông tin khách hàng mới</span> : <span>Thông tin khách hàng cũ</span>}
                             </legend>
-                            <div className='d-flex justify-content-end gap-2 mb-4'>
-                                <span className='badge text-bg-success btn' onClick={() => setNewCustomer(true)}>New Customer</span>
-                                <span className='badge text-bg-warning btn' onClick={() => setNewCustomer(false)}>Old Customer</span>
+                            <div className='customer-type d-flex justify-content-between gap-1 mb-4'>
+                                <span className={newCustomer ? 'active-btn type-btn text-center w-50' : 'type-btn text-center w-50'} onClick={() => setNewCustomer(true)}>New Customer</span>
+                                <span className={newCustomer ? 'type-btn text-center w-50': 'active-btn type-btn text-center w-50'} onClick={() => setNewCustomer(false)}>Old Customer</span>
                             </div>
                             {
                                 newCustomer ?
-                                    <>
+                                    <div className='new-customer-info'>
                                         <div className='row mb-2'>
                                             <div className='form-group col-6'>
                                                 <label className='form-label'>Họ và Tên: <span className='required'>(*)</span></label>
@@ -434,10 +434,10 @@ const BookRoom = () => {
                                                 </select>
                                             </div>
                                         </div>
-                                    </>
+                                    </div>
 
                                     :
-                                    <>
+                                    <div className='old-customer-info'>
                                         <div className='row mb-2'>
                                             <div className='form-group col-6'>
                                                 <label className='form-label'>Họ và Tên:</label>
@@ -454,7 +454,7 @@ const BookRoom = () => {
                                                 />
                                             </div>
                                         </div>
-                                    </>
+                                    </div>
                             }
                         </fieldset>
                         <fieldset className='last-confirm-form border rounded-2 p-2'>

@@ -178,13 +178,13 @@ const BookRoomDetail = (props) => {
                             </div>
                             <div className='form-group mt-2'>
                                 <label className='form-label'>Ngày nhận:</label>
-                                <input type='text' className='form-control' value={bookRoomInfo?.receive_date ? bookRoomInfo.receive_date : ''} disabled={!editAllowance}
+                                <input type='date' className='form-control' value={bookRoomInfo?.receive_date ? bookRoomInfo.receive_date : ''} disabled={!editAllowance}
                                     onChange={(event) => handleOnChange('receive_date', event.target.value)}
                                 />
                             </div>
                             <div className='form-group mt-2'>
                                 <label className='form-label'>Ngày trả:</label>
-                                <input type='text' className='form-control' value={bookRoomInfo?.checkOut_date ? bookRoomInfo.checkOut_date : ''} disabled={!editAllowance}
+                                <input type='date' min={bookRoomInfo?.receive_date} className='form-control' value={bookRoomInfo?.checkOut_date ? bookRoomInfo.checkOut_date : ''} disabled={!editAllowance}
                                     onChange={(event) => handleOnChange('checkOut_date', event.target.value)}
                                 />
                             </div>

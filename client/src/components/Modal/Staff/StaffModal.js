@@ -155,7 +155,7 @@ const StaffModal = (props) => {
                             <div className='row-info d-flex gap-4 mb-2'>
                                 <div className='form-group left'>
                                     <label className='form-label'>Ngày sinh: <span className='required'>(*)</span></label>
-                                    <input type='text' className='form-control' value={newStaff.dob}
+                                    <input type='date' className='form-control' value={newStaff.dob}
                                         onChange={(event) => handleOnChange('dob', event.target.value)}
                                     />
                                 </div>

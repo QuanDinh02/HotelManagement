@@ -91,6 +91,26 @@ $legend-text-size: 1.125rem;
                 box-shadow  : 0 0 0 0.01rem $main-color;
             }
 
+            .third-form {
+                .customer-type {
+                    color: black;
+                    
+                    .type-btn {
+                        padding: 8px 16px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        border: 1px solid rgb(174, 174, 174);
+                    }
+
+                    .active-btn {
+                        background-color: $main-color;
+                        color: white;
+                        border: 1px solid $main-color;
+                        transition: 0.25s;
+                    }
+                }
+            }
+
             .last-confirm-form {
                 flex-grow: 1;
 

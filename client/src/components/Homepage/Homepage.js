@@ -3,7 +3,6 @@ import { FaUserAlt } from 'react-icons/fa';
 import { RxExit } from 'react-icons/rx';
 import Calendar from '../../assets/images/calender_image.png';
 import Key from '../../assets/images/key.png';
-import Invoice from '../../assets/images/invoice.png';
 import Dish from '../../assets/images/dish.png';
 import Revenue from '../../assets/images/revenue.png';
 import Room from '../../assets/images/room.png';
@@ -24,7 +23,7 @@ const Homepage = () => {
     const item_class_name = 'item d-flex align-items-center gap-3 mt-3';
     const history = useHistory();
     const dispatch = useDispatch();
-
+    const [logOut, setLogOut] = React.useState(false);
     const userAccount = useSelector(state => state.user.account);
 
     const [logout] = useLazyQuery(LOGOUT, {
@@ -34,6 +33,7 @@ const Homepage = () => {
     const handleLogout = async () => {
         let { data: { userLogout } } = await logout();
         if (userLogout && userLogout?.errorCode === 0) {
+            setLogOut(true);
             successToast(userLogout.message);
             dispatch(UserLogout());
             setTimeout(() => {
@@ -46,12 +46,16 @@ const Homepage = () => {
         <div className='homepage-container'>
             <div className='sidebar d-flex justify-content-between flex-column'>
                 <div className="account_name d-flex align-items-center gap-3">
-                    <FaUserAlt />
-                    <div>
-                        <span>{userAccount ? (String(userAccount.username)).toUpperCase() : ''}</span>
-                        <br />
-                        <span className='text'>{userAccount ? userAccount.group : ''}</span>
-                    </div>
+                    {!logOut &&
+                        <>
+                            <FaUserAlt />
+                            <div>
+                                <span>{userAccount ? (String(userAccount?.username)).toUpperCase() : ''}</span>
+                                <br />
+                                <span className='text'>{userAccount ? userAccount?.group : ''}</span>
+                            </div>
+                        </>
+                    }
                 </div>
                 <div className={item_class_name} onClick={handleLogout}><RxExit className='icon' /> <span>Đăng xuất</span></div>
             </div>
@@ -59,101 +63,79 @@ const Homepage = () => {
                 <div className='title'>
                     <span>Quản Lý Khách Sạn</span>
                 </div>
-                <hr className='mb-4' />
+                <hr className='mb-4 w-100' />
                 <div className='main'>
-                    <div className='item left-content'>
-                        <div className='top-left'>
-                            <div className='left section d-flex flex-column p-2' onClick={() => history.push('/book-room')}>
-                                <div className='image-box d-flex flex-column justify-content-center'>
-                                    <div>
-                                        <img src={Calendar} alt='' />
-                                    </div>
-                                </div>
-                                <span className='text-title'>Đặt Phòng</span>
-                            </div>
-                            <div className='right section d-flex flex-column p-2' onClick={() => history.push('/receive-room')}>
-                                <div className='image-box d-flex flex-column justify-content-center align-items-center'>
-                                    <div className='image'>
-                                        <img src={Key} alt='' />
-                                    </div>
-                                </div>
-                                <span className='text-title'>Nhận Phòng</span>
+                    <div className='item' onClick={() => history.push('/book-room')}> 
+                        <div>
+                            <div className='img-box'>
+                                <img src={Calendar} alt='' />
                             </div>
                         </div>
-                        <div className='bottom-left section d-flex flex-column p-2' onClick={() => history.push('/service-using-payment')}>
-                            <div className='image-box d-flex justify-content-center align-items-center'>
-                                <div className='image'>
-                                    <img src={Payment} alt='' />
-                                </div>
-                            </div>
-                            <span className='text-title'>Sử Dụng Dịch Vụ và Thanh Toán</span>
-                        </div>
+                        <span className='text-title'>Đặt Phòng</span>
                     </div>
-                    <div className='item center-content'>
-                        <div className='top-left'>
-                            <div className='top section d-flex flex-column p-2' onClick={() => history.push('/revenue-report')}>
-                                <div className='image-box d-flex justify-content-center'>
-                                    <div className='image'>
-                                        <img src={Revenue} alt='' />
-                                    </div>
-                                </div>
-                                <span className='text-title'>Thống kê doanh thu</span>
-                            </div>
-                            <div className='bottom'>
-                                <div className='left section d-flex flex-column p-2' onClick={() => history.push('/room-management')}>
-                                    <div className='image-box d-flex justify-content-center align-items-center'>
-                                        <div className='image'>
-                                            <img src={Room} alt='' />
-                                        </div>
-                                    </div>
-                                    <span className='text-title'>Quản Lý Phòng</span>
-                                </div>
-                                <div className='right section d-flex flex-column p-2' onClick={() => history.push('/staff-management')}>
-                                    <div className='image-box d-flex justify-content-center align-items-center'>
-                                        <div className='staff-image'>
-                                            <img src={Staff} alt='' />
-                                        </div>
-                                    </div>
-                                    <span className='text-title'>Quản Lý Nhân Viên</span>
-                                </div>
+                    <div className='item' onClick={() => history.push('/receive-room')}>
+                        <div>
+                            <div className='img-box'>
+                                <img src={Key} alt='' />
                             </div>
                         </div>
-                        <div className='bottom-left section d-flex flex-column p-2' onClick={() => history.push('/customer-management')}>
-                            <div className='image-box d-flex justify-content-center align-items-center'>
-                                <div className='image'>
-                                    <img src={Customer} alt='' />
-                                </div>
-                            </div>
-                            <span className='text-title'>Quản Lý Khách Hàng</span>
-                        </div>
+                        <span className='text-title'>Nhận Phòng</span>
                     </div>
-                    <div className='item right-content'>
-                        <div className='top-left'>
-                            {/* <div className='left section d-flex flex-column p-2'>
-                                <div className='image-box d-flex flex-column justify-content-center align-items-center'>
-                                    <div className='image'>
-                                        <img src={Invoice} alt='' />
-                                    </div>
-                                </div>
-                                <span className='text-title'>Quản Lý Hóa Đơn</span>
-                            </div> */}
-                            <div className='one-box section d-flex flex-column p-2' onClick={() => history.push('/service-management')}>
-                                <div className='image-box d-flex flex-column justify-content-center align-items-center'>
-                                    <div className='image'>
-                                        <img src={Dish} alt='' />
-                                    </div>
-                                </div>
-                                <span className='text-title'>Quản Lý Dịch Vụ</span>
+                    <div className='item' onClick={() => history.push('/service-using-payment')}>
+                        <div>
+                            <div className='img-box'>
+                                <img src={Payment} alt='' />
                             </div>
                         </div>
-                        <div className='bottom-left section d-flex flex-column p-2' onClick={() => history.push('/regulation-management')}>
-                            <div className='image-box d-flex justify-content-center align-items-center'>
-                                <div className='image'>
-                                    <img src={Policy} alt='' />
-                                </div>
+                        <span className='text-title'>Sử Dụng Dịch Vụ và Thanh Toán</span>
+                    </div>
+                    <div className='item' onClick={() => history.push('/revenue-report')}>
+                        <div>
+                            <div className='img-box'>
+                                <img src={Revenue} alt='' />
                             </div>
-                            <span className='text-title'>Quy Định</span>
                         </div>
+                        <span className='text-title'>Thống kê doanh thu</span>
+                    </div>
+                    <div className='item' onClick={() => history.push('/room-management')}>
+                        <div>
+                            <div className='img-box'>
+                                <img src={Room} alt='' />
+                            </div>
+                        </div>
+                        <span className='text-title'>Quản Lý Phòng</span>
+                    </div>
+                    <div className='item' onClick={() => history.push('/staff-management')}>
+                        <div>
+                            <div className='img-box'> 
+                                <img src={Staff} alt='' />
+                            </div>
+                        </div>
+                        <span className='text-title'>Quản Lý Nhân Viên</span>
+                    </div>
+                    <div className='item' onClick={() => history.push('/customer-management')}>
+                        <div>
+                            <div className='img-box'>
+                                <img src={Customer} alt='' />
+                            </div>
+                        </div>
+                        <span className='text-title'>Quản Lý Khách Hàng</span>
+                    </div>
+                    <div className='item' onClick={() => history.push('/service-management')}>
+                        <div>
+                            <div className='img-box'>
+                                <img src={Dish} alt='' />
+                            </div>
+                        </div>
+                        <span className='text-title'>Quản Lý Dịch Vụ</span>
+                    </div>
+                    <div className='item' onClick={() => history.push('/regulation-management')}>
+                        <div>
+                            <div className='img-box'>
+                                <img src={Policy} alt='' />
+                            </div>
+                        </div>
+                        <span className='text-title'>Quy Định</span>
                     </div>
                 </div>
             </div>

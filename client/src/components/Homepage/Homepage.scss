@@ -9,8 +9,7 @@ $light-color-1: #d8874d;
         flex-basis      : 15%;
         height          : 100vh;
         background-color: $main-color;
-
-        color: white;
+        color           : white;
 
         .account_name {
             padding      : 0.3rem;
@@ -20,7 +19,7 @@ $light-color-1: #d8874d;
 
             .text {
                 font-size: 0.75rem;
-                color: yellow;
+                color    : yellow;
             }
         }
 
@@ -47,6 +46,7 @@ $light-color-1: #d8874d;
     .content {
         flex-basis: 85%;
         padding   : 1rem 2rem;
+        overflow-y: scroll;
 
         .title {
             font-size: 26px;
@@ -54,181 +54,36 @@ $light-color-1: #d8874d;
         }
 
         .main {
-            display        : flex;
-            justify-content: space-between;
+            height               : 100%;
+            display              : grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            column-gap           : 50px;
+            row-gap              : 50px;
 
             .item {
-                flex-basis     : 30%;
-                height         : 75vh;
-                display        : flex;
-                flex-direction : column;
-                justify-content: space-between;
+                display         : flex;
+                flex-direction  : column;
+                gap             : 20px;
+                justify-content : center;
+                border-radius   : 5px;
+                background-color: $light-color-1;
 
-                .top-left {
-                    height: 60%;
+                img {
+                    width : 25%;
+                    height: 25%;
                 }
 
-                .bottom-left {
-                    height: 30%;
+                .img-box {
+                    display        : flex;
+                    justify-content: center;
                 }
 
                 .text-title {
+                    text-align : center;
                     color      : white;
                     font-weight: 600;
                 }
-            }
 
-            .left-content,
-            .right-content {
-                .top-left {
-                    display        : flex;
-                    justify-content: space-between;
-
-                    .left,
-                    .right {
-                        flex-basis: 48%;
-                    }
-
-                    .one-box {
-                        background-color: $light-color-1;
-                        width           : 100%;
-
-                        .image-box {
-                            flex-grow: 1;
-
-                            .image {
-                                width: 32%;
-                            }
-
-                            img {
-                                width : 100%;
-                                height: 100%;
-                            }
-                        }
-                    }
-
-                    .left,
-                    .right {
-                        background-color: $light-color-1;
-
-                        .image-box {
-                            flex-grow: 1;
-
-                            .image {
-                                width: 55%;
-                            }
-
-                            img {
-                                width : 100%;
-                                height: 100%;
-                            }
-                        }
-
-                    }
-                }
-
-                .bottom-left {
-                    background-color: $light-color-1;
-
-                    .image-box {
-                        flex-grow: 1;
-
-                        .image {
-                            width: 25%;
-                        }
-
-                        img {
-                            width : 100%;
-                            height: 100%;
-                        }
-                    }
-                }
-            }
-
-            .center-content {
-                .top-left {
-                    display        : flex;
-                    flex-direction : column;
-                    justify-content: space-between;
-
-                    .top,
-                    .bottom {
-                        flex-basis: 48%;
-                    }
-
-                    .bottom {
-                        flex-basis: 48%;
-
-                        display        : flex;
-                        justify-content: space-between;
-
-                        .left,
-                        .right {
-                            flex-basis: 48%;
-                        }
-
-                        .left,
-                        .right {
-                            background-color: $light-color-1;
-
-                            .image-box {
-                                flex-grow: 1;
-
-                                .image {
-                                    width : 30%;
-                                    height: 80%;
-                                }
-
-                                .staff-image {
-                                    width : 40%;
-                                    height: 70%;
-                                }
-
-                                img {
-                                    width : 100%;
-                                    height: 100%;
-                                }
-                            }
-                        }
-                    }
-
-                    .top {
-                        background-color: $light-color-1;
-
-                        .image-box {
-                            flex-grow: 1;
-
-                            .image {
-                                width: 25%;
-                            }
-
-                            img {
-                                width : 100%;
-                                height: 100%;
-                            }
-                        }
-                    }
-                }
-
-                .bottom-left {
-                    background-color: $light-color-1;
-
-                    .image-box {
-                        flex-grow: 1;
-
-                        .image {
-                            width: 25%;
-                        }
-
-                        img {
-                            width : 100%;
-                            height: 100%;
-                        }
-                    }
-                }
-            }
-
-            .section {
                 &:hover {
                     cursor    : pointer;
                     transform : scale(1.02);

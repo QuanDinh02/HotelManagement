@@ -231,7 +231,7 @@ const StaffManagement = () => {
                                 </div>
                                 <div className='form-group col-12 px-4 mt-1'>
                                     <label className='form-label'>Ngày sinh:</label>
-                                    <input type='text' className='form-control' disabled={!editAllowance} value={editStaff?.dob ? editStaff.dob : ''}
+                                    <input type='date' className='form-control' disabled={!editAllowance} value={editStaff?.dob ? editStaff.dob : ''}
                                         onChange={(event) => handleEditStaff('dob', event.target.value)}
                                     />
                                 </div>
